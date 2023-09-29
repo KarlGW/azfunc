@@ -19,7 +19,7 @@ type Output struct {
 	ReturnValue any
 }
 
-// JSON returns the JSON encoding of a Binding.
+// JSON returns the JSON encoding of Output.
 func (r Output) JSON() []byte {
 	b, _ := json.MarshalIndent(r, "", "  ")
 	return b
