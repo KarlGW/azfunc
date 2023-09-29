@@ -13,9 +13,9 @@ type trigger interface {
 	Data() []byte
 }
 
-// Input represents an incoming request (trigger) from the
+// Trigger represents an incoming request (trigger) from the
 // Azure Function Host.
-type Input[T trigger] struct {
+type Trigger[T trigger] struct {
 	Data     map[string]T
 	Metadata map[string]any
 	d        []byte
@@ -24,7 +24,7 @@ type Input[T trigger] struct {
 
 // Parse is used to parse the data contained in a trigger into
 // the provided struct.
-func (t Input[T]) Parse(v any) error {
+func (t Trigger[T]) Parse(v any) error {
 	return json.Unmarshal(t.d, &v)
 }
 
@@ -33,7 +33,7 @@ func (t Input[T]) Parse(v any) error {
 type HTTPTrigger struct {
 	URL     string `json:"Url"`
 	Method  string
-	Body    []byte
+	Body    json.RawMessage
 	Headers http.Header
 	Params  map[string]string
 	Query   map[string]string
@@ -55,20 +55,22 @@ func (t GenericTrigger) Data() []byte {
 	return t.RawMessage
 }
 
-// TriggerOption[T] is function that sets option on a Input[T]
-type TriggerOption[T trigger] func(*Input[T])
+// TriggerOption[T] is function that sets option on a Trigger[T]
+type TriggerOption[T trigger] func(*Trigger[T])
 
 // WithName sets the trigger name get data from. The name should
 // match the incoming trigger (binding) name in function.json.
 func WithName[T trigger](name string) TriggerOption[T] {
-	return func(t *Input[T]) {
-		t.n = name
+	return func(t *Trigger[T]) {
+		if _, ok := t.Data[name]; ok {
+
+		}
 	}
 }
 
-// NewInput handles a request from the Function host and returns a Input[T].
-func NewInput[T trigger](r *http.Request, options ...TriggerOption[T]) (Input[T], error) {
-	t := Input[T]{
+// NewTrigger handles a request from the Function host and returns a Trigger[T].
+func NewTrigger[T trigger](r *http.Request, options ...TriggerOption[T]) (Trigger[T], error) {
+	t := Trigger[T]{
 		n: "req",
 	}
 	for _, option := range options {
@@ -76,12 +78,12 @@ func NewInput[T trigger](r *http.Request, options ...TriggerOption[T]) (Input[T]
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return Input[T]{}, err
+		return Trigger[T]{}, err
 	}
 
 	d, ok := t.Data[t.n]
 	if !ok {
-		return Input[T]{}, errors.New("name incorrect")
+		return Trigger[T]{}, errors.New("name incorrect")
 	}
 	t.d = d.Data()
 	return t, nil
@@ -97,10 +99,12 @@ type QueueTrigger = GenericTrigger
 // or pass it on to the next handler as an ordinarily formatted
 // *http.Request.
 func RequestFrom(r *http.Request) (*http.Request, error) {
-	input, err := NewInput[HTTPTrigger](r)
+	input, err := NewTrigger[HTTPTrigger](r)
 	if err != nil {
 		return nil, err
 	}
+
+	// If "req" exists, it's an HTTP trigger.
 	data, ok := input.Data["req"]
 	if !ok {
 		return nil, errors.New("not an HTTP trigger")
@@ -126,5 +130,11 @@ func RequestFrom(r *http.Request) (*http.Request, error) {
 		body = bytes.NewBuffer(data.Body)
 	}
 
-	return http.NewRequest(data.Method, u.String(), body)
+	req, err := http.NewRequest(data.Method, u.String(), body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = data.Headers
+
+	return req, nil
 }
