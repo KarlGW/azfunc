@@ -26,4 +26,4 @@ If you are developing a Function that will only handle incoming and outgoing HTT
 }
 ```
 
-That enbables you to develop it like any HTTP server/handler.
+This enbables you to develop it like any HTTP server/handler.
