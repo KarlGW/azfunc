@@ -39,7 +39,7 @@ If developing a Function that will only handle incoming and outgoing HTTP (one H
 }
 ```
 
-This enbables the function to be developed like any HTTP server/handler.
+This enables the function to be developed like any HTTP server/handler.
 **Note**: This is not suitable if a non HTTP output binding, or multiple output bindings are used.
 
 ## Install
