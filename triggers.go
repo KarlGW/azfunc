@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 var (
@@ -22,30 +21,14 @@ var (
 	ErrTriggerPayloadMalformed = errors.New("trigger payload malformed")
 )
 
-// RawMessage is a type based on json.RawMessage with a custom UnmarshalJSON
-// method to handle escaped JSON.
-type RawMessage json.RawMessage
-
-// UnmarshalJSON satisfies json.Unmarshaler and unquotes the incoming
-// data. If it cannot be unquoted it's assumed it is not unquoted.
-func (r *RawMessage) UnmarshalJSON(b []byte) error {
-	unquoted, err := strconv.Unquote(string(b))
-	if err == nil {
-		*r = RawMessage(unquoted)
-		return nil
-	}
-	*r = RawMessage(b)
-	return nil
-}
-
 // trigger is the interface that wraps around method Data.
-type trigger interface {
+type Triggerable interface {
 	Data() []byte
 }
 
 // Trigger represents an incoming request (trigger) from the
 // Azure Function Host.
-type Trigger[T trigger] struct {
+type Trigger[T Triggerable] struct {
 	Payload  map[string]T `json:"Data"`
 	Metadata map[string]any
 	d        []byte
@@ -113,7 +96,7 @@ func WithName(name string) TriggerOption {
 }
 
 // NewTrigger handles a request from the Function host and returns a Trigger[T].
-func NewTrigger[T trigger](r *http.Request, options ...TriggerOption) (Trigger[T], error) {
+func NewTrigger[T Triggerable](r *http.Request, options ...TriggerOption) (Trigger[T], error) {
 	opts := TriggerOptions{}
 	for _, option := range options {
 		option(&opts)
@@ -173,7 +156,7 @@ func NewRequest(r *http.Request) (*http.Request, error) {
 
 // Parse the incoming Function host request (trigger) and set
 // the data to the provided value.
-func Parse[T trigger](r *http.Request, v any, options ...TriggerOption) error {
+func Parse[T Triggerable](r *http.Request, v any, options ...TriggerOption) error {
 	trigger, err := NewTrigger[T](r, options...)
 	if err != nil {
 		return err
@@ -183,7 +166,7 @@ func Parse[T trigger](r *http.Request, v any, options ...TriggerOption) error {
 
 // Data returns the data from the incoming Function host
 // request (trigger).
-func Data[T trigger](r *http.Request, options ...TriggerOption) ([]byte, error) {
+func Data[T Triggerable](r *http.Request, options ...TriggerOption) ([]byte, error) {
 	trigger, err := NewTrigger[T](r, options...)
 	if err != nil {
 		return nil, err
