@@ -64,10 +64,10 @@ This module support for the following trigger types:
 * `GenericTrigger`
 * `QueueTrigger` (alias for `GenericTrigger`, to provide clarity and intention of the trigger)
 
-Custom defined trigger types can be used as long as the implement the `trigger` interface:
+Custom defined trigger types can be used as long as the implement the `Triggerable` interface:
 
 ```go
-type trigger interface {
+type Triggerable interface {
     Data() []byte
 }
 ```
