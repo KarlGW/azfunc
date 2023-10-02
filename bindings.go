@@ -7,28 +7,86 @@ import (
 	"strings"
 )
 
-// binding is the interface that wraps around method Name.
-type binding interface {
+// Bindable is the interface that wraps around method Name.
+type Bindable interface {
 	Name() string
 }
 
 // Output represents an outgoing response to the Functuon Host.
 type Output struct {
-	Outputs     map[string]binding
+	Outputs     map[string]Bindable
 	Logs        []string
 	ReturnValue any
 }
 
 // JSON returns the JSON encoding of Output.
-func (r Output) JSON() []byte {
-	b, _ := json.MarshalIndent(r, "", "  ")
+func (o Output) JSON() []byte {
+	b, _ := json.Marshal(o)
 	return b
+}
+
+// AddBinding one or more bindings to Output.
+func (o *Output) AddBinding(bindings ...Bindable) {
+	if o.Outputs == nil {
+		o.Outputs = make(map[string]Bindable, len(bindings))
+	}
+
+	for _, binding := range bindings {
+		o.Outputs[binding.Name()] = binding
+	}
+}
+
+// Log adds a message to the Logs of Output.
+func (o *Output) Log(msg string) {
+	if o.Logs == nil {
+		o.Logs = make([]string, 0)
+	}
+	o.Logs = append(o.Logs, msg)
+}
+
+// SetReturnValue sets ReturnValue of Output.
+func (o *Output) SetReturnValue(v any) {
+	o.ReturnValue = v
+}
+
+// OutputOptions contains options for creating a new
+// Output.
+type OutputOptions struct {
+	Bindings    []Bindable
+	Logs        []string
+	ReturnValue any
+}
+
+// Output option is a function that sets OutputOptions.
+type OutputOption func(o *OutputOptions)
+
+// NewOutput creates a new Output containing binding to be used for creating
+// the response back to the Function host.
+func NewOutput(options ...OutputOption) Output {
+	opts := OutputOptions{}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	var logs []string
+	if len(opts.Logs) > 0 {
+		logs = make([]string, len(opts.Logs))
+		copy(logs, opts.Logs)
+	}
+
+	output := Output{
+		Logs:        logs,
+		ReturnValue: opts.ReturnValue,
+	}
+	output.AddBinding(opts.Bindings...)
+
+	return output
 }
 
 // HTTPBinding represents an HTTP output binding.
 type HTTPBinding struct {
 	StatusCode string            `json:"statusCode"`
-	Body       string            `json:"body"`
+	Body       RawMessage        `json:"body"`
 	Headers    map[string]string `json:"headers"`
 }
 
@@ -48,19 +106,16 @@ func NewHTTPBinding(statusCode int, body []byte, header ...http.Header) HTTPBind
 	}
 	return HTTPBinding{
 		StatusCode: strconv.Itoa(statusCode),
-		Body:       string(body),
+		Body:       body,
 		Headers:    hdr,
 	}
 }
-
-// Data is the data contained in a generic binding.
-type Data []byte
 
 // GenericBinding represents a generic Function App trigger. With custom handlers
 // all bindings that are not HTTP output bindings share the same data structure.
 type GenericBinding struct {
 	name string
-	Data
+	RawMessage
 }
 
 // Name returns the name of the binding.
@@ -68,26 +123,25 @@ func (b GenericBinding) Name() string {
 	return b.name
 }
 
+// MarshalJSON satisfies json.Marshaler and returns the content
+// of embedded RawMessage as JSON without the key.
+func (b GenericBinding) MarshalJSON() ([]byte, error) {
+	var js json.RawMessage
+	if err := json.Unmarshal(b.RawMessage, &js); err == nil {
+		return []byte(strconv.Quote(string(b.RawMessage))), nil
+	}
+	return b.RawMessage, nil
+}
+
 // NewGenericBinding creates a new generic output binding.
-func NewGenericBinding(name string, data Data) GenericBinding {
+func NewGenericBinding(name string, data []byte) GenericBinding {
 	return GenericBinding{
-		name: name,
-		Data: data,
+		name:       name,
+		RawMessage: data,
 	}
 }
 
-// NewOutput creates a new Output containing binding to be used for creating
-// the response back to the Function host.
-func NewOutput(bindings ...binding) (Output, error) {
-	outputs := make(map[string]binding, len(bindings))
-	for _, binding := range bindings {
-		outputs[binding.Name()] = binding
-	}
-
-	return Output{
-		Outputs: outputs,
-	}, nil
-}
+// Binding aliases.
 
 // QueueBinding represents a Function App Queue Binding and contains
 // the outgoing queue message data.
