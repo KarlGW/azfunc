@@ -25,8 +25,8 @@ func (o Output) JSON() []byte {
 	return b
 }
 
-// AddBinding one or more bindings to Output.
-func (o *Output) AddBinding(bindings ...Bindable) {
+// AddBindings one or more bindings to Output.
+func (o *Output) AddBindings(bindings ...Bindable) {
 	if o.Outputs == nil {
 		o.Outputs = make(map[string]Bindable, len(bindings))
 	}
@@ -60,6 +60,13 @@ type OutputOptions struct {
 // Output option is a function that sets OutputOptions.
 type OutputOption func(o *OutputOptions)
 
+// WithBindings add one or more bindings to OutputOptions
+func WithBindings(bindings ...Bindable) OutputOption {
+	return func(o *OutputOptions) {
+		o.Bindings = bindings
+	}
+}
+
 // NewOutput creates a new Output containing binding to be used for creating
 // the response back to the Function host.
 func NewOutput(options ...OutputOption) Output {
@@ -78,7 +85,7 @@ func NewOutput(options ...OutputOption) Output {
 		Logs:        logs,
 		ReturnValue: opts.ReturnValue,
 	}
-	output.AddBinding(opts.Bindings...)
+	output.AddBindings(opts.Bindings...)
 
 	return output
 }
