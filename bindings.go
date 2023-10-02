@@ -123,16 +123,6 @@ func (b GenericBinding) Name() string {
 	return b.name
 }
 
-// MarshalJSON satisfies json.Marshaler and returns the content
-// of embedded RawMessage as JSON without the key.
-func (b GenericBinding) MarshalJSON() ([]byte, error) {
-	var js json.RawMessage
-	if err := json.Unmarshal(b.RawMessage, &js); err == nil {
-		return []byte(strconv.Quote(string(b.RawMessage))), nil
-	}
-	return b.RawMessage, nil
-}
-
 // NewGenericBinding creates a new generic output binding.
 func NewGenericBinding(name string, data []byte) GenericBinding {
 	return GenericBinding{
