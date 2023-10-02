@@ -19,6 +19,7 @@ func (r *RawMessage) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	*r = RawMessage(b)
+
 	return nil
 }
 
