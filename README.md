@@ -9,6 +9,8 @@ The purpose of this module is to provide functions and structures that helps wit
 * [Install](#install)
 * [Usage](#usage)
   * [Triggers (input bindings)](#triggers-input-bindings)
+  * [Outputs (output bindings)](#output-output-bindings)
+* [Roadmap](#roadmap)
 
 ## Why use this module?
 
@@ -58,13 +60,13 @@ go get github.com/KarlGW/azfunc
 
 An Azure Function can have one and only one trigger. This module provides a couple of ways to handle the incoming trigger requests, suitable for different purposes.
 
-This module support for the following trigger types:
+The following triggers are supported:
 
 * `HTTPTrigger`
 * `GenericTrigger`
 * `QueueTrigger` (alias for `GenericTrigger`, to provide clarity and intention of the trigger)
 
-Custom defined trigger types can be used as long as the implement the `Triggerable` interface:
+Custom defined trigger types can be used as long as they satisfy the `Triggerable` interface:
 
 ```go
 type Triggerable interface {
@@ -234,3 +236,94 @@ func main() {
     log.Fatalln(http.ListenAndServe(":"+port, r))
 }
 ```
+
+### Output (output bindings)
+
+An Azure Function can have multiple output bindings. This module
+provides the `Output` struct to handle all outputs to the Function host.
+
+The following output bindings are supported:
+
+* `HTTPBinding`
+* `GenericBinding`
+* `QueueBinding` (alias for `GenericBinding`, to provide clarity and intention of the binding)
+
+Custom defined binding types can be used as long as they satisfy the
+`Bindable` interface:
+
+```go
+type Bindable interface {
+    Name() string
+}
+```
+
+#### Example
+
+```go
+package main
+
+import (
+    "github.com/KarlGW/azfunc"
+)
+
+// Request handler for Function "helloHTTP" that handles
+// HTTP trigger requests. This will parse the body of
+// the incoming HTTP request into "customType" (assuming)
+// is is valid JSON. Together with an HTTP and Queue output binding.
+func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
+    // Parse the incoming request.
+
+    // Create output.
+    output := azfunc.NewOutput(
+        WithBindings(
+            NewHTTPBinding(http.StatusOk, []byte(`{"message":"hello world"}`)),
+            NewQueueBinding("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+        )
+    )
+
+    // All custom handlers regardless of output binding type
+    // must set Content-Type: application/json to the response
+    // to the Function host, followed by the data.
+    w.Header.Set("Content-Type", "application/json")
+    w.Write(output.JSON())
+}
+```
+
+Bindings can also be added after the output is created:
+
+```go
+package main
+
+import (
+    "github.com/KarlGW/azfunc"
+)
+
+// Request handler for Function "helloHTTP" that handles
+// HTTP trigger requests. This will parse the body of
+// the incoming HTTP request into "customType" (assuming)
+// is is valid JSON. Together with an HTTP and Queue output binding.
+func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
+    // Parse the incoming request.
+
+    // Create output.
+    output := azfunc.NewOutput()
+    // ...
+    // ...
+
+    // Can be added in their on subsequent calls.
+    output.AddBindings(
+        NewHTTPBinding(http.StatusOk, []byte(`{"message":"hello world"}`)),
+        NewQueueBinding("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+    )
+
+    // All custom handlers regardless of output binding type
+    // must set Content-Type: application/json to the response
+    // to the Function host, followed by the data.
+    w.Header.Set("Content-Type", "application/json")
+    w.Write(output.JSON())
+}
+```
+
+## Roadmap
+
+* Add better `Output` with bindings handling.
