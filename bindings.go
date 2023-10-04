@@ -93,7 +93,7 @@ func NewOutput(options ...OutputOption) Output {
 // HTTPBinding represents an HTTP output binding.
 type HTTPBinding struct {
 	StatusCode string            `json:"statusCode"`
-	Body       RawMessage        `json:"body"`
+	Body       Payload           `json:"body"`
 	Headers    map[string]string `json:"headers"`
 }
 
@@ -122,7 +122,7 @@ func NewHTTPBinding(statusCode int, body []byte, header ...http.Header) HTTPBind
 // all bindings that are not HTTP output bindings share the same data structure.
 type GenericBinding struct {
 	name string
-	RawMessage
+	Payload
 }
 
 // Name returns the name of the binding.
@@ -133,8 +133,8 @@ func (b GenericBinding) Name() string {
 // NewGenericBinding creates a new generic output binding.
 func NewGenericBinding(name string, data []byte) GenericBinding {
 	return GenericBinding{
-		name:       name,
-		RawMessage: data,
+		name:    name,
+		Payload: data,
 	}
 }
 

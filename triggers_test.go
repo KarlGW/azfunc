@@ -125,7 +125,7 @@ func TestGenericTrigger_Trigger(t *testing.T) {
 		}
 
 		want := GenericTrigger{
-			RawMessage: []byte(`{"message":"hello","number":2}`),
+			Payload: []byte(`{"message":"hello","number":2}`),
 		}
 
 		got := trigger.Trigger()
@@ -162,7 +162,7 @@ func TestNewTrigger_GenericTrigger(t *testing.T) {
 			want: Trigger[GenericTrigger]{
 				Payload: map[string]GenericTrigger{
 					"queue": {
-						RawMessage: []byte(`{"message":"hello","number":2}`),
+						Payload: []byte(`{"message":"hello","number":2}`),
 					},
 				},
 				Metadata: map[string]any{},
@@ -187,7 +187,7 @@ func TestNewTrigger_GenericTrigger(t *testing.T) {
 			want: Trigger[GenericTrigger]{
 				Payload: map[string]GenericTrigger{
 					"queue": {
-						RawMessage: []byte(`hello`),
+						Payload: []byte(`hello`),
 					},
 				},
 				Metadata: map[string]any{},

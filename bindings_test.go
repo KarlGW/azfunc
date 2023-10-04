@@ -37,7 +37,7 @@ func TestNewOutput(t *testing.T) {
 			want: Output{
 				Outputs: map[string]Bindable{
 					"res":   HTTPBinding{StatusCode: "200", Body: []byte(`{"message":"hello","number":2}`), Headers: map[string]string{"Content-Type": "application/json"}},
-					"queue": GenericBinding{name: "queue", RawMessage: []byte(`{"message":"hello","number":3}`)},
+					"queue": GenericBinding{name: "queue", Payload: []byte(`{"message":"hello","number":3}`)},
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
@@ -74,8 +74,8 @@ func TestOutput_JSON(t *testing.T) {
 						},
 					},
 					"queue": GenericBinding{
-						name:       "queue",
-						RawMessage: []byte(`{"message":"hello","number":3}`),
+						name:    "queue",
+						Payload: []byte(`{"message":"hello","number":3}`),
 					},
 				},
 				Logs:        nil,
