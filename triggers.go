@@ -56,7 +56,7 @@ func (t Trigger[T]) Trigger() T {
 type HTTPTrigger struct {
 	URL     string `json:"Url"`
 	Method  string
-	Body    RawMessage
+	Body    Payload
 	Headers http.Header
 	Params  map[string]string
 	Query   map[string]string
@@ -70,12 +70,12 @@ func (t HTTPTrigger) Data() []byte {
 // GenericTrigger represents a generic Function App trigger. With custom handlers all
 // triggers that are not HTTP triggers share the same data structure.
 type GenericTrigger struct {
-	RawMessage
+	Payload
 }
 
 // Data returns data of the trigger as a []byte.
 func (t GenericTrigger) Data() []byte {
-	return t.RawMessage
+	return t.Payload
 }
 
 // TriggerOptions contains options for functions and methods related
