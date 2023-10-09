@@ -23,7 +23,9 @@ var (
 
 // Triggerable is the interface that wraps around method Data.
 type Triggerable interface {
+	// Data returns the raw data of the trigger.
 	Data() data.Raw
+	// Parse the raw data of the trigger into the provided value.
 	Parse(v any) error
 }
 

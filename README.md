@@ -256,6 +256,7 @@ Custom defined binding types can be used as long as they satisfy the
 
 ```go
 type Bindable interface {
+    // Name returns the name of the binding.
     Name() string
 }
 ```
