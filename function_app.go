@@ -21,6 +21,13 @@ var (
 	ErrInvalidTrigger = errors.New("invalid trigger")
 )
 
+// logger is the interface that wraps around methods Info
+// and Error.
+type logger interface {
+	Info(msg string, args ...any)
+	Error(msg string, args ...any)
+}
+
 // FunctionApp represents a Function App with its configuration
 // and functions.
 type FunctionApp struct {
@@ -34,6 +41,7 @@ type FunctionApp struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
+	log     logger
 }
 
 // FunctionAppOption is a function that sets options to a
@@ -42,10 +50,19 @@ type FunctionAppOption func(*FunctionApp)
 
 // NewFunction app creates and configures a FunctionApp.
 func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
+	port, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT")
+	if !ok {
+		port = "8080"
+	}
+
 	router := http.NewServeMux()
 	app := &FunctionApp{
 		httpServer: &http.Server{
-			Handler: router,
+			Addr:         os.Getenv("FUNCTIONS_CUSTOMHANDLER_HOST") + ":" + port,
+			Handler:      router,
+			ReadTimeout:  time.Second * 30,
+			WriteTimeout: time.Second * 30,
+			IdleTimeout:  time.Second * 60,
 		},
 		router:   router,
 		services: make(services, 0),
@@ -53,6 +70,9 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 	}
 	for _, option := range options {
 		option(app)
+	}
+	if app.log == nil {
+		app.log = noOpLogger{}
 	}
 
 	return app
@@ -81,6 +101,7 @@ func (a FunctionApp) Start() error {
 	case <-time.After(time.Millisecond * 10):
 		// Await so that error is not returned while
 		// server is starting. Add logging her.
+		a.log.Info("function app started.")
 	}
 
 	_, err := a.shutdown()
@@ -178,3 +199,9 @@ func WithClient(name string, client any) FunctionAppOption {
 		f.clients.Add(name, client)
 	}
 }
+
+type noOpLogger struct{}
+
+func (l noOpLogger) Info(msg string, args ...any) {}
+
+func (l noOpLogger) Error(msg string, args ...any) {}
