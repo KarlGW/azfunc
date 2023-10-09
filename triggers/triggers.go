@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/KarlGW/azfunc/data"
 )
 
 var (
@@ -21,7 +23,7 @@ var (
 
 // Triggerable is the interface that wraps around method Data.
 type Triggerable interface {
-	Data() RawData
+	Data() data.Raw
 	Parse(v any) error
 }
 

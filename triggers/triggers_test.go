@@ -112,7 +112,7 @@ func TestNew_Generic(t *testing.T) {
 			want: trigger[Generic]{
 				Payload: map[string]Generic{
 					"queue": {
-						RawData: []byte(`{"message":"hello","number":2}`),
+						Raw: []byte(`{"message":"hello","number":2}`),
 					},
 				},
 				Metadata: map[string]any{},
@@ -137,7 +137,7 @@ func TestNew_Generic(t *testing.T) {
 			want: trigger[Generic]{
 				Payload: map[string]Generic{
 					"queue": {
-						RawData: []byte(`hello`),
+						Raw: []byte(`hello`),
 					},
 				},
 				Metadata: map[string]any{},

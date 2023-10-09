@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/KarlGW/azfunc/data"
 )
 
 // HTTP represents an HTTP trigger.
 type HTTP struct {
 	URL      string
 	Method   string
-	Body     RawData
+	Body     data.Raw
 	Headers  http.Header
 	Params   map[string]string
 	Query    map[string]string
@@ -22,8 +24,8 @@ func (t HTTP) Parse(v any) error {
 	return json.Unmarshal(t.Body, &v)
 }
 
-// Data returns the RawData of the HTTP trigger.
-func (t HTTP) Data() RawData {
+// Data returns the Raw data of the HTTP trigger.
+func (t HTTP) Data() data.Raw {
 	return t.Body
 }
 
@@ -58,7 +60,7 @@ type httpTrigger struct {
 		Req struct {
 			URL     string `json:"Url"`
 			Method  string
-			Body    RawData
+			Body    data.Raw
 			Headers http.Header
 			Params  map[string]string
 			Query   map[string]string

@@ -1,4 +1,4 @@
-package triggers
+package data
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func TestRawData_MarshalJSON(t *testing.T) {
+func TestRaw_MarshalJSON(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   []byte
@@ -43,7 +43,7 @@ func TestRawData_MarshalJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			type testRawData struct {
-				Body RawData `json:"body"`
+				Body Raw `json:"body"`
 			}
 
 			r := testRawData{
@@ -62,17 +62,17 @@ func TestRawData_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestRawData_UnmarshalJSON(t *testing.T) {
+func TestRaw_UnmarshalJSON(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   []byte
-		want    RawData
+		want    Raw
 		wantErr error
 	}{
 		{
 			name:    "string",
 			input:   []byte(`{"body":"hello"}`),
-			want:    RawData(`hello`),
+			want:    Raw(`hello`),
 			wantErr: nil,
 		},
 		{
@@ -97,7 +97,7 @@ func TestRawData_UnmarshalJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			type testRawData struct {
-				Body RawData `json:"body"`
+				Body Raw `json:"body"`
 			}
 
 			var p testRawData

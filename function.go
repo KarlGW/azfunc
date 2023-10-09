@@ -1,6 +1,7 @@
 package azfunc
 
 import (
+	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/triggers"
 )
 
@@ -47,7 +48,7 @@ type function struct {
 	bindingName     string
 	triggerFunc     TriggerFunc
 	httpTriggerFunc HTTPTriggerFunc
-	bindings        map[string]Bindable
+	bindings        map[string]bindings.Bindable
 }
 
 // Context represents the function contexts and contains output,
@@ -59,8 +60,8 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients  clients
-	output   Output
-	bindings map[string]Bindable
+	output   bindings.Output
+	bindings map[string]bindings.Bindable
 }
 
 // Services returns the services set in the Context.
@@ -96,7 +97,7 @@ func WithTriggerFunc(name string, fn TriggerFunc) FunctionOption {
 }
 
 // WithBinding sets the provided binding to the function.
-func WithBinding(name string, binding Bindable) FunctionOption {
+func WithBinding(name string, binding bindings.Bindable) FunctionOption {
 	return func(f *function) {
 		f.bindings[name] = binding
 	}

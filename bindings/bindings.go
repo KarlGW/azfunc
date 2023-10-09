@@ -1,10 +1,7 @@
-package azfunc
+package bindings
 
 import (
 	"encoding/json"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // Bindable is the interface that wraps around method Name.
@@ -90,59 +87,11 @@ func NewOutput(options ...OutputOption) Output {
 	return output
 }
 
-// HTTPBinding represents an HTTP output binding.
-type HTTPBinding struct {
-	StatusCode string            `json:"statusCode"`
-	Body       Payload           `json:"body"`
-	Headers    map[string]string `json:"headers"`
-}
-
-// Name returns the name of the binding. In case of an HTTP binding
-// it is always "res".
-func (b HTTPBinding) Name() string {
-	return "res"
-}
-
-// NewHTTPBinding creates a new HTTP output binding.
-func NewHTTPBinding(statusCode int, body []byte, header ...http.Header) HTTPBinding {
-	hdr := make(map[string]string, len(header))
-	for _, h := range header {
-		for k, v := range h {
-			hdr[k] = strings.Join(v, ", ")
-		}
-	}
-	return HTTPBinding{
-		StatusCode: strconv.Itoa(statusCode),
-		Body:       body,
-		Headers:    hdr,
-	}
-}
-
-// GenericBinding represents a generic Function App trigger. With custom handlers
-// all bindings that are not HTTP output bindings share the same data structure.
-type GenericBinding struct {
-	name string
-	Payload
-}
-
-// Name returns the name of the binding.
-func (b GenericBinding) Name() string {
-	return b.name
-}
-
-// NewGenericBinding creates a new generic output binding.
-func NewGenericBinding(name string, data []byte) GenericBinding {
-	return GenericBinding{
-		name:    name,
-		Payload: data,
-	}
-}
-
 // Binding aliases.
 
 // QueueBinding represents a Function App Queue Binding and contains
 // the outgoing queue message data.
-type QueueBinding = GenericBinding
+type QueueBinding = Generic
 
 // NewQueueBinding creates a new Queue output binding.
-var NewQueueBinding = NewGenericBinding
+var NewQueueBinding = NewGeneric

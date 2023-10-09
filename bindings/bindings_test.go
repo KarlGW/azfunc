@@ -1,4 +1,4 @@
-package azfunc
+package bindings
 
 import (
 	"net/http"
@@ -27,8 +27,8 @@ func TestNewOutput(t *testing.T) {
 			input: []OutputOption{
 				func(o *OutputOptions) {
 					o.Bindings = []Bindable{
-						NewHTTPBinding(http.StatusOK, []byte(`{"message":"hello","number":2}`), http.Header{"Content-Type": {"application/json"}}),
-						NewGenericBinding("queue", []byte(`{"message":"hello","number":3}`)),
+						NewHTTP(http.StatusOK, []byte(`{"message":"hello","number":2}`), http.Header{"Content-Type": {"application/json"}}),
+						NewGeneric("queue", []byte(`{"message":"hello","number":3}`)),
 					}
 					o.Logs = []string{"Log message"}
 					o.ReturnValue = 0
@@ -36,8 +36,8 @@ func TestNewOutput(t *testing.T) {
 			},
 			want: Output{
 				Outputs: map[string]Bindable{
-					"res":   HTTPBinding{StatusCode: "200", Body: []byte(`{"message":"hello","number":2}`), Headers: map[string]string{"Content-Type": "application/json"}},
-					"queue": GenericBinding{name: "queue", Payload: []byte(`{"message":"hello","number":3}`)},
+					"res":   HTTP{StatusCode: "200", Body: []byte(`{"message":"hello","number":2}`), Headers: map[string]string{"Content-Type": "application/json"}},
+					"queue": Generic{name: "queue", Raw: []byte(`{"message":"hello","number":3}`)},
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
@@ -49,7 +49,7 @@ func TestNewOutput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := NewOutput(test.input...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(GenericBinding{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Generic{})); diff != "" {
 				t.Errorf("NewOutput() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
@@ -66,16 +66,16 @@ func TestOutput_JSON(t *testing.T) {
 			name: "Parse output to JSON",
 			input: Output{
 				Outputs: map[string]Bindable{
-					"res": HTTPBinding{
+					"res": HTTP{
 						StatusCode: "200",
 						Body:       []byte(`{"message":"hello","number":2}`),
 						Headers: map[string]string{
 							"Content-Type": "application/json",
 						},
 					},
-					"queue": GenericBinding{
-						name:    "queue",
-						Payload: []byte(`{"message":"hello","number":3}`),
+					"queue": Generic{
+						name: "queue",
+						Raw:  []byte(`{"message":"hello","number":3}`),
 					},
 				},
 				Logs:        nil,
