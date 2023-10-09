@@ -12,30 +12,26 @@ import (
 // or pass it on to the next handler as an ordinarily formatted
 // *http.Request.
 func NewRequest(r *http.Request) (*http.Request, error) {
-	trigger, err := New[HTTP](r)
+	trigger, err := NewHTTP(r)
 	if err != nil {
 		return nil, err
 	}
-	request, ok := trigger.Payload["req"]
-	if !ok {
-		return nil, ErrNotHTTPTrigger
-	}
 
-	u, err := buildURL(request.URL, request.Params, request.Query)
+	u, err := buildURL(trigger.URL, trigger.Params, trigger.Query)
 	if err != nil {
 		return nil, err
 	}
 
 	var body *bytes.Buffer
-	if request.Body != nil {
-		body = bytes.NewBuffer(request.Body)
+	if trigger.Body != nil {
+		body = bytes.NewBuffer(trigger.Body)
 	}
 
-	req, err := http.NewRequest(request.Method, u, body)
+	req, err := http.NewRequest(trigger.Method, u, body)
 	if err != nil {
 		return nil, err
 	}
-	req.Header = request.Headers
+	req.Header = trigger.Headers
 
 	return req, nil
 }
