@@ -200,6 +200,6 @@ func buildURL(u string, p, q map[string]string) (string, error) {
 
 // Trigger aliases.
 
-// QueueTrigger represnts a Function App Queue Trigger and contains
+// QueueTrigger represents a Function App Queue Trigger and contains
 // the incoming queue message data.
 type QueueTrigger = GenericTrigger
