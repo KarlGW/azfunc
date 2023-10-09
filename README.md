@@ -62,19 +62,22 @@ An Azure Function can have one and only one trigger. This module provides a coup
 
 The following triggers are supported:
 
-* `HTTPTrigger`
-* `GenericTrigger`
-* `QueueTrigger` (alias for `GenericTrigger`, to provide clarity and intention of the trigger)
+* `HTTP`
+* `Generic`
+* `Queue` (alias for `Generic`, to provide clarity and intention of the trigger)
 
 Custom defined trigger types can be used as long as they satisfy the `Triggerable` interface:
 
 ```go
 type Triggerable interface {
+    // Data returns the raw data of the trigger.
     Data() []byte
+    // Parse the raw data of the trigger into the provided value.
+    Parse(v any) error
 }
 ```
 
-**`Parse[T trigger](r *http.Request, v any, options ...TriggerOptions) error`**
+**`Parse[t Triggerable](r *http.Request, v any, options ...Options) error`**
 
 The most straight forward way to handle an incoming request and
 parse it's data to a struct.
@@ -83,7 +86,7 @@ parse it's data to a struct.
 package main
 
 import (
-    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/triggers"
 )
 
 // Request handler for Function "helloHTTP" that handles
@@ -92,7 +95,7 @@ import (
 // is is valid JSON.
 func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     var t customType
-    if err := azfunc.Parse[azfunc.HTTPTrigger](r, &t); err != nil {
+    if err := triggers.Parse[trigger.HTTP](r, &t); err != nil {
         // Handle error.
     }
     // ...
@@ -105,7 +108,7 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
 // is is valid JSON.
 func helloQueueHandler(r *http.Request, w http.ResponseWriter) {
     var t customType
-    if err := azfunc.Parse[azfunc.QueueTrigger][r, &t, azfunc.WithName("<trigger/binding-name>")]; err != nil {
+    if err := triggers.Parse[triggers.Queue][r, &t, triggers.WithName("<trigger/binding-name>")]; err != nil {
         // Handle error.
     }
     // ...
@@ -128,7 +131,7 @@ func main() {
 }
 ```
 
-**`NewTrigger[T trigger](r *http.Request, options ...TriggerOptions) (Trigger[T], error)`**
+**`New[T Triggerable](r *http.Request, options ...Options) (Trigger[T], error)`**
 
 Creates a new `Trigger[T]` from the incoming request that gives access to all
 the data contained in the trigger.
@@ -137,7 +140,7 @@ the data contained in the trigger.
 package main
 
 import (
-    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/triggers"
 )
 
 // Request handler for Function "helloHTTP" that handles
@@ -146,7 +149,7 @@ import (
 // If it's desired to get the underlying type and handle
 // the fields on the HTTP trigger use trigger.Trigger().
 func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
-    trigger, err := NewTrigger[HTTPTrigger](req)
+    trigger, err := triggers.New[triggers.HTTP](req)
     if err != nil {
         // Handle error.
     }
@@ -166,7 +169,7 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
 // on the Queue trigger, use trigger.Trigger().
 func helloQueueHandler(r *http.Request, w http.ResponseWriter) {
     var customType struct
-    if err := azfunc.Parse[azfunc.QueueTrigger][r, &customType, azfunc.WithName("<trigger/binding-name>")]; err != nil {
+    if err := triggers.Parse[trigger.Queue][r, &customType, triggers.WithName("<trigger/binding-name>")]; err != nil {
         // Handle error.
     }
     // Parse the data into a struct.
@@ -196,7 +199,7 @@ func main() {
 
 **`NewRequest(r *http.Request) (*http.Request, error)`**
 
-Creates a new `*http.Request` based on the payload from the incoming request (must be an HTTP Trigger, `Trigger[HTTPTrigger]`). This provides
+Creates a new `*http.Request` based on the payload from the incoming request (must be an HTTP Trigger, `HTTP`). This provides
 a means to handle the incoming HTTP trigger payload as any other `*http.Request`. Suitable for middlewares, or when it is just required to be
 handled this way.
 
@@ -204,7 +207,7 @@ handled this way.
 package main
 
 import (
-    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/triggers"
 )
 
 // Request handler for Function "helloHTTP" that handles
@@ -214,7 +217,7 @@ import (
 func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     // r will contain the request details from the Function host
     // payload, effectively "passing" on the original request.
-    r, err := azfunc.NewRequest(r)
+    r, err := triggers.NewRequest(r)
     if err != nil {
         // Handle error.
     }
@@ -263,7 +266,7 @@ type Bindable interface {
 package main
 
 import (
-    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/bindings"
 )
 
 // Request handler for Function "helloHTTP" that handles
@@ -274,10 +277,10 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     // Parse the incoming request.
 
     // Create output.
-    output := azfunc.NewOutput(
-        WithBindings(
-            NewHTTPBinding(http.StatusOk, []byte(`{"message":"hello world"}`)),
-            NewQueueBinding("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+    output := bindings.NewOutput(
+        bindings.WithBindings(
+            bindings.NewHTTP(http.StatusOk, []byte(`{"message":"hello world"}`)),
+            bindings.NewQueue("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
         )
     )
 
@@ -295,7 +298,7 @@ Bindings can also be added after the output is created:
 package main
 
 import (
-    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/bindings"
 )
 
 // Request handler for Function "helloHTTP" that handles
@@ -306,14 +309,14 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     // Parse the incoming request.
 
     // Create output.
-    output := azfunc.NewOutput()
+    output := bindings.NewOutput()
     // ...
     // ...
 
     // Can be added in their on subsequent calls.
     output.AddBindings(
-        NewHTTPBinding(http.StatusOk, []byte(`{"message":"hello world"}`)),
-        NewQueueBinding("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+        bindings.NewHTTP(http.StatusOk, []byte(`{"message":"hello world"}`)),
+        bindings.NewQueue("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
     )
 
     // All custom handlers regardless of output binding type
