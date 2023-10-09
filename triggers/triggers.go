@@ -27,17 +27,17 @@ type Triggerable interface {
 	Parse(v any) error
 }
 
-// trigger represents an incoming request (trigger) from the
+// Trigger represents an incoming request (trigger) from the
 // Azure Function Host.
-type trigger[T Triggerable] struct {
+type Trigger[T Triggerable] struct {
 	Payload  map[string]T `json:"Data"`
 	Metadata map[string]any
 	d        []byte
 	n        string
 }
 
-// New handles a request from the Function host and returns a trigger[T].
-func New[T Triggerable](r *http.Request, options ...Option) (trigger[T], error) {
+// New handles a request from the Function host and returns a Trigger[T].
+func New[T Triggerable](r *http.Request, options ...Option) (Trigger[T], error) {
 	opts := Options{}
 	for _, option := range options {
 		option(&opts)
@@ -46,16 +46,16 @@ func New[T Triggerable](r *http.Request, options ...Option) (trigger[T], error) 
 		opts.Name = "req"
 	}
 
-	t := trigger[T]{
+	t := Trigger[T]{
 		n: opts.Name,
 	}
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return trigger[T]{}, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
+		return Trigger[T]{}, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
 	}
 
 	d, ok := t.Payload[t.n]
 	if !ok {
-		return trigger[T]{}, ErrTriggerNameIncorrect
+		return Trigger[T]{}, ErrTriggerNameIncorrect
 	}
 	t.d = d.Data()
 	return t, nil
@@ -63,12 +63,12 @@ func New[T Triggerable](r *http.Request, options ...Option) (trigger[T], error) 
 
 // Parse is used to parse the data contained in a trigger into
 // the provided struct.
-func (t trigger[T]) Parse(v any) error {
+func (t Trigger[T]) Parse(v any) error {
 	return json.Unmarshal(t.d, &v)
 }
 
 // Data returns the data contained in the trigger.
-func (t trigger[T]) Data() []byte {
+func (t Trigger[T]) Data() []byte {
 	return t.d
 }
 

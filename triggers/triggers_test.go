@@ -14,15 +14,15 @@ func TestNew_HTTP(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
-		want    trigger[HTTP]
+		want    Trigger[HTTP]
 		wantErr error
 	}{
 		{
-			name: "new trigger[HTTP]",
+			name: "new Trigger[HTTP]",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 			},
-			want: trigger[HTTP]{
+			want: Trigger[HTTP]{
 				Payload: map[string]HTTP{
 					"req": {
 						URL:    "http://localhost:7071/api/endpoint",
@@ -42,11 +42,11 @@ func TestNew_HTTP(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new trigger[HTTP] with simple body, parameters and query",
+			name: "new Trigger[HTTP] with simple body, parameters and query",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger2)),
 			},
-			want: trigger[HTTP]{
+			want: Trigger[HTTP]{
 				Payload: map[string]HTTP{
 					"req": {
 						URL:    "http://localhost:7071/api/endpoint",
@@ -75,7 +75,7 @@ func TestNew_HTTP(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got, gotErr := New[HTTP](test.input)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(trigger[HTTP]{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[HTTP]{})); diff != "" {
 				t.Errorf("New[HTTP]() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
@@ -93,11 +93,11 @@ func TestNew_Generic(t *testing.T) {
 			req     *http.Request
 			options []Option
 		}
-		want    trigger[Generic]
+		want    Trigger[Generic]
 		wantErr error
 	}{
 		{
-			name: "new trigger[Generic]",
+			name: "new Trigger[Generic]",
 			input: struct {
 				req     *http.Request
 				options []Option
@@ -109,7 +109,7 @@ func TestNew_Generic(t *testing.T) {
 					WithName("queue"),
 				},
 			},
-			want: trigger[Generic]{
+			want: Trigger[Generic]{
 				Payload: map[string]Generic{
 					"queue": {
 						Raw: []byte(`{"message":"hello","number":2}`),
@@ -122,7 +122,7 @@ func TestNew_Generic(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new trigger[GenericTRigger] - simple body",
+			name: "new Trigger[GenericTRigger] - simple body",
 			input: struct {
 				req     *http.Request
 				options []Option
@@ -134,7 +134,7 @@ func TestNew_Generic(t *testing.T) {
 					WithName("queue"),
 				},
 			},
-			want: trigger[Generic]{
+			want: Trigger[Generic]{
 				Payload: map[string]Generic{
 					"queue": {
 						Raw: []byte(`hello`),
@@ -147,7 +147,7 @@ func TestNew_Generic(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new trigger[Generic] - error no name provided",
+			name: "new Trigger[Generic] - error no name provided",
 			input: struct {
 				req     *http.Request
 				options []Option
@@ -157,7 +157,7 @@ func TestNew_Generic(t *testing.T) {
 				},
 				options: nil,
 			},
-			want:    trigger[Generic]{},
+			want:    Trigger[Generic]{},
 			wantErr: ErrTriggerNameIncorrect,
 		},
 	}
@@ -166,7 +166,7 @@ func TestNew_Generic(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got, gotErr := New[Generic](test.input.req, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(trigger[Generic]{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[Generic]{})); diff != "" {
 				t.Errorf("New[Generic]() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
@@ -180,13 +180,13 @@ func TestNew_Generic(t *testing.T) {
 func TestTrigger_Parse(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() trigger[HTTP]
+		input   func() Trigger[HTTP]
 		want    testType
 		wantErr error
 	}{
 		{
-			name: "Parse the data in trigger[HTTP]",
-			input: func() trigger[HTTP] {
+			name: "Parse the data in Trigger[HTTP]",
+			input: func() Trigger[HTTP] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 				}
@@ -219,13 +219,13 @@ func TestTrigger_Parse(t *testing.T) {
 func TestHTTP_Data(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() trigger[HTTP]
+		input   func() Trigger[HTTP]
 		want    []byte
 		wantErr error
 	}{
 		{
-			name: "Parse the data in trigger[HTTP]",
-			input: func() trigger[HTTP] {
+			name: "Parse the data in Trigger[HTTP]",
+			input: func() Trigger[HTTP] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 				}
@@ -250,13 +250,13 @@ func TestHTTP_Data(t *testing.T) {
 func TestGeneric_Parse(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() trigger[Generic]
+		input   func() Trigger[Generic]
 		want    testType
 		wantErr error
 	}{
 		{
-			name: "Parse the data in trigger[GenericTrigger]",
-			input: func() trigger[Generic] {
+			name: "Parse the data in Trigger[Generic]",
+			input: func() Trigger[Generic] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 				}
@@ -289,13 +289,13 @@ func TestGeneric_Parse(t *testing.T) {
 func TestGeneric_Data(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() trigger[Generic]
+		input   func() Trigger[Generic]
 		want    []byte
 		wantErr error
 	}{
 		{
-			name: "Parse the data in trigger[GenericTrigger]",
-			input: func() trigger[Generic] {
+			name: "Parse the data in trigger[Generic]",
+			input: func() Trigger[Generic] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 				}
