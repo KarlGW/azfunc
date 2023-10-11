@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/KarlGW/azfunc/data"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -27,8 +28,8 @@ func TestNewOutput(t *testing.T) {
 			input: []OutputOption{
 				func(o *OutputOptions) {
 					o.Bindings = []Bindable{
-						NewHTTP(http.StatusOK, []byte(`{"message":"hello","number":2}`), http.Header{"Content-Type": {"application/json"}}),
-						NewGeneric("queue", []byte(`{"message":"hello","number":3}`)),
+						NewHTTP(),
+						NewGeneric("queue"),
 					}
 					o.Logs = []string{"Log message"}
 					o.ReturnValue = 0
@@ -36,11 +37,11 @@ func TestNewOutput(t *testing.T) {
 			},
 			want: Output{
 				Outputs: map[string]Bindable{
-					"res":   HTTP{StatusCode: "200", Body: []byte(`{"message":"hello","number":2}`), Headers: map[string]string{"Content-Type": "application/json"}},
-					"queue": Generic{name: "queue", Raw: []byte(`{"message":"hello","number":3}`)},
+					"queue": &Generic{name: "queue"},
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
+				http:        &HTTP{name: "res", StatusCode: http.StatusOK},
 			},
 		},
 	}
@@ -49,7 +50,7 @@ func TestNewOutput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := NewOutput(test.input...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Generic{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Output{}, HTTP{}, Generic{})); diff != "" {
 				t.Errorf("NewOutput() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
@@ -66,16 +67,16 @@ func TestOutput_JSON(t *testing.T) {
 			name: "Parse output to JSON",
 			input: Output{
 				Outputs: map[string]Bindable{
-					"res": HTTP{
-						StatusCode: "200",
-						Body:       []byte(`{"message":"hello","number":2}`),
-						Headers: map[string]string{
-							"Content-Type": "application/json",
-						},
-					},
-					"queue": Generic{
+					"queue": &Generic{
 						name: "queue",
 						Raw:  []byte(`{"message":"hello","number":3}`),
+					},
+				},
+				http: &HTTP{
+					StatusCode: http.StatusOK,
+					Body:       data.Raw(`{"message":"hello","number":2}`),
+					header: http.Header{
+						"Content-Type": {"application/json"},
 					},
 				},
 				Logs:        nil,

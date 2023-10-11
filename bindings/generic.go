@@ -14,10 +14,20 @@ func (b Generic) Name() string {
 	return b.name
 }
 
+// Write data to the binding.
+func (b *Generic) Write(d []byte) (int, error) {
+	b.Raw = data.Raw(d)
+	return len(b.Raw), nil
+}
+
 // NewGeneric creates a new generic output binding.
-func NewGeneric(name string, data []byte) Generic {
-	return Generic{
+func NewGeneric(name string, options ...Option) *Generic {
+	opts := Options{}
+	for _, option := range options {
+		option(&opts)
+	}
+	return &Generic{
 		name: name,
-		Raw:  data,
+		Raw:  opts.Data,
 	}
 }

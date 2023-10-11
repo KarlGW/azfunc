@@ -8,6 +8,8 @@ import (
 type Bindable interface {
 	// Name returns the name of the binding.
 	Name() string
+	// Write to the binding.
+	Write([]byte) (int, error)
 }
 
 // Output represents an outgoing response to the Functuon Host.
@@ -15,10 +17,14 @@ type Output struct {
 	Outputs     map[string]Bindable
 	Logs        []string
 	ReturnValue any
+	http        *HTTP
 }
 
 // JSON returns the JSON encoding of Output.
 func (o Output) JSON() []byte {
+	if !o.http.IsZero() {
+		o.Outputs[o.http.Name()] = o.http.toHTTPBinding()
+	}
 	b, _ := json.Marshal(o)
 	return b
 }
@@ -30,7 +36,11 @@ func (o *Output) AddBindings(bindings ...Bindable) {
 	}
 
 	for _, binding := range bindings {
-		o.Outputs[binding.Name()] = binding
+		if b, ok := binding.(*HTTP); ok {
+			o.http = b
+		} else {
+			o.Outputs[binding.Name()] = binding
+		}
 	}
 }
 
@@ -47,12 +57,23 @@ func (o *Output) SetReturnValue(v any) {
 	o.ReturnValue = v
 }
 
+// HTTP returns the HTTB binding of output if any is set.
+// If not set it will create, set and return it.
+func (o *Output) HTTP() *HTTP {
+	if o.http.IsZero() {
+		o.http = NewHTTP()
+		return o.http
+	}
+	return o.http
+}
+
 // OutputOptions contains options for creating a new
 // Output.
 type OutputOptions struct {
 	Bindings    []Bindable
 	Logs        []string
 	ReturnValue any
+	http        *HTTP
 }
 
 // Output option is a function that sets OutputOptions.
@@ -61,7 +82,13 @@ type OutputOption func(o *OutputOptions)
 // WithBindings add one or more bindings to OutputOptions
 func WithBindings(bindings ...Bindable) OutputOption {
 	return func(o *OutputOptions) {
-		o.Bindings = bindings
+		for name, binding := range bindings {
+			if b, ok := binding.(*HTTP); ok {
+				o.http = b
+			} else {
+				o.Bindings[name] = binding
+			}
+		}
 	}
 }
 
@@ -82,6 +109,7 @@ func NewOutput(options ...OutputOption) Output {
 	output := Output{
 		Logs:        logs,
 		ReturnValue: opts.ReturnValue,
+		http:        opts.http,
 	}
 	output.AddBindings(opts.Bindings...)
 
