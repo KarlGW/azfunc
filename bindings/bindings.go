@@ -10,9 +10,9 @@ type Bindable interface {
 
 // Binding aliases.
 
-// QueueBinding represents a Function App Queue Binding and contains
+// Queue represents a Function App Queue Binding and contains
 // the outgoing queue message data.
-type QueueBinding = Generic
+type Queue = Generic
 
-// NewQueueBinding creates a new Queue output binding.
-var NewQueueBinding = NewGeneric
+// NewQueue creates a new Queue output binding.
+var NewQueue = NewGeneric
