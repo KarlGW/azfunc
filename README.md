@@ -4,10 +4,19 @@
 
 The purpose of this module is to provide functions and structures that helps with handling the incoming and outgoing requests to and from the Azure Function host when developing Azure Functions with Custom handlers and Go.
 
+The module provides two ways of working with Functions, triggers and output bindings:
+
+* [`FunctionApp`](#functions) which provides a framework to abstract away the need for setting up an HTTP server with handlers. This makes use of the modules various Triggers and output bindings.
+* [Triggers](#triggers-input-bindings) and [Output](#output-output-bindings) to just provide structurs and functions for handling input and output from
+the function host.
+
+## Contents
+
 * [Why use this module?](#why-use-this-module)
   * [HTTP only Functions](#http-only-functions)
 * [Install](#install)
 * [Usage](#usage)
+  * [Functions](#functions)
   * [Triggers (input bindings)](#triggers-input-bindings)
   * [Outputs (output bindings)](#output-output-bindings)
 * [Roadmap](#roadmap)
@@ -16,7 +25,7 @@ The purpose of this module is to provide functions and structures that helps wit
 
 After writing several Azure Functions with Custom handlers for Go I came to realize that the process of handling the incoming request payload from the Function host a tedious task (the overall structure and some content being escaped) and I found myself rewriting this request handling time and time again, every time with different ways and end result.
 
-For examples on how incoming and outgoing requests might look, look at the bottom of [triggers_test.go](triggers_test.go) and [bindings_test.go](bindings_test.go) respectively.
+For examples on how incoming and outgoing requests might look, look at the bottom of [triggers_test.go](triggers(triggers_test.go) and [bindings_test.go](bindings/bindings_test.go) respectively.
 
 The thought of this module awoke to address this and to create a uniform
 way to do it across my different and future projects.
@@ -56,6 +65,10 @@ go get github.com/KarlGW/azfunc
 
 ## Usage
 
+### Functions
+
+
+
 ### Triggers (input bindings)
 
 An Azure Function can have one and only one trigger. This module provides a couple of ways to handle the incoming trigger requests, suitable for different purposes.
@@ -70,10 +83,10 @@ Custom defined trigger types can be used as long as they satisfy the `Triggerabl
 
 ```go
 type Triggerable interface {
-    // Data returns the raw data of the trigger.
-    Data() []byte
-    // Parse the raw data of the trigger into the provided value.
-    Parse(v any) error
+	// Data returns the raw data of the trigger.
+	Data() data.Raw
+	// Parse the raw data of the trigger into the provided value.
+	Parse(v any) error
 }
 ```
 
@@ -247,17 +260,19 @@ provides the `Output` struct to handle all outputs to the Function host.
 
 The following output bindings are supported:
 
-* `HTTPBinding`
-* `GenericBinding`
-* `QueueBinding` (alias for `GenericBinding`, to provide clarity and intention of the binding)
+* `HTTP`
+* `Generic`
+* `Queue` (alias for `Generic`, to provide clarity and intention of the binding)
 
 Custom defined binding types can be used as long as they satisfy the
 `Bindable` interface:
 
 ```go
 type Bindable interface {
-    // Name returns the name of the binding.
-    Name() string
+	// Name returns the name of the binding.
+	Name() string
+	// Write to the binding.
+	Write([]byte) (int, error)
 }
 ```
 
@@ -327,7 +342,3 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     w.Write(output.JSON())
 }
 ```
-
-## Roadmap
-
-* Add better `Output` with bindings handling.
