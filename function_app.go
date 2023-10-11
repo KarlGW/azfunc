@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/triggers"
 )
 
@@ -99,8 +100,6 @@ func (a FunctionApp) Start() error {
 	case err := <-errCh:
 		return err
 	case <-time.After(time.Millisecond * 10):
-		// Await so that error is not returned while
-		// server is starting. Add logging her.
 		a.log.Info("function app started.")
 	}
 
@@ -145,28 +144,28 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 func (a FunctionApp) handler(fn *function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
+			Output:   bindings.NewOutput(bindings.WithBindings(fn.bindings...)),
 			services: a.services,
 			clients:  a.clients,
-			bindings: fn.bindings,
 		}
 
-		if fn.httpTriggerFunc != nil {
+		if fn.triggerFunc != nil {
+			trigger, err := triggers.NewGeneric(r, fn.triggerName)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if err := fn.triggerFunc(ctx, trigger); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		} else if fn.httpTriggerFunc != nil {
 			trigger, err := triggers.NewHTTP(r)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			if err := fn.httpTriggerFunc(trigger, ctx); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		} else if fn.triggerFunc != nil {
-			trigger, err := triggers.NewGeneric(r, fn.bindingName)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if err := fn.triggerFunc(trigger, ctx); err != nil {
+			if err := fn.httpTriggerFunc(ctx, trigger); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -178,7 +177,7 @@ func (a FunctionApp) handler(fn *function) http.Handler {
 		// Write OK response to the function host.
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(ctx.output.JSON())
+		w.Write(ctx.Output.JSON())
 	})
 }
 
@@ -200,8 +199,12 @@ func WithClient(name string, client any) FunctionAppOption {
 	}
 }
 
+// noOpLogger is a placeholder for when no logger is provided to the
+// function app.
 type noOpLogger struct{}
 
+// Info together with Error satisfies the logger interface.
 func (l noOpLogger) Info(msg string, args ...any) {}
 
+// Error together with Info satisfies the logger interface.
 func (l noOpLogger) Error(msg string, args ...any) {}

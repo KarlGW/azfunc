@@ -6,10 +6,10 @@ import (
 )
 
 // TriggerFunc represents a generic function to be executed by the function app.
-type TriggerFunc func(t triggers.Generic, ctx *Context) error
+type TriggerFunc func(*Context, triggers.Generic) error
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
-type HTTPTriggerFunc func(t triggers.HTTP, ctx *Context) error
+type HTTPTriggerFunc func(*Context, triggers.HTTP) error
 
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
@@ -45,23 +45,22 @@ func (c clients) Get(name string) any {
 // in a FunctionApp.
 type function struct {
 	name            string
-	bindingName     string
+	triggerName     string
 	triggerFunc     TriggerFunc
 	httpTriggerFunc HTTPTriggerFunc
-	bindings        map[string]bindings.Bindable
+	bindings        []bindings.Bindable
 }
 
 // Context represents the function contexts and contains output,
 // bindings, services and clients.
 type Context struct {
+	Output bindings.Output
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	services services
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
-	clients  clients
-	output   bindings.Output
-	bindings map[string]bindings.Bindable
+	clients clients
 }
 
 // Services returns the services set in the Context.
@@ -77,28 +76,32 @@ func (c *Context) Clients() clients {
 // FunctionOption sets options to the function.
 type FunctionOption func(f *function)
 
-// WithHTTPTriggerFunc takes the provided function and sets it to the
+// Trigger takes the provided function and sets it to the
 // function.
-func WithHTTPTriggerFunc(fn HTTPTriggerFunc) FunctionOption {
+func Trigger(name string, fn TriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = name
+		f.triggerFunc = fn
+		f.httpTriggerFunc = nil
+	}
+}
+
+// HTTPTrigger takes the provided function and sets it to the
+// function.
+func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.httpTriggerFunc = fn
 		f.triggerFunc = nil
 	}
 }
 
-// WithTriggerFunc takes the provided function and sets it to the
-// function.
-func WithTriggerFunc(name string, fn TriggerFunc) FunctionOption {
+// Binding sets the provided binding to the function.
+func Binding(binding bindings.Bindable) FunctionOption {
 	return func(f *function) {
-		f.bindingName = name
-		f.triggerFunc = fn
-		f.httpTriggerFunc = nil
-	}
-}
-
-// WithBinding sets the provided binding to the function.
-func WithBinding(name string, binding bindings.Bindable) FunctionOption {
-	return func(f *function) {
-		f.bindings[name] = binding
+		if f.bindings == nil {
+			f.bindings = []bindings.Bindable{binding}
+			return
+		}
+		f.bindings = append(f.bindings, binding)
 	}
 }
