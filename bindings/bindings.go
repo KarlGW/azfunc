@@ -67,6 +67,17 @@ func (o *Output) HTTP() *HTTP {
 	return o.http
 }
 
+// Binding returns the binding with the provided name, if no binding
+// with that name exists, return a new generic binding with the
+// provided name.
+func (o Output) Binding(name string) Bindable {
+	binding, ok := o.Outputs[name]
+	if !ok {
+		return NewGeneric(name)
+	}
+	return binding
+}
+
 // OutputOptions contains options for creating a new
 // Output.
 type OutputOptions struct {
@@ -82,11 +93,11 @@ type OutputOption func(o *OutputOptions)
 // WithBindings add one or more bindings to OutputOptions
 func WithBindings(bindings ...Bindable) OutputOption {
 	return func(o *OutputOptions) {
-		for name, binding := range bindings {
+		for _, binding := range bindings {
 			if b, ok := binding.(*HTTP); ok {
 				o.http = b
 			} else {
-				o.Bindings[name] = binding
+				o.Bindings = append(o.Bindings, binding)
 			}
 		}
 	}
