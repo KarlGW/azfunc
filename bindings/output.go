@@ -4,14 +4,6 @@ import (
 	"encoding/json"
 )
 
-// Bindable is the interface that wraps around method Name.
-type Bindable interface {
-	// Name returns the name of the binding.
-	Name() string
-	// Write to the binding.
-	Write([]byte) (int, error)
-}
-
 // Output represents an outgoing response to the Functuon Host.
 type Output struct {
 	Outputs     map[string]Bindable
@@ -57,6 +49,17 @@ func (o *Output) SetReturnValue(v any) {
 	o.ReturnValue = v
 }
 
+// Binding returns the binding with the provided name, if no binding
+// with that name exists, return a new generic binding with the
+// provided name.
+func (o Output) Binding(name string) Bindable {
+	binding, ok := o.Outputs[name]
+	if !ok {
+		return NewGeneric(name)
+	}
+	return binding
+}
+
 // HTTP returns the HTTB binding of output if any is set.
 // If not set it will create, set and return it.
 func (o *Output) HTTP() *HTTP {
@@ -67,15 +70,9 @@ func (o *Output) HTTP() *HTTP {
 	return o.http
 }
 
-// Binding returns the binding with the provided name, if no binding
-// with that name exists, return a new generic binding with the
-// provided name.
-func (o Output) Binding(name string) Bindable {
-	binding, ok := o.Outputs[name]
-	if !ok {
-		return NewGeneric(name)
-	}
-	return binding
+// HasHTTP checks if Output has an HTTP binding.
+func (o *Output) HasHTTP() bool {
+	return o.http != nil
 }
 
 // OutputOptions contains options for creating a new
@@ -89,19 +86,6 @@ type OutputOptions struct {
 
 // Output option is a function that sets OutputOptions.
 type OutputOption func(o *OutputOptions)
-
-// WithBindings add one or more bindings to OutputOptions
-func WithBindings(bindings ...Bindable) OutputOption {
-	return func(o *OutputOptions) {
-		for _, binding := range bindings {
-			if b, ok := binding.(*HTTP); ok {
-				o.http = b
-			} else {
-				o.Bindings = append(o.Bindings, binding)
-			}
-		}
-	}
-}
 
 // NewOutput creates a new Output containing binding to be used for creating
 // the response back to the Function host.
@@ -127,11 +111,15 @@ func NewOutput(options ...OutputOption) Output {
 	return output
 }
 
-// Binding aliases.
-
-// QueueBinding represents a Function App Queue Binding and contains
-// the outgoing queue message data.
-type QueueBinding = Generic
-
-// NewQueueBinding creates a new Queue output binding.
-var NewQueueBinding = NewGeneric
+// WithBindings add one or more bindings to OutputOptions
+func WithBindings(bindings ...Bindable) OutputOption {
+	return func(o *OutputOptions) {
+		for _, binding := range bindings {
+			if b, ok := binding.(*HTTP); ok {
+				o.http = b
+			} else {
+				o.Bindings = append(o.Bindings, binding)
+			}
+		}
+	}
+}
