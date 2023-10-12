@@ -55,7 +55,8 @@ func (o *Output) SetReturnValue(v any) {
 func (o Output) Binding(name string) Bindable {
 	binding, ok := o.Outputs[name]
 	if !ok {
-		return NewBase(name)
+		o.Outputs[name] = NewBase(name)
+		return o.Outputs[name]
 	}
 	return binding
 }
