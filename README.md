@@ -300,6 +300,13 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
         )
     )
 
+    // Write to the HTTP output binding.
+    output.HTTP().WriteHeader(http.StatusOK)
+    output.HTTP().Write(`{"message":"hello, world"}`)
+
+    // Write to the queue output binding.
+    output.Binding("<queue-binding-name>").Write(`{"message":"hello, world"}`)
+
     // All custom handlers regardless of output binding type
     // must set Content-Type: application/json to the response
     // to the Function host, followed by the data.
@@ -326,14 +333,41 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
 
     // Create output.
     output := bindings.NewOutput()
-    // ...
-    // ...
-
-    // Can be added in their on subsequent calls.
     output.AddBindings(
         bindings.NewHTTP(),
         bindings.NewQueue("<queue-binding-name>")
     )
+
+    // All custom handlers regardless of output binding type
+    // must set Content-Type: application/json to the response
+    // to the Function host, followed by the data.
+    w.Header.Set("Content-Type", "application/json")
+    w.Write(output.JSON())
+}
+```
+
+It is possible to create a binding and use it at the same times:
+
+```go
+package main
+
+import (
+    "github.com/KarlGW/azfunc/bindings"
+)
+
+// Request handler for Function "helloHTTP" that handles
+// HTTP trigger requests. This will parse the body of
+// the incoming HTTP request into "customType" (assuming)
+// is is valid JSON. Together with an HTTP and Queue output binding.
+func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
+    // Parse the incoming request.
+
+    // Create output.
+    output := bindings.NewOutput()
+    // Create and write to the HTTP binding.
+    output.HTTP().Write(`{"message":"hello, world"}`)
+    // Create and write to the queue binding.
+    output.Binding("<queue-binding-name>").Write(`{"message":"hello, world"}`)
 
     // All custom handlers regardless of output binding type
     // must set Content-Type: application/json to the response
