@@ -76,8 +76,8 @@ An Azure Function can have one and only one trigger. This module provides a coup
 The following triggers are supported:
 
 * `HTTP`
-* `Generic`
-* `Queue` (alias for `Generic`, to provide clarity and intention of the trigger)
+* `Base`
+* `Queue` (alias for `Base`, to provide clarity and intention of the trigger)
 
 Custom defined trigger types can be used as long as they satisfy the `Triggerable` interface:
 
@@ -261,8 +261,8 @@ provides the `Output` struct to handle all outputs to the Function host.
 The following output bindings are supported:
 
 * `HTTP`
-* `Generic`
-* `Queue` (alias for `Generic`, to provide clarity and intention of the binding)
+* `Base`
+* `Queue` (alias for `Base`, to provide clarity and intention of the binding)
 
 Custom defined binding types can be used as long as they satisfy the
 `Bindable` interface:
