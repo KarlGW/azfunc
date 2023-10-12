@@ -98,8 +98,8 @@ func Data[T Triggerable](r *http.Request, options ...Option) ([]byte, error) {
 
 // Queue represents a Function App Queue Trigger and contains
 // the incoming queue message data.
-type Queue = Generic
+type Queue = Base
 
-// NewQueue creates an returns a Generic trigger from the provided
+// NewQueue creates an returns a Base trigger from the provided
 // *http.Request.
-var NewQueue = NewGeneric
+var NewQueue = NewBase

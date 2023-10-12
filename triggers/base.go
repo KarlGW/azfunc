@@ -8,27 +8,27 @@ import (
 	"github.com/KarlGW/azfunc/data"
 )
 
-// Generic represents a generic Function App trigger. With custom handlers many
+// Base represents a base Function App trigger. With custom handlers many
 // triggers that are not HTTP triggers share the same data structure.
-type Generic struct {
+type Base struct {
 	data.Raw
 	Metadata map[string]any
 }
 
-// Parse the Raw data of the Generic trigger into the provided
+// Parse the Raw data of the Base trigger into the provided
 // value.
-func (t Generic) Parse(v any) error {
+func (t Base) Parse(v any) error {
 	return json.Unmarshal(t.Raw, &v)
 }
 
-// Data returns the Raw data of the Generic trigger.
-func (t Generic) Data() data.Raw {
+// Data returns the Raw data of the Base trigger.
+func (t Base) Data() data.Raw {
 	return t.Raw
 }
 
-// NewGeneric creates an returns a Generic trigger from the provided
+// NewBase creates an returns a Base trigger from the provided
 // *http.Request.
-func NewGeneric(r *http.Request, name string, options ...Option) (Generic, error) {
+func NewBase(r *http.Request, name string, options ...Option) (Base, error) {
 	opts := Options{}
 	for _, option := range options {
 		option(&opts)
@@ -36,17 +36,17 @@ func NewGeneric(r *http.Request, name string, options ...Option) (Generic, error
 
 	metadata, raw, err := triggerData(r, name)
 	if err != nil {
-		return Generic{}, err
+		return Base{}, err
 	}
 
-	return Generic{
+	return Base{
 		Raw:      raw,
 		Metadata: metadata,
 	}, nil
 }
 
-// genericTrigger is the incoming request from the Function host.
-type genericTrigger struct {
+// baseTrigger is the incoming request from the Function host.
+type baseTrigger struct {
 	Data     map[string]data.Raw
 	Metadata map[string]any
 }
@@ -54,7 +54,7 @@ type genericTrigger struct {
 // triggerData handles the incoming request and returns a trigger
 // metadata, raw data and an error (if any).
 func triggerData(r *http.Request, name string) (map[string]any, data.Raw, error) {
-	var t genericTrigger
+	var t baseTrigger
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
 		return nil, nil, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
 	}
