@@ -1,13 +1,15 @@
 # azfunc
 
-> Module to assist working with Azure Functions Custom handlers with Go
+> Module to assist with Azure Functions with Custom handlers and Go
 
-The purpose of this module is to provide functions and structures that helps with handling the incoming and outgoing requests to and from the Azure Function host when developing Azure Functions with Custom handlers and Go.
+The purpose of this module is to provide functions and structures that helps with handling the incoming and outgoing requests to
+and from the Azure Function host when developing Azure Functions with Custom handlers and Go.
 
-The module provides two ways of working with Functions, triggers and output bindings:
+The module provides several ways of working with Azure Functions:
 
-* [`FunctionApp`](#functions) which provides a framework to abstract away the need for setting up an HTTP server with handlers. This makes use of the modules various Triggers and output bindings.
-* [Triggers](#triggers-input-bindings) and [Output](#output-output-bindings) to just provide structurs and functions for handling input and output from
+* [`FunctionApp`](#functions) provides a framework that abstract away the need for setting up an HTTP server with handlers. It handles input
+and output from and to the Function host.
+* [Triggers](#triggers-input-bindings) and [Output](#output-output-bindings) to just provide structures and functions for handling input and output from
 the function host.
 
 ## Contents
@@ -25,10 +27,7 @@ the function host.
 
 After writing several Azure Functions with Custom handlers for Go I came to realize that the process of handling the incoming request payload from the Function host a tedious task (the overall structure and some content being escaped) and I found myself rewriting this request handling time and time again, every time with different ways and end result.
 
-For examples on how incoming and outgoing requests might look, look at the bottom of [triggers_test.go](triggers(triggers_test.go) and [bindings_test.go](bindings/bindings_test.go) respectively.
-
-The thought of this module awoke to address this and to create a uniform
-way to do it across my different and future projects.
+The idea of this module awoke to address this and to create a uniform way to do it across my current and future projects.
 
 ### HTTP only Functions
 
