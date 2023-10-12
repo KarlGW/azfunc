@@ -180,11 +180,11 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
 // If it's desired to the underlying type and handle the fields
 // on the Queue trigger, use trigger.Trigger().
 func helloQueueHandler(r *http.Request, w http.ResponseWriter) {
-    var customType struct
-    if err := triggers.Parse[trigger.Queue][r, &customType, triggers.WithName("<trigger/binding-name>")]; err != nil {
+    trigger, err := triggers.New[triggers.Queue](req)
+    if err != nil {
         // Handle error.
     }
-    // Parse the data into a struct.
+    // Parse the body into a struct.
     var t customType
     if err := trigger.Parse(&t); err != nil {
         // Handle error.
