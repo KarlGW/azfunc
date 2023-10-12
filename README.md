@@ -295,8 +295,8 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
     // Create output.
     output := bindings.NewOutput(
         bindings.WithBindings(
-            bindings.NewHTTP(http.StatusOk, []byte(`{"message":"hello world"}`)),
-            bindings.NewQueue("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+            bindings.NewHTTP(),
+            bindings.NewQueue("<queue-binding-name>")
         )
     )
 
@@ -331,8 +331,8 @@ func helloHTTPHandler(r *http.Request, w http.ResponseWriter) {
 
     // Can be added in their on subsequent calls.
     output.AddBindings(
-        bindings.NewHTTP(http.StatusOk, []byte(`{"message":"hello world"}`)),
-        bindings.NewQueue("<queue-binding-name>", []byte(`{"message":"Hello queue"}`))
+        bindings.NewHTTP(),
+        bindings.NewQueue("<queue-binding-name>")
     )
 
     // All custom handlers regardless of output binding type
