@@ -67,7 +67,9 @@ func (b HTTP) toHTTPBinding() *httpBinding {
 
 // NewHTTP creates a new HTTP output binding.
 func NewHTTP(options ...Option) *HTTP {
-	opts := Options{}
+	opts := Options{
+		Header: http.Header{},
+	}
 	for _, option := range options {
 		option(&opts)
 	}
