@@ -50,12 +50,12 @@ func (o *Output) SetReturnValue(v any) {
 }
 
 // Binding returns the binding with the provided name, if no binding
-// with that name exists, return a new generic binding with the
+// with that name exists, return a new base binding with the
 // provided name.
 func (o Output) Binding(name string) Bindable {
 	binding, ok := o.Outputs[name]
 	if !ok {
-		return NewGeneric(name)
+		return NewBase(name)
 	}
 	return binding
 }

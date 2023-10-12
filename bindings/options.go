@@ -15,7 +15,7 @@ type Options struct {
 	Body data.Raw
 	// Header sets the body of an HTTP binding.
 	Header http.Header
-	// Data sets the data of a generic binding.
+	// Data sets the data of a base binding.
 	Data data.Raw
 	// Name sets the name of a binding.
 	Name string

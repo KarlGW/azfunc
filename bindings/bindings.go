@@ -12,7 +12,7 @@ type Bindable interface {
 
 // Queue represents a Function App Queue Binding and contains
 // the outgoing queue message data.
-type Queue = Generic
+type Queue = Base
 
 // NewQueue creates a new Queue output binding.
-var NewQueue = NewGeneric
+var NewQueue = NewBase
