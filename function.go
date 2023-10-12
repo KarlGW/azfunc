@@ -54,6 +54,7 @@ type function struct {
 // Context represents the function contexts and contains output,
 // bindings, services and clients.
 type Context struct {
+	// Output contains bindings.
 	Output bindings.Output
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.

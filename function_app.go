@@ -42,7 +42,9 @@ type FunctionApp struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
-	log     logger
+	// log provides logging for the FunctionApp. Defaults to a no-op
+	// logger.
+	log logger
 }
 
 // FunctionAppOption is a function that sets options to a
@@ -152,24 +154,29 @@ func (a FunctionApp) handler(fn *function) http.Handler {
 		if fn.triggerFunc != nil {
 			trigger, err := triggers.NewBase(r, fn.triggerName)
 			if err != nil {
+				a.log.Error(err.Error())
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			if err := fn.triggerFunc(ctx, trigger); err != nil {
+				a.log.Error(err.Error())
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 		} else if fn.httpTriggerFunc != nil {
 			trigger, err := triggers.NewHTTP(r)
 			if err != nil {
+				a.log.Error(err.Error())
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			if err := fn.httpTriggerFunc(ctx, trigger); err != nil {
+				a.log.Error(err.Error())
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 		} else {
+			a.log.Error(ErrInvalidTrigger.Error())
 			http.Error(w, ErrInvalidTrigger.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -196,6 +203,14 @@ func WithService(name string, service any) FunctionAppOption {
 func WithClient(name string, client any) FunctionAppOption {
 	return func(f *FunctionApp) {
 		f.clients.Add(name, client)
+	}
+}
+
+// WithLogger sets the provided logger to the FunctionApp.
+// The logger must satisfy the logger interface.
+func WithLogger(log logger) FunctionAppOption {
+	return func(f *FunctionApp) {
+		f.log = log
 	}
 }
 
