@@ -150,7 +150,7 @@ func (a FunctionApp) handler(fn *function) http.Handler {
 		}
 
 		if fn.triggerFunc != nil {
-			trigger, err := triggers.NewGeneric(r, fn.triggerName)
+			trigger, err := triggers.NewBase(r, fn.triggerName)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return

@@ -60,14 +60,14 @@ func TestContext_Output_Trigger_Write(t *testing.T) {
 	ctx := Context{
 		Output: bindings.Output{},
 	}
-	ctx.Output.AddBindings(bindings.NewGeneric("queue"))
+	ctx.Output.AddBindings(bindings.NewBase("queue"))
 	ctx.Output.Binding("queue").Write([]byte(`{"message":"hello"}`))
 	got := ctx.Output.Binding("queue")
 
-	want := bindings.NewGeneric("queue")
+	want := bindings.NewBase("queue")
 	want.Write([]byte(`{"message":"hello"}`))
 
-	if diff := cmp.Diff(want, got, cmp.AllowUnexported(bindings.Generic{})); diff != "" {
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(bindings.Base{})); diff != "" {
 		t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 	}
 }

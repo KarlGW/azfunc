@@ -5,8 +5,8 @@ import (
 	"github.com/KarlGW/azfunc/triggers"
 )
 
-// TriggerFunc represents a generic function to be executed by the function app.
-type TriggerFunc func(*Context, triggers.Generic) error
+// TriggerFunc represents a base function to be executed by the function app.
+type TriggerFunc func(*Context, triggers.Base) error
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(*Context, triggers.HTTP) error
