@@ -77,7 +77,18 @@ func (c *Context) Clients() clients {
 // FunctionOption sets options to the function.
 type FunctionOption func(f *function)
 
-// Trigger takes the provided function and sets it to the
+// Binding sets the provided binding to the function.
+func Binding(binding bindings.Bindable) FunctionOption {
+	return func(f *function) {
+		if f.bindings == nil {
+			f.bindings = []bindings.Bindable{binding}
+			return
+		}
+		f.bindings = append(f.bindings, binding)
+	}
+}
+
+// Trigger takes the provided name and function and sets it to the
 // function.
 func Trigger(name string, fn TriggerFunc) FunctionOption {
 	return func(f *function) {
@@ -96,13 +107,10 @@ func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	}
 }
 
-// Binding sets the provided binding to the function.
-func Binding(binding bindings.Bindable) FunctionOption {
-	return func(f *function) {
-		if f.bindings == nil {
-			f.bindings = []bindings.Bindable{binding}
-			return
-		}
-		f.bindings = append(f.bindings, binding)
-	}
-}
+// QueueTrigger takes the provided name and function and sets it to the
+// function.
+var QueueTrigger = Trigger
+
+// TimerTrigger takes the provided name and function and sets it to the
+// function.
+var TimeTrigger = Trigger
