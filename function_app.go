@@ -35,7 +35,7 @@ type FunctionApp struct {
 	httpServer *http.Server
 	router     *http.ServeMux
 	// functions that are set on the FunctionApp.
-	functions map[string]*function
+	functions map[string]function
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	services services
@@ -67,9 +67,10 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 			WriteTimeout: time.Second * 30,
 			IdleTimeout:  time.Second * 60,
 		},
-		router:   router,
-		services: make(services, 0),
-		clients:  make(clients, 0),
+		functions: make(map[string]function),
+		router:    router,
+		services:  make(services),
+		clients:   make(clients),
 	}
 	for _, option := range options {
 		option(app)
@@ -131,11 +132,14 @@ func (a FunctionApp) shutdown() (os.Signal, error) {
 
 // AddFunction adds a function to the FunctionApp.
 func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
-	f := &function{
+	if a.functions == nil {
+		a.functions = make(map[string]function)
+	}
+	f := function{
 		name: name,
 	}
 	for _, option := range options {
-		option(f)
+		option(&f)
 	}
 	a.functions[name] = f
 }
@@ -143,7 +147,7 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 // handler takes the provided *function, creates a *Context and a trigger
 // and executes the function on the route it has been configured
 // with (the function name).
-func (a FunctionApp) handler(fn *function) http.Handler {
+func (a FunctionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
 			Output:   bindings.NewOutput(bindings.WithBindings(fn.bindings...)),
@@ -181,8 +185,6 @@ func (a FunctionApp) handler(fn *function) http.Handler {
 			return
 		}
 
-		// Write OK response to the function host.
-		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(ctx.Output.JSON())
 	})
