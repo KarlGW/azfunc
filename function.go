@@ -113,4 +113,4 @@ var QueueTrigger = Trigger
 
 // TimerTrigger takes the provided name and function and sets it to the
 // function.
-var TimeTrigger = Trigger
+var TimerTrigger = Trigger
