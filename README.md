@@ -352,7 +352,7 @@ func main() {
     }))
 
 	app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
-
+        // Omitted for example.
 	}))
 
 	app.AddFunction("helloTimer", azfunc.TimeTrigger("timer", func(ctx *azfunc.Context, b triggers.Base) error {
