@@ -7,7 +7,7 @@ and from the Azure Function host when developing Azure Functions with Custom han
 
 The module provides several ways of working with Azure Functions:
 
-* [`FunctionApp`](#functions) provides a framework that abstract away the need for setting up an HTTP server with handlers. It handles input
+* [`FunctionApp`](#function-app) provides a framework that abstract away the need for setting up an HTTP server with handlers. It handles input
 and output from and to the Function host.
 * [Triggers](#triggers-input-bindings) and [Output](#output-output-bindings) to just provide structures and functions for handling input and output from
 the function host.
@@ -18,7 +18,11 @@ the function host.
   * [HTTP only Functions](#http-only-functions)
 * [Install](#install)
 * [Usage](#usage)
-  * [Functions](#functions)
+  * [`FunctionApp``](#function-app)
+    * [HTTP trigger and output binding](#http-trigger-and-output-binding)
+    * [HTTP trigger with a queue output binding](#http-trigger-with-a-queue-output-binding)
+    * [Queue trigger with queue output binding](#queue-trigger-with-queue-output-binding)
+    * [Timer trigger](#timer-trigger)
   * [Triggers (input bindings)](#triggers-input-bindings)
   * [Outputs (output bindings)](#output-output-bindings)
 * [Roadmap](#roadmap)
@@ -64,9 +68,303 @@ go get github.com/KarlGW/azfunc
 
 ## Usage
 
-### Functions
+As a user of this module you can decide to either use the framework provided to work with the input and output from the Function host,
+or to use the provided functions and structures to to parse the incoming and outgoing requests.
 
+### `FunctionApp`
 
+The framework takes care of setting up the server and handlers, and you as a user register functions and bindings. Each function must have a corresponding `function.json` with binding specifications, in a folder named after the function. For more information about bindings, check out the [documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-expressions-patterns).
+
+The triggers and bindings registered to
+the `FunctionApp` must match with the names of the bindings in this file, the exception being with HTTP triggers and bindings, `req` and `res` where this is handled without the names for convenience.
+
+Creating this structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions ot can be used to run and test your functions locally.
+
+All examples assumes the following steps have been done (either with `func` or manually.)
+
+```sh
+# Initiate the function project.
+mkdir example && cd example
+func init
+```
+
+#### HTTP trigger and output binding
+
+```sh
+# Create the function.json in folder helloHTTP.
+func new --name helloHTTP --language custom --template 'HTTP trigger'
+```
+
+*Folder with the function name*
+
+```sh
+├── helloHTTP
+│   └── function.json
+```
+
+*`function.json` with input binding (trigger) and output binding*
+
+```json
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+  ]
+}
+```
+
+```go
+package main
+
+import (
+	"github.com/KarlGW/azfunc"
+	"github.com/KarlGW/azfunc/triggers"
+)
+
+func main() {
+    app := azfunc.NewFunctionApp()
+
+	app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Parse the incoming trigger body into the custom type.
+        // To get the raw data of the body, use trigger.Data instead.
+		var t test
+		if err := trigger.Parse(&t); err != nil {
+            // Send response back to caller.
+			ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
+            // To imply an application error, return the error here
+            // instead of nil.
+			return nil
+		}
+        // Do something with t.
+
+        // Create the response.
+		ctx.Output.HTTP().WriteHeader(http.StatusOK)
+		ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
+		ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
+		return nil
+	}))
+
+    if err := app.Start(); err != nil {
+        // Handle error.
+    }
+}
+```
+
+#### HTTP trigger with a queue output binding
+
+```sh
+func new --name helloHTTPQueue --language custom --template 'HTTP Trigger'
+```
+
+*Edit `helloHTTPQueue/function.json`*:
+
+```json
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    // Add queue output binding.
+    {
+      "name": "queue",
+      "type": "queue",
+      "direction": "out",
+      "queueName": "out",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}
+```
+
+```go
+package main
+
+import (
+	"github.com/KarlGW/azfunc"
+	"github.com/KarlGW/azfunc/triggers"
+)
+
+func main() {
+    app := azfunc.NewFunctionApp()
+
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Omitted for example.
+    }))
+
+	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Parse the incoming trigger body into the custom type.
+        // To get the raw data of the body, use trigger.Data instead.
+		var t test
+		if err := trigger.Parse(&t); err != nil {
+            // Send response back to caller.
+			ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
+            // To imply an application error, return the error here
+            // instead of nil.
+			return nil
+		}
+        // Do something with t.
+
+        // Create the response to the caller.
+		ctx.Output.HTTP().WriteHeader(http.StatusOK)
+		ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
+		ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
+        // Send a message to the queu. Name should be the same name as specified
+        // in function.json for the binding.
+        ctx.Output.Binding("queue").Write([]byte(`{"message":"hello queue"}`))
+		return nil
+	}))
+
+    if err := app.Start(); err != nil {
+        // Handle error.
+    }
+}
+```
+
+#### Queue trigger with queue output binding
+
+```sh
+func new --name helloQueue --language custom --template 'Azure Queue Storage trigger'
+```
+
+*Edit `helloQueue/function.json`*:
+
+```json
+{
+  "bindings": [
+    {
+      "name": "queue",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "items",
+      "connection": "AzureWebJobsStorage"
+    },
+    {
+      "name": "outqueue",
+      "type": "queue",
+      "direction": "out",
+      "queueName": "out",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}
+```
+
+```go
+package main
+
+import (
+	"github.com/KarlGW/azfunc"
+	"github.com/KarlGW/azfunc/triggers"
+)
+
+func main() {
+    app := azfunc.NewFunctionApp()
+
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Omitted for example.
+    }))
+
+	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Omitted for example.
+    }))
+
+	app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+		var t test
+		if err := trigger.Parse(&t); err != nil {
+			ctx.Output.ReturnValue = 1
+			return nil
+		}
+		fmt.Println("message:", t)
+
+		ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
+		return nil
+	}))
+
+    if err := app.Start(); err != nil {
+        // Handle error.
+    }
+}
+```
+
+#### Timer trigger
+
+```sh
+func new --name helloTimer --language custom --template 'Timer trigger'
+```
+
+*Edit `helloTimer/function.json`*:
+
+```json
+{
+  "bindings": [
+    {
+      "name": "timer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 */2 * * * *"
+    }
+  ]
+}
+```
+
+```go
+package main
+
+import (
+	"github.com/KarlGW/azfunc"
+	"github.com/KarlGW/azfunc/triggers"
+)
+
+func main() {
+    app := azfunc.NewFunctionApp()
+
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Omitted for example.
+    }))
+
+	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+        // Omitted for example.
+    }))
+
+	app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+
+	}))
+
+	app.AddFunction("helloTimer", azfunc.TimeTrigger("timer", func(ctx *azfunc.Context, b triggers.Base) error {
+		// Do something.
+		return nil
+	}))
+
+    if err := app.Start(); err != nil {
+        // Handle error.
+    }
+}
+```
 
 ### Triggers (input bindings)
 
