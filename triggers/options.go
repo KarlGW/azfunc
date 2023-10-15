@@ -6,7 +6,7 @@ type Options struct {
 	Name string
 }
 
-// Option is function that sets options on Options.
+// Option is a function that sets options on Options.
 type Option func(*Options)
 
 // WithName sets the trigger name get data from. The name should
