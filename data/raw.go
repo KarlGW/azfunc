@@ -7,8 +7,9 @@ import (
 	"unicode/utf8"
 )
 
-// Raw is a type based on []byte with a custom UnmarshalJSON
-// method to handle escaped JSON.
+// Raw is a type based on []byte with custom UnmarshalJSON
+// and MarshalJSON methods to handle double escaped JSON and
+// raw data.
 type Raw []byte
 
 // UnmarshalJSON satisfies json.Unmarshaler. It unquotes
