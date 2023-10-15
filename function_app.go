@@ -40,7 +40,7 @@ type FunctionApp struct {
 	// user to perform type assertion to handle these services.
 	services services
 	// clients contains clients defined by the user. It is up to the
-	// user to perform type assertion to handle these services.
+	// user to perform type assertion to handle these clients.
 	clients clients
 	// log provides logging for the FunctionApp. Defaults to a no-op
 	// logger.
