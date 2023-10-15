@@ -144,7 +144,7 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 	a.functions[name] = f
 }
 
-// handler takes the provided *function, creates a *Context and a trigger
+// handler takes the provided function, creates a *Context and a trigger
 // and executes the function on the route it has been configured
 // with (the function name).
 func (a FunctionApp) handler(fn function) http.Handler {
