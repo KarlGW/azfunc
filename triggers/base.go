@@ -2,7 +2,6 @@ package triggers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/KarlGW/azfunc/data"
@@ -56,7 +55,7 @@ type baseTrigger struct {
 func triggerData(r *http.Request, name string) (map[string]any, data.Raw, error) {
 	var t baseTrigger
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return nil, nil, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
+		return nil, nil, ErrTriggerPayloadMalformed
 	}
 	defer r.Body.Close()
 

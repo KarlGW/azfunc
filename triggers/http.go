@@ -2,7 +2,6 @@ package triggers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/KarlGW/azfunc/data"
@@ -39,7 +38,7 @@ func NewHTTP(r *http.Request, options ...Option) (HTTP, error) {
 
 	var t httpTrigger
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return HTTP{}, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
+		return HTTP{}, ErrTriggerPayloadMalformed
 	}
 	defer r.Body.Close()
 

@@ -3,7 +3,6 @@ package triggers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/KarlGW/azfunc/data"
@@ -52,7 +51,7 @@ func New[T Triggerable](r *http.Request, options ...Option) (Trigger[T], error) 
 		n: opts.Name,
 	}
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return Trigger[T]{}, fmt.Errorf("%w: %w", ErrTriggerPayloadMalformed, err)
+		return Trigger[T]{}, ErrTriggerPayloadMalformed
 	}
 
 	d, ok := t.Payload[t.n]
