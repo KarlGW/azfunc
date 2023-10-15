@@ -1,5 +1,7 @@
 # azfunc
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/KarlGW/azfunc.svg)](https://pkg.go.dev/github.com/KarlGW/azfunc)
+
 > Module to assist with Azure Functions with Custom handlers and Go
 
 The purpose of this module is to provide functions and structures that helps with handling the incoming and outgoing requests to
