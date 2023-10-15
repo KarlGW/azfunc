@@ -61,7 +61,7 @@ func (o Output) Binding(name string) Bindable {
 	return binding
 }
 
-// HTTP returns the HTTB binding of output if any is set.
+// HTTP returns the HTTP binding of output if any is set.
 // If not set it will create, set and return it.
 func (o *Output) HTTP() *HTTP {
 	if o.http == nil || o.http.IsZero() {
