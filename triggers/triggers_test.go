@@ -122,7 +122,7 @@ func TestNew_Base(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new Trigger[BaseTrigger] - simple body",
+			name: "new Trigger[Base] - simple body",
 			input: struct {
 				req     *http.Request
 				options []Option
