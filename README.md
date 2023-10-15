@@ -18,7 +18,7 @@ the function host.
   * [HTTP only Functions](#http-only-functions)
 * [Install](#install)
 * [Usage](#usage)
-  * [`FunctionApp``](#function-app)
+  * [`FunctionApp`](#function-app)
     * [HTTP trigger and HTTP output binding](#http-trigger-and-http-output-binding)
     * [HTTP trigger with a HTTP and a queue output binding](#http-trigger-with-a-http-and-a-queue-output-binding)
     * [Queue trigger with queue output binding](#queue-trigger-with-queue-output-binding)
