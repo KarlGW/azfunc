@@ -1,30 +1,29 @@
-package azfunc
+package triggers
 
 import (
 	"bytes"
 	"io"
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func TestNewTrigger_HTTPTrigger(t *testing.T) {
+func TestNew_HTTP(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
-		want    Trigger[HTTPTrigger]
+		want    Trigger[HTTP]
 		wantErr error
 	}{
 		{
-			name: "new Trigger[HTTPTrigger]",
+			name: "new Trigger[HTTP]",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 			},
-			want: Trigger[HTTPTrigger]{
-				Payload: map[string]HTTPTrigger{
+			want: Trigger[HTTP]{
+				Payload: map[string]HTTP{
 					"req": {
 						URL:    "http://localhost:7071/api/endpoint",
 						Method: http.MethodPost,
@@ -43,12 +42,12 @@ func TestNewTrigger_HTTPTrigger(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new Trigger[HTTPTrigger] with simple body, parameters and query",
+			name: "new Trigger[HTTP] with simple body, parameters and query",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger2)),
 			},
-			want: Trigger[HTTPTrigger]{
-				Payload: map[string]HTTPTrigger{
+			want: Trigger[HTTP]{
+				Payload: map[string]HTTP{
 					"req": {
 						URL:    "http://localhost:7071/api/endpoint",
 						Method: http.MethodPost,
@@ -74,95 +73,46 @@ func TestNewTrigger_HTTPTrigger(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := NewTrigger[HTTPTrigger](test.input)
+			got, gotErr := New[HTTP](test.input)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[HTTPTrigger]{})); diff != "" {
-				t.Errorf("NewTrigger[HTTPTrigger]() = unexpected result (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[HTTP]{})); diff != "" {
+				t.Errorf("New[HTTP]() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
 			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("NewTrigger[HTTPTrigger]() = unexpected error (-want +got)\n%s\n", diff)
+				t.Errorf("New[HTTP]() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
 }
 
-func TestHTTPTrigger_Trigger(t *testing.T) {
-	t.Run("Get underlying HTTPTrigger", func(t *testing.T) {
-		trigger, err := NewTrigger[HTTPTrigger](&http.Request{
-			Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
-		})
-		if err != nil {
-			t.Errorf("unexpected error %v", err)
-		}
-
-		want := HTTPTrigger{
-			URL:    "http://localhost:7071/api/endpoint",
-			Method: http.MethodPost,
-			Query:  map[string]string{},
-			Params: map[string]string{},
-			Headers: http.Header{
-				"Content-Type": {"application/json"},
-			},
-			Body: []byte(`{"message":"hello","number":2}`),
-		}
-
-		got := trigger.Trigger()
-
-		if diff := cmp.Diff(want, got); diff != "" {
-			t.Errorf("Trigger() = unexpected result (-want +got)\n%s\n", diff)
-		}
-	})
-}
-
-func TestGenericTrigger_Trigger(t *testing.T) {
-	t.Run("Get underlying QueueTrigger", func(t *testing.T) {
-		trigger, err := NewTrigger[GenericTrigger](&http.Request{
-			Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
-		}, WithName("queue"))
-		if err != nil {
-			t.Errorf("unexpected error %v", err)
-		}
-
-		want := GenericTrigger{
-			Payload: []byte(`{"message":"hello","number":2}`),
-		}
-
-		got := trigger.Trigger()
-
-		if diff := cmp.Diff(want, got); diff != "" {
-			t.Errorf("Trigger() = unexpected result (-want +got)\n%s\n", diff)
-		}
-	})
-}
-
-func TestNewTrigger_GenericTrigger(t *testing.T) {
+func TestNew_Base(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
 			req     *http.Request
-			options []TriggerOption
+			options []Option
 		}
-		want    Trigger[GenericTrigger]
+		want    Trigger[Base]
 		wantErr error
 	}{
 		{
-			name: "new Trigger[GenericTRigger]",
+			name: "new Trigger[Base]",
 			input: struct {
 				req     *http.Request
-				options []TriggerOption
+				options []Option
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 				},
-				options: []TriggerOption{
+				options: []Option{
 					WithName("queue"),
 				},
 			},
-			want: Trigger[GenericTrigger]{
-				Payload: map[string]GenericTrigger{
+			want: Trigger[Base]{
+				Payload: map[string]Base{
 					"queue": {
-						Payload: []byte(`{"message":"hello","number":2}`),
+						Raw: []byte(`{"message":"hello","number":2}`),
 					},
 				},
 				Metadata: map[string]any{},
@@ -172,22 +122,22 @@ func TestNewTrigger_GenericTrigger(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new Trigger[GenericTRigger] - simple body",
+			name: "new Trigger[Base] - simple body",
 			input: struct {
 				req     *http.Request
-				options []TriggerOption
+				options []Option
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger2)),
 				},
-				options: []TriggerOption{
+				options: []Option{
 					WithName("queue"),
 				},
 			},
-			want: Trigger[GenericTrigger]{
-				Payload: map[string]GenericTrigger{
+			want: Trigger[Base]{
+				Payload: map[string]Base{
 					"queue": {
-						Payload: []byte(`hello`),
+						Raw: []byte(`hello`),
 					},
 				},
 				Metadata: map[string]any{},
@@ -197,31 +147,31 @@ func TestNewTrigger_GenericTrigger(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "new Trigger[GenericTRigger] - error no name provided",
+			name: "new Trigger[Base] - error no name provided",
 			input: struct {
 				req     *http.Request
-				options []TriggerOption
+				options []Option
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger2)),
 				},
 				options: nil,
 			},
-			want:    Trigger[GenericTrigger]{},
+			want:    Trigger[Base]{},
 			wantErr: ErrTriggerNameIncorrect,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := NewTrigger[GenericTrigger](test.input.req, test.input.options...)
+			got, gotErr := New[Base](test.input.req, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[GenericTrigger]{})); diff != "" {
-				t.Errorf("NewTrigger[GenericTrigger]() = unexpected result (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Trigger[Base]{})); diff != "" {
+				t.Errorf("New[Base]() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
 			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("NewTrigger[GenericTrigger]() = unexpected error (-want +got)\n%s\n", diff)
+				t.Errorf("New[Base]() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
@@ -230,17 +180,17 @@ func TestNewTrigger_GenericTrigger(t *testing.T) {
 func TestTrigger_Parse(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() Trigger[HTTPTrigger]
+		input   func() Trigger[HTTP]
 		want    testType
 		wantErr error
 	}{
 		{
-			name: "Parse the data in Trigger[HTTPTrigger]",
-			input: func() Trigger[HTTPTrigger] {
+			name: "Parse the data in Trigger[HTTP]",
+			input: func() Trigger[HTTP] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 				}
-				trigger, _ := NewTrigger[HTTPTrigger](req)
+				trigger, _ := New[HTTP](req)
 				return trigger
 			},
 			want: testType{
@@ -266,20 +216,20 @@ func TestTrigger_Parse(t *testing.T) {
 	}
 }
 
-func TestHTTPTrigger_Data(t *testing.T) {
+func TestHTTP_Data(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() Trigger[HTTPTrigger]
+		input   func() Trigger[HTTP]
 		want    []byte
 		wantErr error
 	}{
 		{
-			name: "Parse the data in Trigger[GenericTrigger]",
-			input: func() Trigger[HTTPTrigger] {
+			name: "Parse the data in Trigger[HTTP]",
+			input: func() Trigger[HTTP] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 				}
-				trigger, _ := NewTrigger[HTTPTrigger](req)
+				trigger, _ := New[HTTP](req)
 				return trigger
 			},
 			want: []byte(`{"message":"hello","number":2}`),
@@ -297,20 +247,20 @@ func TestHTTPTrigger_Data(t *testing.T) {
 	}
 }
 
-func TestGenericTrigger_Parse(t *testing.T) {
+func TestBase_Parse(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() Trigger[GenericTrigger]
+		input   func() Trigger[Base]
 		want    testType
 		wantErr error
 	}{
 		{
-			name: "Parse the data in Trigger[GenericTrigger]",
-			input: func() Trigger[GenericTrigger] {
+			name: "Parse the data in Trigger[Base]",
+			input: func() Trigger[Base] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 				}
-				trigger, _ := NewTrigger[GenericTrigger](req, WithName("queue"))
+				trigger, _ := New[Base](req, WithName("queue"))
 				return trigger
 			},
 			want: testType{
@@ -336,20 +286,20 @@ func TestGenericTrigger_Parse(t *testing.T) {
 	}
 }
 
-func TestGenericTrigger_Data(t *testing.T) {
+func TestBase_Data(t *testing.T) {
 	var tests = []struct {
 		name    string
-		input   func() Trigger[GenericTrigger]
+		input   func() Trigger[Base]
 		want    []byte
 		wantErr error
 	}{
 		{
-			name: "Parse the data in Trigger[GenericTrigger]",
-			input: func() Trigger[GenericTrigger] {
+			name: "Parse the data in trigger[Base]",
+			input: func() Trigger[Base] {
 				req := &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 				}
-				trigger, _ := NewTrigger[GenericTrigger](req, WithName("queue"))
+				trigger, _ := New[Base](req, WithName("queue"))
 				return trigger
 			},
 			want: []byte(`{"message":"hello","number":2}`),
@@ -367,7 +317,7 @@ func TestGenericTrigger_Data(t *testing.T) {
 	}
 }
 
-func TestParse_HTTPTrigger(t *testing.T) {
+func TestParse_HTTP(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
@@ -375,7 +325,7 @@ func TestParse_HTTPTrigger(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Parse - HTTPTrigger",
+			name: "Parse - HTTP",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 			},
@@ -390,7 +340,7 @@ func TestParse_HTTPTrigger(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var got testType
-			gotErr := Parse[HTTPTrigger](test.input, &got)
+			gotErr := Parse[HTTP](test.input, &got)
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("Parse() = unexpected result (-want +got)\n%s\n", diff)
@@ -403,7 +353,7 @@ func TestParse_HTTPTrigger(t *testing.T) {
 	}
 }
 
-func TestData_HTTPTrigger(t *testing.T) {
+func TestData_HTTP(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
@@ -411,7 +361,7 @@ func TestData_HTTPTrigger(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Data from HTTPTrigger",
+			name: "Data from HTTP",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(httpTrigger1)),
 			},
@@ -422,7 +372,7 @@ func TestData_HTTPTrigger(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := Data[HTTPTrigger](test.input)
+			got, gotErr := Data[HTTP](test.input)
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("Data() = unexpected result (-want +got)\n%s\n", diff)
@@ -435,7 +385,7 @@ func TestData_HTTPTrigger(t *testing.T) {
 	}
 }
 
-func TestParse_GenericTrigger(t *testing.T) {
+func TestParse_Base(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
@@ -443,7 +393,7 @@ func TestParse_GenericTrigger(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Parse - GenericTrigger",
+			name: "Parse - Base",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 			},
@@ -458,7 +408,7 @@ func TestParse_GenericTrigger(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var got testType
-			gotErr := Parse[QueueTrigger](test.input, &got, WithName("queue"))
+			gotErr := Parse[Base](test.input, &got, WithName("queue"))
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("Parse() = unexpected result (-want +got)\n%s\n", diff)
@@ -471,7 +421,7 @@ func TestParse_GenericTrigger(t *testing.T) {
 	}
 }
 
-func TestData_GenericTrigger(t *testing.T) {
+func TestData_Base(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *http.Request
@@ -479,7 +429,7 @@ func TestData_GenericTrigger(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Data from GenericTrigger",
+			name: "Data from Base",
 			input: &http.Request{
 				Body: io.NopCloser(bytes.NewBuffer(queueTrigger1)),
 			},
@@ -490,7 +440,7 @@ func TestData_GenericTrigger(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := Data[GenericTrigger](test.input, WithName("queue"))
+			got, gotErr := Data[Base](test.input, WithName("queue"))
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("Data() = unexpected result (-want +got)\n%s\n", diff)
@@ -500,86 +450,6 @@ func TestData_GenericTrigger(t *testing.T) {
 				t.Errorf("Data() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
-	}
-}
-
-func TestNewRequestFrom(t *testing.T) {
-	var tests = []struct {
-		name    string
-		input   *http.Request
-		want    wantRequest
-		wantErr error
-	}{
-		{
-			name: "Request without params or query",
-			input: &http.Request{
-				Method: http.MethodPost,
-				URL:    &url.URL{},
-				Body:   io.NopCloser(bytes.NewBuffer(httpTrigger1)),
-			},
-			want: wantRequest{
-				method: http.MethodPost,
-				url:    "http://localhost:7071/api/endpoint",
-				body:   []byte(`{"message":"hello","number":2}`),
-				header: http.Header{
-					"Content-Type": []string{"application/json"},
-				},
-			},
-			wantErr: nil,
-		},
-		{
-			name: "Request with params and query",
-			input: &http.Request{
-				Method: http.MethodPost,
-				URL:    &url.URL{},
-				Body:   io.NopCloser(bytes.NewBuffer(httpTrigger2)),
-			},
-			want: wantRequest{
-				method: http.MethodPost,
-				url:    "http://localhost:7071/api/endpoint/resource/1?order=desc",
-				body:   []byte(`hello`),
-				header: http.Header{
-					"Content-Type": []string{"application/json"},
-				},
-			},
-			wantErr: nil,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			req, gotErr := NewRequest(test.input)
-			got := newWantRequest(req)
-
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(wantRequest{})); diff != "" {
-				t.Errorf("NewRequestFrom() = unexpected result (-want +got)\n%s\n", diff)
-			}
-
-			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("NewRequestFrom() = unexpected error (-want +got)\n%s\n", diff)
-			}
-		})
-	}
-}
-
-type wantRequest struct {
-	method string
-	url    string
-	body   []byte
-	header http.Header
-}
-
-func newWantRequest(r *http.Request) wantRequest {
-	var b []byte
-	if r.Body != nil {
-		b, _ = io.ReadAll(r.Body)
-		defer r.Body.Close()
-	}
-	return wantRequest{
-		method: r.Method,
-		url:    r.URL.String(),
-		body:   b,
-		header: r.Header,
 	}
 }
 

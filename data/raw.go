@@ -1,4 +1,4 @@
-package azfunc
+package data
 
 import (
 	"encoding/base64"
@@ -7,46 +7,47 @@ import (
 	"unicode/utf8"
 )
 
-// Payload is a type based on []byte with a custom UnmarshalJSON
-// method to handle escaped JSON.
-type Payload []byte
+// Raw is a type based on []byte with custom UnmarshalJSON
+// and MarshalJSON methods to handle double escaped JSON and
+// raw data.
+type Raw []byte
 
 // UnmarshalJSON satisfies json.Unmarshaler. It unquotes
 // escaped JSON if it's escaped, otherwise sets
 // the data as is.
-func (p *Payload) UnmarshalJSON(b []byte) error {
+func (r *Raw) UnmarshalJSON(b []byte) error {
 	unquoted, err := strconv.Unquote(string(b))
 	if err == nil {
 		innerUnquoted, innerErr := strconv.Unquote(unquoted)
 		if innerErr == nil {
-			*p = Payload(innerUnquoted)
+			*r = Raw(innerUnquoted)
 			return nil
 		}
 		trimmed := trimDoubleQuotes(b)
 		decoded := make([]byte, base64.StdEncoding.DecodedLen(len(trimmed)))
 		if n, err := base64.StdEncoding.Decode(decoded, trimmed); err == nil {
-			*p = Payload(decoded[:n])
+			*r = Raw(decoded[:n])
 			return nil
 		}
-		*p = Payload(unquoted)
+		*r = Raw(unquoted)
 		return nil
 	}
-	*p = Payload(b)
+	*r = Raw(b)
 	return nil
 }
 
 // MarshalJSON satisfies json.Marshaler. If valid JSON
 // is provided it will be escaped and returned as a
 // JSON string, otherwise return the data as is.
-func (p Payload) MarshalJSON() ([]byte, error) {
+func (r Raw) MarshalJSON() ([]byte, error) {
 	var js any
-	if err := json.Unmarshal(p, &js); err == nil {
-		return json.Marshal(string(p))
+	if err := json.Unmarshal(r, &js); err == nil {
+		return json.Marshal(string(r))
 	}
-	if len(p) > 0 && utf8.Valid(p) && p[0] != '"' && p[len(p)-1] != '"' {
-		return json.Marshal(string(p))
+	if len(r) > 0 && utf8.Valid(r) && r[0] != '"' && r[len(r)-1] != '"' {
+		return json.Marshal(string(r))
 	}
-	return json.Marshal(base64.StdEncoding.EncodeToString(p))
+	return json.Marshal(base64.StdEncoding.EncodeToString(r))
 }
 
 // trimDoubleQuotes removes leading and trailing double quotes.

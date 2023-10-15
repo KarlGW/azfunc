@@ -1,4 +1,4 @@
-package azfunc
+package data
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func TestPayload_MarshalJSON(t *testing.T) {
+func TestRaw_MarshalJSON(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   []byte
@@ -42,14 +42,14 @@ func TestPayload_MarshalJSON(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			type testPayload struct {
-				Body Payload `json:"body"`
+			type testRawData struct {
+				Body Raw `json:"body"`
 			}
 
-			p := testPayload{
+			r := testRawData{
 				Body: test.input,
 			}
-			got, gotErr := json.Marshal(p)
+			got, gotErr := json.Marshal(r)
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("MarshalJSON() = unexpected result (-want +got)\n%s\n", diff)
@@ -62,17 +62,17 @@ func TestPayload_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestPayload_UnmarshalJSON(t *testing.T) {
+func TestRaw_UnmarshalJSON(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   []byte
-		want    Payload
+		want    Raw
 		wantErr error
 	}{
 		{
 			name:    "string",
 			input:   []byte(`{"body":"hello"}`),
-			want:    Payload(`hello`),
+			want:    Raw(`hello`),
 			wantErr: nil,
 		},
 		{
@@ -96,11 +96,11 @@ func TestPayload_UnmarshalJSON(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			type testPayload struct {
-				Body Payload `json:"body"`
+			type testRawData struct {
+				Body Raw `json:"body"`
 			}
 
-			var p testPayload
+			var p testRawData
 			gotErr := json.Unmarshal(test.input, &p)
 			got := p.Body
 
