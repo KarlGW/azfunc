@@ -80,8 +80,6 @@ the `FunctionApp` must match with the names of the bindings in this file, the ex
 
 Creating this structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions ot can be used to run and test your functions locally.
 
-All examples assumes the following steps have been done (either with `func` or manually.)
-
 
 #### HTTP trigger and HTTP output binding
 
