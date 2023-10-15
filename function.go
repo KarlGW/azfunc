@@ -51,7 +51,7 @@ type function struct {
 	bindings        []bindings.Bindable
 }
 
-// Context represents the function contexts and contains output,
+// Context represents the function context and contains output,
 // bindings, services and clients.
 type Context struct {
 	// Output contains bindings.
