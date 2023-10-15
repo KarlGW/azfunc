@@ -9,7 +9,7 @@ type Options struct {
 // Option is a function that sets options on Options.
 type Option func(*Options)
 
-// WithName sets the trigger name get data from. The name should
+// WithName sets the trigger name to get data from. The name should
 // match the incoming trigger (binding) name in function.json.
 func WithName(name string) Option {
 	return func(o *Options) {
