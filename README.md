@@ -78,7 +78,7 @@ The framework takes care of setting up the server and handlers, and you as a use
 The triggers and bindings registered to
 the `FunctionApp` must match with the names of the bindings in this file, the exception being with HTTP triggers and bindings, `req` and `res` where this is handled without the names for convenience.
 
-Creating this structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions ot can be used to run and test your functions locally.
+Creating this application structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions it can be used to run and test your functions locally.
 
 
 #### HTTP trigger and HTTP output binding
@@ -166,7 +166,6 @@ func main() {
       "direction": "out",
       "name": "res"
     },
-    // Add queue output binding.
     {
       "name": "queue",
       "type": "queue",
