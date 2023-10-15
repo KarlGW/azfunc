@@ -16,7 +16,7 @@ import (
 var (
 	// ErrNoFunction is returned when no function has been set to the
 	// FunctionApp.
-	ErrNoFunction = errors.New("at least one function must be set on")
+	ErrNoFunction = errors.New("at least one function must be set")
 	// ErrInvalidTrigger is returned when an invalid trigger has been
 	// provided.
 	ErrInvalidTrigger = errors.New("invalid trigger")
