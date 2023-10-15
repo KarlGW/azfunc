@@ -43,10 +43,7 @@ func buildURL(u string, p, q map[string]string) (string, error) {
 		return "", err
 	}
 	for k, v := range p {
-		_url.Path, err = url.JoinPath(_url.Path, k+"/"+v)
-		if err != nil {
-			return "", err
-		}
+		_url.Path += "/" + k + "/" + v
 	}
 
 	if q != nil {
