@@ -266,16 +266,16 @@ func main() {
     }))
 
     app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
-	    var t test
+        var t test
         if err := trigger.Parse(&t); err != nil {
-		    ctx.Output.ReturnValue = 1
+            ctx.Output.ReturnValue = 1
             return nil
         }
         // Do something with t.
         // Send message to queue.
         ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
         return nil
-	}))
+    }))
 
     if err := app.Start(); err != nil {
         // Handle error.
