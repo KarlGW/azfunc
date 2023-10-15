@@ -129,8 +129,8 @@ func main() {
             ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
             // To imply an application error, return the error here
             // instead of nil.
-			return nil
-		}
+            return nil
+        }
         // Do something with t.
         // Create the response.
         ctx.Output.HTTP().WriteHeader(http.StatusOK)
