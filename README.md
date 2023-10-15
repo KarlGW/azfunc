@@ -82,27 +82,10 @@ Creating this structure can be done with ease with the help of the Function [Cor
 
 All examples assumes the following steps have been done (either with `func` or manually.)
 
-```sh
-# Initiate the function project.
-mkdir example && cd example
-func init
-```
 
-#### HTTP trigger and output binding
+#### HTTP trigger and HTTP output binding
 
-```sh
-# Create the function.json in folder helloHTTP.
-func new --name helloHTTP --language custom --template 'HTTP trigger'
-```
-
-*Folder with the function name*
-
-```sh
-├── helloHTTP
-│   └── function.json
-```
-
-*`function.json` with input binding (trigger) and output binding*
+*Create `helloHTTP/function.json` with a HTTP trigger and HTTP output binding*
 
 ```json
 {
@@ -163,13 +146,9 @@ func main() {
 }
 ```
 
-#### HTTP trigger with a queue output binding
+#### HTTP trigger with a HTTP and a queue output binding
 
-```sh
-func new --name helloHTTPQueue --language custom --template 'HTTP Trigger'
-```
-
-*Edit `helloHTTPQueue/function.json`*:
+*Create `helloHTTPQueue/function.json` with a HTTP trigger and a HTTP and a queue output binding*:
 
 ```json
 {
@@ -247,11 +226,7 @@ func main() {
 
 #### Queue trigger with queue output binding
 
-```sh
-func new --name helloQueue --language custom --template 'Azure Queue Storage trigger'
-```
-
-*Edit `helloQueue/function.json`*:
+*Create `helloQueue/function.json` with a queue trigger and a queue output binding*:
 
 ```json
 {
@@ -313,11 +288,7 @@ func main() {
 
 #### Timer trigger
 
-```sh
-func new --name helloTimer --language custom --template 'Timer trigger'
-```
-
-*Edit `helloTimer/function.json`*:
+*Create `helloTimer/function.json` with a timer trigger*:
 
 ```json
 {
