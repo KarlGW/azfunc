@@ -62,7 +62,7 @@ This enables the function to be developed like any HTTP server/handler.
 
 **Prerequisites**
 
-* Go 18
+* Go 1.18
 
 ```sh
 go get github.com/KarlGW/azfunc
@@ -120,24 +120,23 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-	app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
         // Parse the incoming trigger body into the custom type.
         // To get the raw data of the body, use trigger.Data instead.
-		var t test
-		if err := trigger.Parse(&t); err != nil {
+        var t test
+        if err := trigger.Parse(&t); err != nil {
             // Send response back to caller.
-			ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
+            ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
             // To imply an application error, return the error here
             // instead of nil.
 			return nil
 		}
         // Do something with t.
-
         // Create the response.
-		ctx.Output.HTTP().WriteHeader(http.StatusOK)
-		ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
-		ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
-		return nil
+        ctx.Output.HTTP().WriteHeader(http.StatusOK)
+        ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
+        ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
+        return nil
 	}))
 
     if err := app.Start(); err != nil {
@@ -194,28 +193,27 @@ func main() {
         // Omitted for example.
     }))
 
-	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
         // Parse the incoming trigger body into the custom type.
         // To get the raw data of the body, use trigger.Data instead.
-		var t test
-		if err := trigger.Parse(&t); err != nil {
+        var t test
+        if err := trigger.Parse(&t); err != nil {
             // Send response back to caller.
-			ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
+            ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
             // To imply an application error, return the error here
             // instead of nil.
-			return nil
-		}
+            return nil
+        }
         // Do something with t.
-
         // Create the response to the caller.
-		ctx.Output.HTTP().WriteHeader(http.StatusOK)
-		ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
-		ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
+        ctx.Output.HTTP().WriteHeader(http.StatusOK)
+        ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
+        ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
         // Send a message to the queu. Name should be the same name as specified
         // in function.json for the binding.
         ctx.Output.Binding("queue").Write([]byte(`{"message":"hello queue"}`))
-		return nil
-	}))
+        return nil
+    }))
 
     if err := app.Start(); err != nil {
         // Handle error.
@@ -263,20 +261,20 @@ func main() {
         // Omitted for example.
     }))
 
-	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
         // Omitted for example.
     }))
 
-	app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
-		var t test
-		if err := trigger.Parse(&t); err != nil {
-			ctx.Output.ReturnValue = 1
-			return nil
-		}
-		fmt.Println("message:", t)
-
-		ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
-		return nil
+    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+	    var t test
+        if err := trigger.Parse(&t); err != nil {
+		    ctx.Output.ReturnValue = 1
+            return nil
+        }
+        // Do something with t.
+        // Send message to queue.
+        ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
+        return nil
 	}))
 
     if err := app.Start(); err != nil {
@@ -317,18 +315,18 @@ func main() {
         // Omitted for example.
     }))
 
-	app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
         // Omitted for example.
     }))
 
-	app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
         // Omitted for example.
-	}))
+    }))
 
-	app.AddFunction("helloTimer", azfunc.TimeTrigger("timer", func(ctx *azfunc.Context, b triggers.Base) error {
-		// Do something.
-		return nil
-	}))
+    app.AddFunction("helloTimer", azfunc.TimeTrigger("timer", func(ctx *azfunc.Context, b triggers.Base) error {
+        // Do something.
+        return nil
+    }))
 
     if err := app.Start(); err != nil {
         // Handle error.
