@@ -21,7 +21,7 @@ var (
 	ErrTriggerPayloadMalformed = errors.New("trigger payload malformed")
 )
 
-// Triggerable is the interface that wraps around method Data.
+// Triggerable is the interface that wraps around methods Data and Write.
 type Triggerable interface {
 	// Data returns the raw data of the trigger.
 	Data() data.Raw

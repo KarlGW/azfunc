@@ -1,6 +1,6 @@
 package bindings
 
-// Bindable is the interface that wraps around method Name.
+// Bindable is the interface that wraps around methods Name and Write.
 type Bindable interface {
 	// Name returns the name of the binding.
 	Name() string
