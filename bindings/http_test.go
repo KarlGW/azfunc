@@ -21,7 +21,7 @@ func TestNewHTTP(t *testing.T) {
 				name:       "res",
 				StatusCode: http.StatusOK,
 				Body:       nil,
-				header:     nil,
+				header:     http.Header{},
 			},
 		},
 		{

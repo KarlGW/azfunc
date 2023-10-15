@@ -41,7 +41,7 @@ func TestNewOutput(t *testing.T) {
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
-				http:        &HTTP{name: "res", StatusCode: http.StatusOK},
+				http:        &HTTP{name: "res", StatusCode: http.StatusOK, header: http.Header{}},
 			},
 		},
 	}
