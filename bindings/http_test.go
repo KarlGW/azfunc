@@ -78,6 +78,64 @@ func TestHTTP_WriteHeader(t *testing.T) {
 	})
 }
 
+func TestHTTP_WriteResponse(t *testing.T) {
+	var tests = []struct {
+		name  string
+		input struct {
+			statusCode int
+			body       []byte
+			options    []Option
+		}
+		want *HTTP
+	}{
+		{
+			name: "write response",
+			input: struct {
+				statusCode int
+				body       []byte
+				options    []Option
+			}{
+				statusCode: http.StatusCreated,
+				body:       []byte(`{"message":"hello"}`),
+			},
+			want: &HTTP{
+				StatusCode: http.StatusCreated,
+				Body:       data.Raw(`{"message":"hello"}`),
+			},
+		},
+		{
+			name: "write response with hheaders",
+			input: struct {
+				statusCode int
+				body       []byte
+				options    []Option
+			}{
+				statusCode: http.StatusCreated,
+				body:       []byte(`{"message":"hello"}`),
+				options: []Option{
+					WithHeader(http.Header{"Content-Type": {"application/json"}}),
+				},
+			},
+			want: &HTTP{
+				StatusCode: http.StatusCreated,
+				Body:       data.Raw(`{"message":"hello"}`),
+				header:     http.Header{"Content-Type": {"application/json"}},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := &HTTP{}
+			got.WriteResponse(test.input.statusCode, test.input.body, test.input.options...)
+
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(HTTP{})); diff != "" {
+				t.Errorf("WriteResponse() = unexpected result (-want +got)\n%s\n", diff)
+			}
+		})
+	}
+}
+
 func TestHTTP_Name(t *testing.T) {
 	var tests = []struct {
 		name  string
