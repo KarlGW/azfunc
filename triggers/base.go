@@ -27,7 +27,7 @@ func (t Base) Data() data.Raw {
 
 // NewBase creates an returns a Base trigger from the provided
 // *http.Request.
-func NewBase(r *http.Request, name string, options ...Option) (Base, error) {
+func NewBase(r *http.Request, name string, options ...Option) (*Base, error) {
 	opts := Options{}
 	for _, option := range options {
 		option(&opts)
@@ -35,10 +35,10 @@ func NewBase(r *http.Request, name string, options ...Option) (Base, error) {
 
 	metadata, raw, err := triggerData(r, name)
 	if err != nil {
-		return Base{}, err
+		return nil, err
 	}
 
-	return Base{
+	return &Base{
 		Raw:      raw,
 		Metadata: metadata,
 	}, nil
