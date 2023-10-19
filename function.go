@@ -56,12 +56,19 @@ type function struct {
 type Context struct {
 	// Output contains bindings.
 	Output bindings.Output
+	// log contains a logger.
+	log logger
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	services services
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
+}
+
+// Log returns the logger of the context.
+func (c Context) Log() logger {
+	return c.log
 }
 
 // Services returns the services set in the Context.
