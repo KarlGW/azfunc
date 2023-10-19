@@ -151,6 +151,7 @@ func (a FunctionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
 			Output:   bindings.NewOutput(bindings.WithBindings(fn.bindings...)),
+			log:      a.log,
 			services: a.services,
 			clients:  a.clients,
 		}
