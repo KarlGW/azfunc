@@ -72,7 +72,7 @@ func TestNewHTTP(t *testing.T) {
 						Sys: MetadataSys{
 							MethodName: "helloHTTP",
 							UtcNow:     _testTime1,
-							RandGuid:   "b77285b3-ae19-4860-aadf-0ab74c2e4fb7",
+							RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 						},
 					},
 				},
@@ -141,7 +141,7 @@ var httpRequest1 = []byte(`{
 	  "sys": {
 		"MethodName": "helloHTTP",
 		"UtcNow": "2023-10-12T20:13:49.640002Z",
-		"RandGuid": "b77285b3-ae19-4860-aadf-0ab74c2e4fb7"
+		"RandGuid": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741"
 	  }
 	}
   }
