@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/KarlGW/azfunc/data"
 )
@@ -91,6 +92,20 @@ func Data[T Triggerable](r *http.Request, options ...Option) ([]byte, error) {
 		return nil, err
 	}
 	return trigger.Data(), nil
+}
+
+// Metadata represents the metadata of the incoming trigger
+// request.
+type Metadata struct {
+	Sys MetadataSys `json:"sys"`
+}
+
+// MetadataSys contains the sys fields of the incoming trigger
+// request.
+type MetadataSys struct {
+	MethodName string
+	UtcNow     time.Time
+	RandGuid   string
 }
 
 // Trigger aliases.
