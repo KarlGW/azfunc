@@ -11,7 +11,7 @@ type TriggerFunc func(*Context, *triggers.Base) error
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(*Context, *triggers.HTTP) error
 
-// HTTPTriggerFunc represents a Timer based function tp be executed by the function app.
+// TimerTriggerFunc represents a Timer based function tp be executed by the function app.
 type TimerTriggerFunc func(*Context, *triggers.Timer) error
 
 // services is intended to hold custom services to be used within the
