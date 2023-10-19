@@ -6,10 +6,13 @@ import (
 )
 
 // TriggerFunc represents a base function to be executed by the function app.
-type TriggerFunc func(*Context, triggers.Base) error
+type TriggerFunc func(*Context, *triggers.Base) error
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(*Context, *triggers.HTTP) error
+
+// HTTPTriggerFunc represents a Timer based function tp be executed by the function app.
+type TimerTriggerFunc func(*Context, *triggers.Timer) error
 
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
@@ -44,11 +47,10 @@ func (c clients) Get(name string) any {
 // function is an internal structure that represents a function
 // in a FunctionApp.
 type function struct {
-	name            string
-	triggerName     string
-	triggerFunc     TriggerFunc
-	httpTriggerFunc HTTPTriggerFunc
-	bindings        []bindings.Bindable
+	name        string
+	triggerName string
+	trigger     any
+	bindings    []bindings.Bindable
 }
 
 // Context represents the function context and contains output,
@@ -100,8 +102,7 @@ func Binding(binding bindings.Bindable) FunctionOption {
 func Trigger(name string, fn TriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
-		f.triggerFunc = fn
-		f.httpTriggerFunc = nil
+		f.trigger = fn
 	}
 }
 
@@ -109,15 +110,20 @@ func Trigger(name string, fn TriggerFunc) FunctionOption {
 // function.
 func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	return func(f *function) {
-		f.httpTriggerFunc = fn
-		f.triggerFunc = nil
+		f.triggerName = "req"
+		f.trigger = fn
+	}
+}
+
+// TimerTrigger takes the provided function and sets it to the
+// function.
+func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = "timer"
+		f.trigger = fn
 	}
 }
 
 // QueueTrigger takes the provided name and function and sets it to the
 // function.
 var QueueTrigger = Trigger
-
-// TimerTrigger takes the provided name and function and sets it to the
-// function.
-var TimerTrigger = Trigger
