@@ -46,6 +46,19 @@ func (b *HTTP) Header() http.Header {
 	return b.header
 }
 
+// WriteResponse writes the provided status code, body and options to
+// the HTTP binding. Supports option WithHeader.
+func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...Option) {
+	opts := Options{}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	b.StatusCode = statusCode
+	b.Body = data.Raw(body)
+	b.header = opts.Header
+}
+
 // IsZero checks if the HTTP binding is unset.
 func (b HTTP) IsZero() bool {
 	return b.StatusCode == 0 && b.Body == nil && b.header == nil

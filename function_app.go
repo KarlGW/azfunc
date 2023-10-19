@@ -156,39 +156,40 @@ func (a FunctionApp) handler(fn function) http.Handler {
 			clients:  a.clients,
 		}
 
-		if fn.triggerFunc != nil {
-			trigger, err := triggers.NewBase(r, fn.triggerName)
-			if err != nil {
-				a.log.Error(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if err := fn.triggerFunc(ctx, trigger); err != nil {
-				a.log.Error(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		} else if fn.httpTriggerFunc != nil {
-			trigger, err := triggers.NewHTTP(r)
-			if err != nil {
-				a.log.Error(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if err := fn.httpTriggerFunc(ctx, trigger); err != nil {
-				a.log.Error(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		} else {
-			a.log.Error(ErrInvalidTrigger.Error())
-			http.Error(w, ErrInvalidTrigger.Error(), http.StatusInternalServerError)
-			return
+		if err := a.executeFunc(r, ctx, fn.triggerName, fn.trigger); err != nil {
+			a.log.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(ctx.Output.JSON())
 	})
+}
+
+// executeFunc executes a function.
+func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn any, options ...triggers.Option) error {
+	switch fn := fn.(type) {
+	case TriggerFunc:
+		trigger, err := triggers.NewBase(r, name, options...)
+		if err != nil {
+			return err
+		}
+		return fn(ctx, trigger)
+	case HTTPTriggerFunc:
+		trigger, err := triggers.NewHTTP(r, options...)
+		if err != nil {
+			return err
+		}
+		return fn(ctx, trigger)
+	case TimerTriggerFunc:
+		trigger, err := triggers.NewTimer(r, options...)
+		if err != nil {
+			return err
+		}
+		return fn(ctx, trigger)
+	default:
+		return ErrInvalidTrigger
+	}
 }
 
 // WithService sets the provided service to the FunctionApp. Can be

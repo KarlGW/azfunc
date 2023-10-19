@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/KarlGW/azfunc/data"
 )
@@ -23,3 +24,15 @@ type Options struct {
 
 // Option is a function that sets Options.
 type Option func(o *Options)
+
+// WithHeader adds the provided header to a HTTP binding.
+func WithHeader(header http.Header) Option {
+	return func(o *Options) {
+		if o.Header == nil {
+			o.Header = http.Header{}
+		}
+		for k, v := range header {
+			o.Header.Add(k, strings.Join(v, ", "))
+		}
+	}
+}
