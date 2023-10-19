@@ -9,7 +9,7 @@ import (
 type TriggerFunc func(*Context, triggers.Base) error
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
-type HTTPTriggerFunc func(*Context, triggers.HTTP) error
+type HTTPTriggerFunc func(*Context, *triggers.HTTP) error
 
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
