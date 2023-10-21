@@ -86,6 +86,7 @@ func (c Context) Err() error {
 func (c *Context) SetError(err error) {
 	if c.err == nil {
 		c.err = err
+		return
 	}
 	c.err = fmt.Errorf("%w", err)
 }
