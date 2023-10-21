@@ -68,21 +68,21 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
-	// err contains error (wrapped if multiple) set to the context.
+	// err contains error (wrapped if multiple).
 	err error
 }
 
-// Log returns the logger of the context.
+// Log returns the logger of the Context.
 func (c Context) Log() logger {
 	return c.log
 }
 
-// Err returns the errors (wrapped if multiple).
+// Err returns the errors (wrapped if multiple) set to the Context.
 func (c Context) Err() error {
 	return c.err
 }
 
-// SetError sets an error to the context.
+// SetError sets an error to the Context.
 func (c *Context) SetError(err error) {
 	if c.err == nil {
 		c.err = err
