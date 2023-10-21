@@ -174,22 +174,23 @@ func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn 
 		if err != nil {
 			return err
 		}
-		return fn(ctx, trigger)
+		fn(ctx, trigger)
 	case HTTPTriggerFunc:
 		trigger, err := triggers.NewHTTP(r, options...)
 		if err != nil {
 			return err
 		}
-		return fn(ctx, trigger)
+		fn(ctx, trigger)
 	case TimerTriggerFunc:
 		trigger, err := triggers.NewTimer(r, options...)
 		if err != nil {
 			return err
 		}
-		return fn(ctx, trigger)
+		fn(ctx, trigger)
 	default:
 		return ErrInvalidTrigger
 	}
+	return ctx.err
 }
 
 // WithService sets the provided service to the FunctionApp. Can be
