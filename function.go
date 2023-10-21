@@ -100,6 +100,12 @@ func (c *Context) Clients() clients {
 	return c.clients
 }
 
+// SetLogger sets a logger to the Context. Should not be used in most
+// use-cases due to it being set by the FunctionApp.
+func (c *Context) SetLogger(l logger) {
+	c.log = l
+}
+
 // FunctionOption sets options to the function.
 type FunctionOption func(f *function)
 
