@@ -68,7 +68,7 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
-	// contextError contains errors set to the context.
+	// err contains error (wrapped if multiple) set to the context.
 	err error
 }
 
