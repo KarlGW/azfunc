@@ -1,18 +1,20 @@
 package azfunc
 
 import (
+	"fmt"
+
 	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/triggers"
 )
 
 // TriggerFunc represents a base function to be executed by the function app.
-type TriggerFunc func(*Context, *triggers.Base) error
+type TriggerFunc func(*Context, *triggers.Base)
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
-type HTTPTriggerFunc func(*Context, *triggers.HTTP) error
+type HTTPTriggerFunc func(*Context, *triggers.HTTP)
 
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
-type TimerTriggerFunc func(*Context, *triggers.Timer) error
+type TimerTriggerFunc func(*Context, *triggers.Timer)
 
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
@@ -66,11 +68,27 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
+	// err contains error (wrapped if multiple).
+	err error
 }
 
-// Log returns the logger of the context.
+// Log returns the logger of the Context.
 func (c Context) Log() logger {
 	return c.log
+}
+
+// Err returns the errors (wrapped if multiple) set to the Context.
+func (c Context) Err() error {
+	return c.err
+}
+
+// SetError sets an error to the Context.
+func (c *Context) SetError(err error) {
+	if c.err == nil {
+		c.err = err
+		return
+	}
+	c.err = fmt.Errorf("%w", err)
 }
 
 // Services returns the services set in the Context.
@@ -81,6 +99,12 @@ func (c *Context) Services() services {
 // Clients returns the clients set in the Context.
 func (c *Context) Clients() clients {
 	return c.clients
+}
+
+// SetLogger sets a logger to the Context. Should not be used in most
+// use-cases due to it being set by the FunctionApp.
+func (c *Context) SetLogger(l logger) {
+	c.log = l
 }
 
 // FunctionOption sets options to the function.

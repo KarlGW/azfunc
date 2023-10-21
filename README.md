@@ -120,29 +120,28 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Parse the incoming trigger body into the custom type.
         // To get the raw data of the body, use trigger.Data instead.
         var t test
         if err := trigger.Parse(&t); err != nil {
             // Send response back to caller.
             ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
-            // To imply an application error, return the error here
-            // instead of nil.
-            return nil
+            return
         }
         // Do something with t.
         // Create the response.
         ctx.Output.HTTP().WriteHeader(http.StatusOK)
         ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
         ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
-        return nil
 	}))
 
     if err := app.Start(); err != nil {
         // Handle error.
     }
 }
+
+type test struct {}
 ```
 
 #### HTTP trigger with a HTTP and a queue output binding
@@ -189,20 +188,18 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Parse the incoming trigger body into the custom type.
         // To get the raw data of the body, use trigger.Data instead.
         var t test
         if err := trigger.Parse(&t); err != nil {
             // Send response back to caller.
             ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
-            // To imply an application error, return the error here
-            // instead of nil.
-            return nil
+            return
         }
         // Do something with t.
         // Create the response to the caller.
@@ -212,7 +209,6 @@ func main() {
         // Send a message to the queu. Name should be the same name as specified
         // in function.json for the binding.
         ctx.Output.Binding("queue").Write([]byte(`{"message":"hello queue"}`))
-        return nil
     }))
 
     if err := app.Start(); err != nil {
@@ -257,24 +253,25 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
         var t test
         if err := trigger.Parse(&t); err != nil {
             ctx.Output.ReturnValue = 1
-            return nil
+            // Set error to the context to signal an error to the Function host.
+            ctx.SetError(err)
+            return
         }
         // Do something with t.
         // Send message to queue.
         ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
-        return nil
     }))
 
     if err := app.Start(); err != nil {
@@ -311,21 +308,20 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger triggers.HTTP) error {
+    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger triggers.Queue) error {
+    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
         // Omitted for example.
     }))
 
-    app.AddFunction("helloTimer", azfunc.TimeTrigger("timer", func(ctx *azfunc.Context, b triggers.Base) error {
+    app.AddFunction("helloTimer", azfunc.TimeTrigger(func(ctx *azfunc.Context, trigger *triggers.Timer) {
         // Do something.
-        return nil
     }))
 
     if err := app.Start(); err != nil {
