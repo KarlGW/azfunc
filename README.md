@@ -24,7 +24,6 @@ the function host.
     * [HTTP trigger and HTTP output binding](#http-trigger-and-http-output-binding)
     * [HTTP trigger with a HTTP and a queue output binding](#http-trigger-with-a-http-and-a-queue-output-binding)
     * [Queue trigger with queue output binding](#queue-trigger-with-queue-output-binding)
-    * [Timer trigger](#timer-trigger)
   * [Triggers (input bindings)](#triggers-input-bindings)
   * [Outputs (output bindings)](#output-output-bindings)
 * [Roadmap](#roadmap)
@@ -141,7 +140,9 @@ func main() {
     }
 }
 
-type test struct {}
+type test struct {
+    Message string `json:"message"`
+}
 ```
 
 #### HTTP trigger with a HTTP and a queue output binding
@@ -272,56 +273,6 @@ func main() {
         // Do something with t.
         // Send message to queue.
         ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
-    }))
-
-    if err := app.Start(); err != nil {
-        // Handle error.
-    }
-}
-```
-
-#### Timer trigger
-
-*Create `helloTimer/function.json` with a timer trigger*:
-
-```json
-{
-  "bindings": [
-    {
-      "name": "timer",
-      "type": "timerTrigger",
-      "direction": "in",
-      "schedule": "0 */2 * * * *"
-    }
-  ]
-}
-```
-
-```go
-package main
-
-import (
-	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
-)
-
-func main() {
-    app := azfunc.NewFunctionApp()
-
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloTimer", azfunc.TimeTrigger(func(ctx *azfunc.Context, trigger *triggers.Timer) {
-        // Do something.
     }))
 
     if err := app.Start(); err != nil {
