@@ -79,7 +79,7 @@ the `FunctionApp` must match with the names of the bindings in this file, the ex
 
 Creating this application structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions it can be used to run and test your functions locally.
 
-Below is example on how to create a function with a HTTP trigger and a HTTP output binding (response). More examples with different triggers and output can be found [here](./_examples/).
+Below is an example on how to create a function with a HTTP trigger and a HTTP output binding (response). More examples with different triggers and output can be found [here](./_examples/).
 
 
 #### HTTP trigger and HTTP output binding
