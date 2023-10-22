@@ -22,7 +22,6 @@ the function host.
 * [Usage](#usage)
   * [`FunctionApp`](#function-app)
     * [HTTP trigger and HTTP output binding](#http-trigger-and-http-output-binding)
-    * [Queue trigger with queue output binding](#queue-trigger-with-queue-output-binding)
   * [Triggers (input bindings)](#triggers-input-bindings)
   * [Outputs (output bindings)](#output-output-bindings)
 * [Roadmap](#roadmap)
@@ -79,6 +78,8 @@ The triggers and bindings registered to
 the `FunctionApp` must match with the names of the bindings in this file, the exception being with HTTP triggers and bindings, `req` and `res` where this is handled without the names for convenience.
 
 Creating this application structure can be done with ease with the help of the Function [Core tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local). In addition to scaffolding functions it can be used to run and test your functions locally.
+
+Below is an example on how to create a function with a HTTP trigger and a HTTP output binding (response). More examples with different triggers and output can be found [here](./_examples/).
 
 
 #### HTTP trigger and HTTP output binding
@@ -141,69 +142,6 @@ func main() {
 
 type test struct {
     Message string `json:"message"`
-}
-```
-
-#### Queue trigger with queue output binding
-
-*Create `helloQueue/function.json` with a queue trigger and a queue output binding*:
-
-```json
-{
-  "bindings": [
-    {
-      "name": "queue",
-      "type": "queueTrigger",
-      "direction": "in",
-      "queueName": "items",
-      "connection": "AzureWebJobsStorage"
-    },
-    {
-      "name": "outqueue",
-      "type": "queue",
-      "direction": "out",
-      "queueName": "out",
-      "connection": "AzureWebJobsStorage"
-    }
-  ]
-}
-```
-
-```go
-package main
-
-import (
-	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
-)
-
-func main() {
-    app := azfunc.NewFunctionApp()
-
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloQueue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
-        var t test
-        if err := trigger.Parse(&t); err != nil {
-            ctx.Output.ReturnValue = 1
-            // Set error to the context to signal an error to the Function host.
-            ctx.SetError(err)
-            return
-        }
-        // Do something with t.
-        // Send message to queue.
-        ctx.Output.Binding("outqueue").Write([]byte(`{"message":"from-queue"}`))
-    }))
-
-    if err := app.Start(); err != nil {
-        // Handle error.
-    }
 }
 ```
 
