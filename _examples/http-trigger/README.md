@@ -1,8 +1,8 @@
-# timer-trigger
+# http-trigger
 
-> Example with a Timer trigger
+> Example with a HTTP trigger
 
-This is an example of running an Azunre Function with a timer triggered function. It is recommended to make use of the Function [Core](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) tools together with [azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite) to test and run this example application.
+This is an example of running an Azunre Function with a HTTP triggered function. It is recommended to make use of the Function [Core](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) tools together with [azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite) to test and run this example application.
 
 * [Run the function](#run-the-function)
 * [Application structure](#application-structure)
@@ -31,7 +31,7 @@ Make sure the name of the built executable is the same as set in `host.json`:
   // ...
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "timer-trigger",
+      "defaultExecutablePath": "http-trigger",
       // ...
     }
   }
@@ -46,7 +46,7 @@ go build && func start
 
 ```sh
 .
-├── hello-timer
+├── hello-http
 │   └── function.json
 ├── README.md
 ├── go.mod
@@ -55,11 +55,11 @@ go build && func start
 ├── main.go
 ```
 
-This example only contains one function, `hello-timer`. When using Azure Functions with custom handlers each function needs its own directory with the same name as the function containing a `function.json`.
+This example only contains one function, `hello-http`. When using Azure Functions with custom handlers each function needs its own directory with the same name as the function containing a `function.json`.
 
 ```sh
 .
-├── hello-timer
+├── hello-http
 │   └── function.json
 ```
 
@@ -72,7 +72,7 @@ package main
 
 func main() {
     // ...
-    app.AddFunction("hello-timer", azfunc.TimerTrigger(/* ... */))
+    app.AddFunction("hello-http", azfunc.HTTPTrigger(/* ... */))
     // ...
 }
 ```
