@@ -22,7 +22,6 @@ the function host.
 * [Usage](#usage)
   * [`FunctionApp`](#function-app)
     * [HTTP trigger and HTTP output binding](#http-trigger-and-http-output-binding)
-    * [HTTP trigger with a HTTP and a queue output binding](#http-trigger-with-a-http-and-a-queue-output-binding)
     * [Queue trigger with queue output binding](#queue-trigger-with-queue-output-binding)
   * [Triggers (input bindings)](#triggers-input-bindings)
   * [Outputs (output bindings)](#output-output-bindings)
@@ -84,7 +83,7 @@ Creating this application structure can be done with ease with the help of the F
 
 #### HTTP trigger and HTTP output binding
 
-*Create `helloHTTP/function.json` with a HTTP trigger and HTTP output binding*
+*Create `hello-http/function.json` with a HTTP trigger and HTTP output binding*
 
 ```json
 {
@@ -119,7 +118,7 @@ import (
 func main() {
     app := azfunc.NewFunctionApp()
 
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
+    app.AddFunction("hello-http", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
         // Parse the incoming trigger body into the custom type.
         // To get the raw data of the body, use trigger.Data instead.
         var t test
@@ -142,79 +141,6 @@ func main() {
 
 type test struct {
     Message string `json:"message"`
-}
-```
-
-#### HTTP trigger with a HTTP and a queue output binding
-
-*Create `helloHTTPQueue/function.json` with a HTTP trigger and a HTTP and a queue output binding*:
-
-```json
-{
-  "bindings": [
-    {
-      "authLevel": "function",
-      "type": "httpTrigger",
-      "direction": "in",
-      "name": "req",
-      "methods": [
-        "get",
-        "post"
-      ]
-    },
-    {
-      "type": "http",
-      "direction": "out",
-      "name": "res"
-    },
-    {
-      "name": "queue",
-      "type": "queue",
-      "direction": "out",
-      "queueName": "out",
-      "connection": "AzureWebJobsStorage"
-    }
-  ]
-}
-```
-
-```go
-package main
-
-import (
-	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
-)
-
-func main() {
-    app := azfunc.NewFunctionApp()
-
-    app.AddFunction("helloHTTP", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Omitted for example.
-    }))
-
-    app.AddFunction("helloHTTPQueue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
-        // Parse the incoming trigger body into the custom type.
-        // To get the raw data of the body, use trigger.Data instead.
-        var t test
-        if err := trigger.Parse(&t); err != nil {
-            // Send response back to caller.
-            ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
-            return
-        }
-        // Do something with t.
-        // Create the response to the caller.
-        ctx.Output.HTTP().WriteHeader(http.StatusOK)
-        ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
-        ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
-        // Send a message to the queu. Name should be the same name as specified
-        // in function.json for the binding.
-        ctx.Output.Binding("queue").Write([]byte(`{"message":"hello queue"}`))
-    }))
-
-    if err := app.Start(); err != nil {
-        // Handle error.
-    }
 }
 ```
 
