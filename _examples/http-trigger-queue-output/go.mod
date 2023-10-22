@@ -2,4 +2,6 @@ module http-trigger-queue-output
 
 go 1.21.3
 
-require github.com/KarlGW/azfunc v0.3.0 // indirect
+replace github.com/KarlGW/azfunc => ../../
+
+require github.com/KarlGW/azfunc v0.0.0-00010101000000-000000000000
