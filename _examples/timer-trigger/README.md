@@ -68,6 +68,8 @@ In `main.go` it is registered like so:
 ```go
 package main
 
+// ...
+
 func main() {
     // ...
     app.AddFunction("hello-timer", azfunc.TimerTrigger(/* ... */))
