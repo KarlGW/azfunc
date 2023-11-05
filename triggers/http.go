@@ -2,9 +2,20 @@ package triggers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/KarlGW/azfunc/data"
+)
+
+var (
+	// ErrHTTPInvalidContentType is returned when an invalid Content-Type provided.
+	ErrHTTPInvalidContentType = errors.New("invalid Content-Type")
+	// ErrHTTPInvalidBody is returned when the HTTP body is invalid.
+	ErrHTTPInvalidBody = errors.New("invalid body")
 )
 
 // HTTP represents an HTTP trigger.
@@ -59,6 +70,29 @@ func (t HTTP) Parse(v any) error {
 // Data returns the Raw data of the HTTP trigger.
 func (t HTTP) Data() data.Raw {
 	return t.Body
+}
+
+// FormData parses the HTTP trigger for form data sent with Content-Type
+// application/x-www-form-urlencoded and returns it as url.Values.
+func (t HTTP) FormData() (url.Values, error) {
+	contentType := t.Headers.Get("Content-Type")
+	if strings.ToLower(contentType) != "application/x-www-form-urlencoded" {
+		return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidContentType, contentType)
+	}
+
+	data, err := url.ParseQuery(string(t.Body))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidBody, string(t.Body))
+	}
+	if len(data) == 1 {
+		for _, v := range data {
+			if len(v[0]) == 0 {
+				return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidBody, string(t.Body))
+			}
+		}
+	}
+
+	return data, nil
 }
 
 // NewHTTP creates and returns an HTTP trigger from the provided
