@@ -76,6 +76,12 @@ func TestRaw_UnmarshalJSON(t *testing.T) {
 			wantErr: nil,
 		},
 		{
+			name:    "form data string",
+			input:   []byte(`{"body":"field1=value1&field2=value2"}`),
+			want:    Raw(`field1=value1&field2=value2`),
+			wantErr: nil,
+		},
+		{
 			name:    "JSON",
 			input:   []byte(`{"body":"{\"message\":\"hello\"}"}`),
 			want:    []byte(`{"message":"hello"}`),

@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/KarlGW/azfunc/data"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestNewHTTP(t *testing.T) {
@@ -89,6 +91,61 @@ func TestNewHTTP(t *testing.T) {
 
 			if diff := cmp.Diff(test.wantErr, gotErr); diff != "" {
 				t.Errorf("NewHTTP() = unexpected error (-want +got)\n%s\n", diff)
+			}
+		})
+	}
+}
+
+func TestHTTP_FormData(t *testing.T) {
+	var tests = []struct {
+		name    string
+		input   *HTTP
+		want    url.Values
+		wantErr error
+	}{
+		{
+			name: "Parse FormData",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {"application/x-www-form-urlencoded"},
+				},
+				Body: []byte(`field1=value1&field2=value2`),
+			},
+			want: url.Values{
+				"field1": {"value1"},
+				"field2": {"value2"},
+			},
+			wantErr: nil,
+		},
+		{
+			name:    "Parse FormData - invalid header",
+			input:   &HTTP{},
+			want:    nil,
+			wantErr: ErrHTTPInvalidContentType,
+		},
+		{
+			name: "Parse FormData - invalid body",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {"application/x-www-form-urlencoded"},
+				},
+				Body: []byte(`{"message":"hello"}`),
+			},
+			want:    nil,
+			wantErr: ErrHTTPInvalidBody,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, gotErr := test.input.FormData()
+
+			if diff := cmp.Diff(test.want, got); diff != "" {
+				t.Errorf("FormData() = unexpected result (-want +got)\n%s\n", diff)
+			}
+
+			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
+				t.Errorf("FormData() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
