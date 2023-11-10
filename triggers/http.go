@@ -124,7 +124,7 @@ func (t HTTP) MultipartForm(maxMemory int64) (*multipart.Form, error) {
 	}
 
 	if err := r.ParseMultipartForm(maxMemory); err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrHTTPInvalidBody, err)
+		return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidBody, err.Error())
 	}
 	return r.MultipartForm, nil
 }
