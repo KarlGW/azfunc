@@ -1,9 +1,11 @@
 package triggers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -16,6 +18,12 @@ var (
 	ErrHTTPInvalidContentType = errors.New("invalid Content-Type")
 	// ErrHTTPInvalidBody is returned when the HTTP body is invalid.
 	ErrHTTPInvalidBody = errors.New("invalid body")
+)
+
+var (
+	// defaultMultipartFormMaxMemory is the default memory to use
+	// when parsing multipart form data.
+	defaultMultipartFormMaxMemory int64 = 32 << 20
 )
 
 // HTTP represents an HTTP trigger.
@@ -72,9 +80,9 @@ func (t HTTP) Data() data.Raw {
 	return t.Body
 }
 
-// FormData parses the HTTP trigger for form data sent with Content-Type
+// Form parses the HTTP trigger for form data sent with Content-Type
 // application/x-www-form-urlencoded and returns it as url.Values.
-func (t HTTP) FormData() (url.Values, error) {
+func (t HTTP) Form() (url.Values, error) {
 	contentType := t.Headers.Get("Content-Type")
 	if strings.ToLower(contentType) != "application/x-www-form-urlencoded" {
 		return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidContentType, contentType)
@@ -93,6 +101,32 @@ func (t HTTP) FormData() (url.Values, error) {
 	}
 
 	return data, nil
+}
+
+// MultipartForm parses the HTTP trigger for multipart form data and returns the
+// resulting *multipart.Form. The whole request body is parsed and up to a total
+// of maxMemory bytes of its file parts are stored in memory, with the remainder
+// stored on disk in temporary files. If 0 or less is provided it will
+// default to 32 MB.
+func (t HTTP) MultipartForm(maxMemory int64) (*multipart.Form, error) {
+	r, err := http.NewRequest(t.Method, t.URL, bytes.NewReader(t.Body))
+	if err != nil {
+		return nil, err
+	}
+	hdr := t.Headers.Get("Content-Type")
+	if len(hdr) == 0 {
+		return nil, ErrHTTPInvalidContentType
+	}
+	r.Header.Add("Content-Type", hdr)
+
+	if maxMemory <= 0 {
+		maxMemory = defaultMultipartFormMaxMemory
+	}
+
+	if err := r.ParseMultipartForm(maxMemory); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrHTTPInvalidBody, err)
+	}
+	return r.MultipartForm, nil
 }
 
 // NewHTTP creates and returns an HTTP trigger from the provided

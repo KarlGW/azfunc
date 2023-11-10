@@ -3,7 +3,9 @@ package triggers
 import (
 	"bytes"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"testing"
 
@@ -96,7 +98,7 @@ func TestNewHTTP(t *testing.T) {
 	}
 }
 
-func TestHTTP_FormData(t *testing.T) {
+func TestHTTP_Form(t *testing.T) {
 	var tests = []struct {
 		name    string
 		input   *HTTP
@@ -104,7 +106,7 @@ func TestHTTP_FormData(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Parse FormData",
+			name: "Parse Form",
 			input: &HTTP{
 				Headers: http.Header{
 					"Content-Type": {"application/x-www-form-urlencoded"},
@@ -118,13 +120,13 @@ func TestHTTP_FormData(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:    "Parse FormData - invalid header",
+			name:    "Parse Form - invalid content type",
 			input:   &HTTP{},
 			want:    nil,
 			wantErr: ErrHTTPInvalidContentType,
 		},
 		{
-			name: "Parse FormData - invalid body",
+			name: "Parse Form - invalid body",
 			input: &HTTP{
 				Headers: http.Header{
 					"Content-Type": {"application/x-www-form-urlencoded"},
@@ -138,14 +140,85 @@ func TestHTTP_FormData(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := test.input.FormData()
+			got, gotErr := test.input.Form()
 
 			if diff := cmp.Diff(test.want, got); diff != "" {
-				t.Errorf("FormData() = unexpected result (-want +got)\n%s\n", diff)
+				t.Errorf("Form() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
 			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("FormData() = unexpected error (-want +got)\n%s\n", diff)
+				t.Errorf("Form() = unexpected error (-want +got)\n%s\n", diff)
+			}
+		})
+	}
+}
+
+func TestHTTP_MultipartForm(t *testing.T) {
+	var tests = []struct {
+		name    string
+		input   *HTTP
+		want    *multipart.Form
+		wantErr error
+	}{
+		{
+			name: "Parse Multipart Form",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {
+						"multipart/form-data; boundary=------------------------458d15332083a867",
+					},
+				},
+				Body: []byte(mpfd),
+			},
+			want: &multipart.Form{
+				Value: map[string][]string{},
+				File: map[string][]*multipart.FileHeader{
+					"file": {
+						{
+							Filename: "test.txt",
+							Header: textproto.MIMEHeader{
+								"Content-Disposition": {`form-data; name="file"; filename="test.txt"`},
+								"Content-Type":        {"text/plain"},
+							},
+							Size: 7,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Parse Multipart form - invalid content type",
+			input: &HTTP{
+				Body: []byte(mpfd),
+			},
+			want:    nil,
+			wantErr: ErrHTTPInvalidContentType,
+		},
+		{
+			name: "Parse Multipart form - invalid body",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {
+						"multipart/form-data; boundary=------------------------458d15332083a867",
+					},
+				},
+				Body: []byte(`test`),
+			},
+			want:    nil,
+			wantErr: ErrHTTPInvalidBody,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, gotErr := test.input.MultipartForm(32 << 20)
+
+			if diff := cmp.Diff(test.want, got, cmpopts.IgnoreUnexported(multipart.FileHeader{})); diff != "" {
+				t.Errorf("MultipartForm() = unexpected result (-want +got)\n%s\n", diff)
+			}
+
+			if diff := cmp.Diff(test.wantErr, gotErr, cmpopts.EquateErrors()); diff != "" {
+				t.Errorf("MultipartForm() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
@@ -202,3 +275,12 @@ var httpRequest1 = []byte(`{
 	}
   }
 `)
+
+var mpfd = `--------------------------458d15332083a867
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+a file
+
+--------------------------458d15332083a867--
+`
