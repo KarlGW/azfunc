@@ -22,7 +22,7 @@ var (
 	ErrInvalidTrigger = errors.New("invalid trigger")
 )
 
-// logger is the interface that wraps around methods Error, Debug, Info
+// logger is the interface that wraps around methods Debug, Error, Info
 // and Warn.
 type logger interface {
 	Debug(msg string, args ...any)
