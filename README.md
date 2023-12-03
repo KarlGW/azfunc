@@ -135,8 +135,8 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
     * `ctx.Log().Info()` for info level logs.
     * `ctx.Log.Error()` for error level logs.
 * `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created (will work as long as a binding with that same name is defined in the functions `function.json`)
-* `ctx.Err()` - Gets the error (mulitple errors if they are wrapped) of the context.
-* `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will be deemed a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
+* `ctx.Err()` - Get the error set to the context.
+* `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will count as a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
 
 ##### Error handling
 
@@ -242,8 +242,10 @@ An Azure Function can have one and only one trigger. This module provides a coup
 The following triggers are supported:
 
 * `HTTP`
-* `Base`
-* `Queue` (alias for `Base`, to provide clarity and intention of the trigger)
+* `Timer`
+* `Queue` (alias for `Base`)
+* `Base` - Base trigger. Works with most incoming triggers from the function host.
+
 
 Custom defined trigger types can be used as long as they satisfy the `Triggerable` interface:
 
