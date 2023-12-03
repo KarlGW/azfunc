@@ -1,8 +1,6 @@
 package azfunc
 
 import (
-	"fmt"
-
 	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/triggers"
 )
@@ -68,7 +66,7 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
-	// err contains error (wrapped if multiple).
+	// err contains error set to the Context.
 	err error
 }
 
@@ -77,18 +75,14 @@ func (c Context) Log() logger {
 	return c.log
 }
 
-// Err returns the errors (wrapped if multiple) set to the Context.
+// Err returns the errors set to the Context.
 func (c Context) Err() error {
 	return c.err
 }
 
 // SetError sets an error to the Context.
 func (c *Context) SetError(err error) {
-	if c.err == nil {
-		c.err = err
-		return
-	}
-	c.err = fmt.Errorf("%w", err)
+	c.err = err
 }
 
 // Services returns the services set in the Context.
