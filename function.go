@@ -6,13 +6,13 @@ import (
 )
 
 // TriggerFunc represents a base function to be executed by the function app.
-type TriggerFunc func(*Context, *triggers.Base)
+type TriggerFunc func(ctx *Context, trigger *triggers.Base)
 
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
-type HTTPTriggerFunc func(*Context, *triggers.HTTP)
+type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
 
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
-type TimerTriggerFunc func(*Context, *triggers.Timer)
+type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
 
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
