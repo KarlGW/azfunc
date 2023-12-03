@@ -75,7 +75,7 @@ func (c Context) Log() logger {
 	return c.log
 }
 
-// Err returns the errors set to the Context.
+// Err returns the error set to the Context.
 func (c Context) Err() error {
 	return c.err
 }
