@@ -10,19 +10,19 @@ import (
 // Base represents a base Function App trigger. With custom handlers many
 // triggers that are not HTTP triggers share the same data structure.
 type Base struct {
-	data.Raw
+	data     data.Raw
 	Metadata map[string]any
 }
 
 // Parse the Raw data of the Base trigger into the provided
 // value.
 func (t Base) Parse(v any) error {
-	return json.Unmarshal(t.Raw, &v)
+	return json.Unmarshal(t.data, &v)
 }
 
 // Data returns the Raw data of the Base trigger.
 func (t Base) Data() data.Raw {
-	return t.Raw
+	return t.data
 }
 
 // NewBase creates an returns a Base trigger from the provided
@@ -33,14 +33,20 @@ func NewBase(r *http.Request, name string, options ...Option) (*Base, error) {
 		option(&opts)
 	}
 
-	metadata, raw, err := triggerData(r, name)
-	if err != nil {
-		return nil, err
+	var t baseTrigger
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		return nil, ErrTriggerPayloadMalformed
+	}
+	defer r.Body.Close()
+
+	d, ok := t.Data[name]
+	if !ok {
+		return nil, ErrTriggerNameIncorrect
 	}
 
 	return &Base{
-		Raw:      raw,
-		Metadata: metadata,
+		data:     d,
+		Metadata: t.Metadata,
 	}, nil
 }
 
@@ -48,21 +54,4 @@ func NewBase(r *http.Request, name string, options ...Option) (*Base, error) {
 type baseTrigger struct {
 	Data     map[string]data.Raw
 	Metadata map[string]any
-}
-
-// triggerData handles the incoming request and returns a trigger
-// metadata, raw data and an error (if any).
-func triggerData(r *http.Request, name string) (map[string]any, data.Raw, error) {
-	var t baseTrigger
-	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return nil, nil, ErrTriggerPayloadMalformed
-	}
-	defer r.Body.Close()
-
-	d, ok := t.Data[name]
-	if !ok {
-		return t.Metadata, nil, ErrTriggerNameIncorrect
-	}
-
-	return t.Metadata, d, nil
 }
