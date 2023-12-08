@@ -26,7 +26,7 @@ type services map[string]any
 // Add a service.
 func (s services) Add(name string, service any) {
 	if s == nil {
-		s = make(services, 0)
+		s = make(services)
 	}
 	s[name] = service
 }
