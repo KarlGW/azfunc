@@ -71,8 +71,6 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 		},
 		functions: make(map[string]function),
 		router:    router,
-		services:  make(services),
-		clients:   make(clients),
 	}
 	for _, option := range options {
 		option(app)
