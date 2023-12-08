@@ -125,8 +125,8 @@ func Binding(binding bindings.Bindable) FunctionOption {
 	}
 }
 
-// Trigger takes the provided name and function and sets it to the
-// function.
+// Trigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
 func Trigger(name string, fn TriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
@@ -134,8 +134,8 @@ func Trigger(name string, fn TriggerFunc) FunctionOption {
 	}
 }
 
-// HTTPTrigger takes the provided function and sets it as the
-// trigger function.
+// HTTPTrigger takes the provided function and sets it as
+// the function to be run by the trigger.
 func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = "req"
@@ -143,8 +143,8 @@ func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	}
 }
 
-// TimerTrigger takes the provided function and sets it as the
-// trigger function.
+// TimerTrigger takes the provided function and sets it as
+// the function to be run by the trigger.
 func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = "timer"
@@ -152,8 +152,8 @@ func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 	}
 }
 
-// QueueStorageTrigger takes the provided function and sets it as the
-// trigger function.
+// QueueStorageTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
 func QueueStorageTrigger(name string, fn QueueStorageTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
@@ -161,6 +161,6 @@ func QueueStorageTrigger(name string, fn QueueStorageTriggerFunc) FunctionOption
 	}
 }
 
-// QueueTrigger takes the provided name and function and sets it to the
-// function.
+// QueueTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
 var QueueTrigger = Trigger
