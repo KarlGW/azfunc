@@ -56,7 +56,7 @@ func TestNewQueueStorage(t *testing.T) {
 
 			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(QueueStorage{})); diff != "" {
 				t.Run(test.name, func(t *testing.T) {
-					t.Errorf("NewBase() = unexpected (-want +got)\n%s\n", diff)
+					t.Errorf("NewQueueStorage() = unexpected (-want +got)\n%s\n", diff)
 				})
 			}
 		})
