@@ -181,6 +181,12 @@ func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn 
 			return err
 		}
 		fn(ctx, trigger)
+	case QueueStorageTriggerFunc:
+		trigger, err := triggers.NewQueueStorage(r, name, options...)
+		if err != nil {
+			return err
+		}
+		fn(ctx, trigger)
 	case TimerTriggerFunc:
 		trigger, err := triggers.NewTimer(r, options...)
 		if err != nil {
