@@ -11,6 +11,10 @@ type TriggerFunc func(ctx *Context, trigger *triggers.Base)
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
 
+// QueueStorageTriggerFunc represents a Queue Storage based function to be exexuted
+// by the function app.
+type QueueStorageTriggerFunc func(ctx *Context, trigger *triggers.QueueStorage)
+
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
 type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
 
@@ -21,6 +25,9 @@ type services map[string]any
 
 // Add a service.
 func (s services) Add(name string, service any) {
+	if s == nil {
+		s = make(services)
+	}
 	s[name] = service
 }
 
@@ -36,6 +43,9 @@ type clients map[string]any
 
 // Add a client.
 func (c clients) Add(name string, client any) {
+	if c == nil {
+		c = make(clients)
+	}
 	c[name] = client
 }
 
@@ -115,8 +125,8 @@ func Binding(binding bindings.Bindable) FunctionOption {
 	}
 }
 
-// Trigger takes the provided name and function and sets it to the
-// function.
+// Trigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
 func Trigger(name string, fn TriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
@@ -124,8 +134,8 @@ func Trigger(name string, fn TriggerFunc) FunctionOption {
 	}
 }
 
-// HTTPTrigger takes the provided function and sets it to the
-// function.
+// HTTPTrigger takes the provided function and sets it as
+// the function to be run by the trigger.
 func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = "req"
@@ -133,8 +143,8 @@ func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	}
 }
 
-// TimerTrigger takes the provided function and sets it to the
-// function.
+// TimerTrigger takes the provided function and sets it as
+// the function to be run by the trigger.
 func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = "timer"
@@ -142,6 +152,15 @@ func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 	}
 }
 
-// QueueTrigger takes the provided name and function and sets it to the
-// function.
+// QueueStorageTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
+func QueueStorageTrigger(name string, fn QueueStorageTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = name
+		f.trigger = fn
+	}
+}
+
+// QueueTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
 var QueueTrigger = Trigger

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -34,15 +35,15 @@ func TestNewTimer(t *testing.T) {
 					AdjustForDST: true,
 				},
 				ScheduleStatus: TimerScheduleStatus{
-					Last:        _testTime1,
-					Next:        _testTime1,
-					LastUpdated: _testTime1,
+					Last:        _testTimerTime1,
+					Next:        _testTimerTime1,
+					LastUpdated: _testTimerTime1,
 				},
 				IsPastDue: false,
 				Metadata: Metadata{
 					Sys: MetadataSys{
 						MethodName: "helloTimer",
-						UtcNow:     _testTime1,
+						UtcNow:     _testTimerTime1,
 						RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 					},
 				},
@@ -89,3 +90,5 @@ var timerRequest1 = []byte(`{
 	}
   }
 `)
+
+var _testTimerTime1, _ = time.Parse("2006-01-02T15:04:05.999999Z", "2023-10-12T20:13:49.640002Z")

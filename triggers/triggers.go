@@ -1,9 +1,7 @@
 package triggers
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
 	"time"
 
 	"github.com/KarlGW/azfunc/data"
@@ -27,71 +25,6 @@ type Triggerable interface {
 	Data() data.Raw
 	// Parse the raw data of the trigger into the provided value.
 	Parse(v any) error
-}
-
-// Trigger represents an incoming request (trigger) from the
-// Azure Function Host.
-type Trigger[T Triggerable] struct {
-	Payload  map[string]T `json:"Data"`
-	Metadata map[string]any
-	d        []byte
-	n        string
-}
-
-// New handles a request from the Function host and returns a Trigger[T].
-func New[T Triggerable](r *http.Request, options ...Option) (Trigger[T], error) {
-	opts := Options{}
-	for _, option := range options {
-		option(&opts)
-	}
-	if len(opts.Name) == 0 {
-		opts.Name = "req"
-	}
-
-	t := Trigger[T]{
-		n: opts.Name,
-	}
-	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		return Trigger[T]{}, ErrTriggerPayloadMalformed
-	}
-
-	d, ok := t.Payload[t.n]
-	if !ok {
-		return Trigger[T]{}, ErrTriggerNameIncorrect
-	}
-	t.d = d.Data()
-	return t, nil
-}
-
-// Parse is used to parse the data contained in a trigger into
-// the provided struct.
-func (t Trigger[T]) Parse(v any) error {
-	return json.Unmarshal(t.d, &v)
-}
-
-// Data returns the data contained in the trigger.
-func (t Trigger[T]) Data() []byte {
-	return t.d
-}
-
-// Parse the incoming Function host request (trigger) and set
-// the data to the provided value.
-func Parse[T Triggerable](r *http.Request, v any, options ...Option) error {
-	trigger, err := New[T](r, options...)
-	if err != nil {
-		return err
-	}
-	return trigger.Parse(v)
-}
-
-// Data returns the data from the incoming Function host
-// request (trigger).
-func Data[T Triggerable](r *http.Request, options ...Option) ([]byte, error) {
-	trigger, err := New[T](r, options...)
-	if err != nil {
-		return nil, err
-	}
-	return trigger.Data(), nil
 }
 
 // Metadata represents the metadata of the incoming trigger

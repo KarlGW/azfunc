@@ -8,6 +8,7 @@ import (
 	"net/textproto"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/KarlGW/azfunc/data"
 	"github.com/google/go-cmp/cmp"
@@ -74,7 +75,7 @@ func TestNewHTTP(t *testing.T) {
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "helloHTTP",
-							UtcNow:     _testTime1,
+							UtcNow:     _testHTTPTime1,
 							RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 						},
 					},
@@ -284,3 +285,5 @@ a file
 
 --------------------------458d15332083a867--
 `
+
+var _testHTTPTime1, _ = time.Parse("2006-01-02T15:04:05.999999Z", "2023-10-12T20:13:49.640002Z")

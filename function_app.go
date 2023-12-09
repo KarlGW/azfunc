@@ -71,8 +71,6 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 		},
 		functions: make(map[string]function),
 		router:    router,
-		services:  make(services),
-		clients:   make(clients),
 	}
 	for _, option := range options {
 		option(app)
@@ -179,6 +177,12 @@ func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn 
 		fn(ctx, trigger)
 	case HTTPTriggerFunc:
 		trigger, err := triggers.NewHTTP(r, options...)
+		if err != nil {
+			return err
+		}
+		fn(ctx, trigger)
+	case QueueStorageTriggerFunc:
+		trigger, err := triggers.NewQueueStorage(r, name, options...)
 		if err != nil {
 			return err
 		}

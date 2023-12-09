@@ -2,8 +2,9 @@ package bindings
 
 import "github.com/KarlGW/azfunc/data"
 
-// Base represents a base Function App trigger. With custom handlers
-// all bindings that are not HTTP output bindings share the same data structure.
+// Base represents a base output binding. With custom handlers
+// all bindings that are not HTTP output bindings share the
+// same data structure.
 type Base struct {
 	name string
 	data.Raw
