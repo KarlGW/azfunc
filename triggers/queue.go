@@ -9,14 +9,14 @@ import (
 	"github.com/KarlGW/azfunc/data"
 )
 
-// QueueStorage represents a Queue Storage trigger.
-type QueueStorage struct {
+// Queue represents a Queue Storage trigger.
+type Queue struct {
 	data     data.Raw
-	Metadata QueueStorageMetadata
+	Metadata QueueMetadata
 }
 
-// QueueStorageMetadata represents the metadata for a Queue Storage trigger.
-type QueueStorageMetadata struct {
+// QueueMetadata represents the metadata for a Queue Storage trigger.
+type QueueMetadata struct {
 	DequeueCount    string
 	ID              string
 	PopReceipt      string
@@ -28,24 +28,24 @@ type QueueStorageMetadata struct {
 
 // Parse the data of the Queue Storage trigger into the provided
 // value.
-func (t QueueStorage) Parse(v any) error {
+func (t Queue) Parse(v any) error {
 	return json.Unmarshal(t.data, &v)
 }
 
 // Data returns the data of the Queue Storage trigger.
-func (t QueueStorage) Data() data.Raw {
+func (t Queue) Data() data.Raw {
 	return t.data
 }
 
-// NewQueueStorage creates and returns a new QueueStorage trigger from the
+// NewQueue creates and returns a new Queue Storage trigger from the
 // provided *http.Request.
-func NewQueueStorage(r *http.Request, name string, options ...Option) (*QueueStorage, error) {
+func NewQueue(r *http.Request, name string, options ...Option) (*Queue, error) {
 	opts := Options{}
 	for _, option := range options {
 		option(&opts)
 	}
 
-	var t queueStorageTrigger
+	var t queueTrigger
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
 		return nil, ErrTriggerPayloadMalformed
 	}
@@ -59,14 +59,14 @@ func NewQueueStorage(r *http.Request, name string, options ...Option) (*QueueSto
 	t.Metadata.ID = strings.Trim(t.Metadata.ID, "\"")
 	t.Metadata.PopReceipt = strings.Trim(t.Metadata.PopReceipt, "\"")
 
-	return &QueueStorage{
+	return &Queue{
 		data:     d,
 		Metadata: t.Metadata,
 	}, nil
 }
 
-// queueStorageTrigger is the incoming request from the function host.
-type queueStorageTrigger struct {
+// queueTrigger is the incoming request from the function host.
+type queueTrigger struct {
 	Data     map[string]data.Raw
-	Metadata QueueStorageMetadata
+	Metadata QueueMetadata
 }

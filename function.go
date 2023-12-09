@@ -11,9 +11,9 @@ type TriggerFunc func(ctx *Context, trigger *triggers.Base)
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
 
-// QueueStorageTriggerFunc represents a Queue Storage based function to be exexuted
+// QueueTriggerFunc represents a Queue Storage based function to be exexuted
 // by the function app.
-type QueueStorageTriggerFunc func(ctx *Context, trigger *triggers.QueueStorage)
+type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue)
 
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
 type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
@@ -152,15 +152,11 @@ func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 	}
 }
 
-// QueueStorageTrigger takes the provided name and function and sets it as
+// QueueTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func QueueStorageTrigger(name string, fn QueueStorageTriggerFunc) FunctionOption {
+func QueueTrigger(name string, fn QueueTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
 		f.trigger = fn
 	}
 }
-
-// QueueTrigger takes the provided name and function and sets it as
-// the function to be run by the trigger.
-var QueueTrigger = Trigger

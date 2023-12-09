@@ -7,14 +7,14 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewQueueStorage(t *testing.T) {
+func TestNewQueue(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
 			name    string
 			options []Option
 		}
-		want *QueueStorage
+		want *Queue
 	}{
 		{
 			name: "defaults",
@@ -25,7 +25,7 @@ func TestNewQueueStorage(t *testing.T) {
 				name:    "queue",
 				options: nil,
 			},
-			want: &QueueStorage{
+			want: &Queue{
 				name: "queue",
 				Raw:  nil,
 			},
@@ -43,7 +43,7 @@ func TestNewQueueStorage(t *testing.T) {
 					},
 				},
 			},
-			want: &QueueStorage{
+			want: &Queue{
 				name: "queue",
 				Raw:  data.Raw(`{"message":"hello"}`),
 			},
@@ -52,30 +52,30 @@ func TestNewQueueStorage(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := NewQueueStorage(test.input.name, test.input.options...)
+			got := NewQueue(test.input.name, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(QueueStorage{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 				t.Run(test.name, func(t *testing.T) {
-					t.Errorf("NewQueueStorage() = unexpected (-want +got)\n%s\n", diff)
+					t.Errorf("NewQueue() = unexpected (-want +got)\n%s\n", diff)
 				})
 			}
 		})
 	}
 }
 
-func TestQueueStorage_Write(t *testing.T) {
+func TestQueue_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
-		got := &QueueStorage{}
+		got := &Queue{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &QueueStorage{Raw: data.Raw(`{"message":"hello"}`)}
+		want := &Queue{Raw: data.Raw(`{"message":"hello"}`)}
 
-		if diff := cmp.Diff(want, got, cmp.AllowUnexported(QueueStorage{})); diff != "" {
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 		}
 	})
 }
 
-func TestQueueStorage_Name(t *testing.T) {
+func TestQueue_Name(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input *Base

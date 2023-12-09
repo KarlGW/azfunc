@@ -40,13 +40,3 @@ type MetadataSys struct {
 	UtcNow     time.Time
 	RandGuid   string
 }
-
-// Trigger aliases.
-
-// Queue represents a Function App Queue Trigger and contains
-// the incoming queue message data.
-type Queue = Base
-
-// NewQueue creates an returns a Base trigger from the provided
-// *http.Request.
-var NewQueue = NewBase
