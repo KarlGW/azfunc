@@ -181,8 +181,14 @@ func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn 
 			return err
 		}
 		fn(ctx, trigger)
-	case QueueStorageTriggerFunc:
-		trigger, err := triggers.NewQueueStorage(r, name, options...)
+	case QueueTriggerFunc:
+		trigger, err := triggers.NewQueue(r, name, options...)
+		if err != nil {
+			return err
+		}
+		fn(ctx, trigger)
+	case ServiceBusTriggerFunc:
+		trigger, err := triggers.NewServiceBus(r, name, options...)
 		if err != nil {
 			return err
 		}

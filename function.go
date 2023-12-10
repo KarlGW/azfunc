@@ -11,9 +11,13 @@ type TriggerFunc func(ctx *Context, trigger *triggers.Base)
 // HTTPTriggerFunc represents an HTTP based function to be executed by the function app.
 type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
 
-// QueueStorageTriggerFunc represents a Queue Storage based function to be exexuted
+// QueueTriggerFunc represents a Queue Storage based function to be exexuted
 // by the function app.
-type QueueStorageTriggerFunc func(ctx *Context, trigger *triggers.QueueStorage)
+type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue)
+
+// ServiceBusTriggerFunc represents a Service Bus based function to be exexuted
+// by the function app.
+type ServiceBusTriggerFunc func(ctx *Context, trigger *triggers.ServiceBus)
 
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
 type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
@@ -143,6 +147,24 @@ func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	}
 }
 
+// QueueTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
+func QueueTrigger(name string, fn QueueTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = name
+		f.trigger = fn
+	}
+}
+
+// ServiceBusTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
+func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = name
+		f.trigger = fn
+	}
+}
+
 // TimerTrigger takes the provided function and sets it as
 // the function to be run by the trigger.
 func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
@@ -151,16 +173,3 @@ func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
 		f.trigger = fn
 	}
 }
-
-// QueueStorageTrigger takes the provided name and function and sets it as
-// the function to be run by the trigger.
-func QueueStorageTrigger(name string, fn QueueStorageTriggerFunc) FunctionOption {
-	return func(f *function) {
-		f.triggerName = name
-		f.trigger = fn
-	}
-}
-
-// QueueTrigger takes the provided name and function and sets it as
-// the function to be run by the trigger.
-var QueueTrigger = Trigger

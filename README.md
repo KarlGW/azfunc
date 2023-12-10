@@ -72,17 +72,13 @@ Triggered by a schedule. The trigger contains the timer data (next and last run 
 func(ctx *azfunc.Context, trigger *triggers.Timer)
 ```
 
-**[Queue Storage trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#QueueStorage)**
-
-Triggered by a message to a queue storage queue.
-
-```go
-func(ctx *azfunc.Context, trigger *triggers.QueueStorage)
-```
-
 **[Queue trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Queue)**
 
-Triggered by a message to a queue (Azure Queue Storage or Service Bus queue). Contains the queue message.
+Triggered by a message to an Azure Queue Storage queue.
+
+**[Service Bus trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#ServiceBus)**
+
+Triggered by a message to an Azure Service Bus queue or topic subscription.
 
 ```go
 func(ctx *azfunc.Context, trigger *triggers.Queue)
@@ -116,13 +112,13 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
 
 Writes an HTTP response back to the caller (only works together with an **HTTP trigger**).
 
-**[Queue Storage binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#QueueStorage)**
+**[Queue binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Queue)**
 
 Writes a message to a queue in Azure Queue Storage.
 
-**[Queue binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Queue)** (**deprecated**)
+**[Service Bus binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Queue)**
 
-Write a message to a queue in either Azure Queue Storage or Azure Service Bus.
+Writes a message to a queue or topic subscription in Azure Service Bus.
 
 **[Base binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Base)**
 

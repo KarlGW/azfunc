@@ -11,7 +11,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewQueueStorage(t *testing.T) {
+func TestNewQueue(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
@@ -19,34 +19,34 @@ func TestNewQueueStorage(t *testing.T) {
 			name    string
 			options []Option
 		}
-		want    *QueueStorage
+		want    *Queue
 		wantErr error
 	}{
 		{
-			name: "NewQueueStorage",
+			name: "NewQueue",
 			input: struct {
 				req     *http.Request
 				name    string
 				options []Option
 			}{
 				req: &http.Request{
-					Body: io.NopCloser(bytes.NewBuffer(queueStorageRequest1)),
+					Body: io.NopCloser(bytes.NewBuffer(queueRequest1)),
 				},
 				name: "queue",
 			},
-			want: &QueueStorage{
+			want: &Queue{
 				data: data.Raw(`{"message":"hello","number":2}`),
-				Metadata: QueueStorageMetadata{
+				Metadata: QueueMetadata{
 					DequeueCount:    "1",
 					ID:              "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 					PopReceipt:      "STRING",
-					ExpirationTime:  _testQueueStorageTime1,
-					InsertionTime:   _testQueueStorageTime1,
-					NextVisibleTime: _testQueueStorageTime1,
+					ExpirationTime:  _testQueueTime1,
+					InsertionTime:   _testQueueTime1,
+					NextVisibleTime: _testQueueTime1,
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "helloQueue",
-							UtcNow:     _testQueueStorageTime1,
+							UTCNow:     _testQueueTime1,
 							RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 						},
 					},
@@ -57,20 +57,20 @@ func TestNewQueueStorage(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := NewQueueStorage(test.input.req, test.input.name, test.input.options...)
+			got, gotErr := NewQueue(test.input.req, test.input.name, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(QueueStorage{})); diff != "" {
-				t.Errorf("NewQueueStorage() = unexpected result (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
+				t.Errorf("NewQueue() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
 			if diff := cmp.Diff(test.wantErr, gotErr); diff != "" {
-				t.Errorf("NewQueueStorage() = unexpected error (-want +got)\n%s\n", diff)
+				t.Errorf("NewQueue() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
 }
 
-var queueStorageRequest1 = []byte(`{
+var queueRequest1 = []byte(`{
 	"Data": {
 		"queue": "{\"message\":\"hello\",\"number\":2}"
 	  },
@@ -90,4 +90,4 @@ var queueStorageRequest1 = []byte(`{
 	  }
 }`)
 
-var _testQueueStorageTime1, _ = time.Parse("2006-01-02T15:04:05.999999Z", "2023-10-12T20:13:49.640002Z")
+var _testQueueTime1, _ = time.Parse("2006-01-02T15:04:05.999999Z", "2023-10-12T20:13:49.640002Z")
