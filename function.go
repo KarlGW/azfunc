@@ -147,20 +147,29 @@ func HTTPTrigger(fn HTTPTriggerFunc) FunctionOption {
 	}
 }
 
-// TimerTrigger takes the provided function and sets it as
-// the function to be run by the trigger.
-func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
-	return func(f *function) {
-		f.triggerName = "timer"
-		f.trigger = fn
-	}
-}
-
 // QueueTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
 func QueueTrigger(name string, fn QueueTriggerFunc) FunctionOption {
 	return func(f *function) {
 		f.triggerName = name
+		f.trigger = fn
+	}
+}
+
+// ServiceBusTrigger takes the provided name and function and sets it as
+// the function to be run by the trigger.
+func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = name
+		f.trigger = fn
+	}
+}
+
+// TimerTrigger takes the provided function and sets it as
+// the function to be run by the trigger.
+func TimerTrigger(fn TimerTriggerFunc) FunctionOption {
+	return func(f *function) {
+		f.triggerName = "timer"
 		f.trigger = fn
 	}
 }
