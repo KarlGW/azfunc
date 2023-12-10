@@ -12,7 +12,7 @@ const (
 	iso8601TZ = "2006-01-02T15:04:05-07:00"
 )
 
-// TimeISO8601 is a wrapper around time.Time that supports JSON marshalling/unmarshallling
+// TimeISO8601 is a wrapper around time.Time that supports JSON marshalling/unmarshalling
 // with format ISO8601 and ISO8601 with a provided timezone.
 type TimeISO8601 struct {
 	time.Time
