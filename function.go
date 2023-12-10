@@ -15,6 +15,10 @@ type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
 // by the function app.
 type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue)
 
+// ServiceBusTriggerFunc represents a Service Bus based function to be exexuted
+// by the function app.
+type ServiceBusTriggerFunc func(ctx *Context, trigger *triggers.ServiceBus)
+
 // TimerTriggerFunc represents a Timer based function tp be executed by the function app.
 type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
 
