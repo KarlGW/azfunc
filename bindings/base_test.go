@@ -55,9 +55,7 @@ func TestNewBase(t *testing.T) {
 			got := NewBase(test.input.name, test.input.options...)
 
 			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Base{})); diff != "" {
-				t.Run(test.name, func(t *testing.T) {
-					t.Errorf("NewBase() = unexpected (-want +got)\n%s\n", diff)
-				})
+				t.Errorf("NewBase() = unexpected (-want +got)\n%s\n", diff)
 			}
 		})
 	}

@@ -55,9 +55,7 @@ func TestNewQueue(t *testing.T) {
 			got := NewQueue(test.input.name, test.input.options...)
 
 			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
-				t.Run(test.name, func(t *testing.T) {
-					t.Errorf("NewQueue() = unexpected (-want +got)\n%s\n", diff)
-				})
+				t.Errorf("NewQueue() = unexpected (-want +got)\n%s\n", diff)
 			}
 		})
 	}
@@ -78,17 +76,17 @@ func TestQueue_Write(t *testing.T) {
 func TestQueue_Name(t *testing.T) {
 	var tests = []struct {
 		name  string
-		input *Base
+		input *Queue
 		want  string
 	}{
 		{
 			name:  "default",
-			input: &Base{},
+			input: &Queue{},
 			want:  "",
 		},
 		{
 			name:  "with name",
-			input: &Base{name: "queue"},
+			input: &Queue{name: "queue"},
 			want:  "queue",
 		},
 	}
@@ -97,7 +95,7 @@ func TestQueue_Name(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := test.input.Name()
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Base{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 				t.Errorf("Name() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
