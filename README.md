@@ -76,6 +76,10 @@ func(ctx *azfunc.Context, trigger *triggers.Timer)
 
 Triggered by a message to an Azure Queue Storage queue.
 
+**[Service Bus trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#ServiceBus)**
+
+Triggered by a message to an Azure Service Bus queue or topic subscription.
+
 ```go
 func(ctx *azfunc.Context, trigger *triggers.Queue)
 ```
@@ -111,6 +115,10 @@ Writes an HTTP response back to the caller (only works together with an **HTTP t
 **[Queue binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Queue)**
 
 Writes a message to a queue in Azure Queue Storage.
+
+**[Service Bus binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Queue)**
+
+Writes a message to a queue or topic subscription in Azure Service Bus.
 
 **[Base binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Base)**
 
