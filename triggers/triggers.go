@@ -37,6 +37,6 @@ type Metadata struct {
 // request.
 type MetadataSys struct {
 	MethodName string
-	UtcNow     time.Time
+	UTCNow     time.Time `json:"UtcNow"`
 	RandGuid   string
 }

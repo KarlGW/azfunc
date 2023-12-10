@@ -46,7 +46,7 @@ func TestNewQueue(t *testing.T) {
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "helloQueue",
-							UtcNow:     _testQueueTime1,
+							UTCNow:     _testQueueTime1,
 							RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 						},
 					},

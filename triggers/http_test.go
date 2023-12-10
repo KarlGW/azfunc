@@ -75,7 +75,7 @@ func TestNewHTTP(t *testing.T) {
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "helloHTTP",
-							UtcNow:     _testHTTPTime1,
+							UTCNow:     _testHTTPTime1,
 							RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 						},
 					},

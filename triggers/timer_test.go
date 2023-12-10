@@ -43,7 +43,7 @@ func TestNewTimer(t *testing.T) {
 				Metadata: Metadata{
 					Sys: MetadataSys{
 						MethodName: "helloTimer",
-						UtcNow:     _testTimerTime1,
+						UTCNow:     _testTimerTime1,
 						RandGuid:   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 					},
 				},
