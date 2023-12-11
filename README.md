@@ -15,8 +15,8 @@ and from the Azure Function host when developing Azure Functions with Custom han
 * [Usage](#usage)
   * [Concepts](#concepts)
     * [Triggers (input bindings)](#triggers-input-bindings)
-    * [Context](#context)
     * [Output (output bindings)](#output-output-bindings)
+    * [Context](#context)
     * [Error handling](#error-handling)
   * [HTTP trigger and HTTP output binding](#http-trigger-and-http-output-binding)
 
@@ -48,11 +48,13 @@ Creating this application structure can be done with ease with the help of the F
 
 An example on how to create a function with a HTTP trigger and a HTTP output binding (response) is provided further [below](#http-trigger-and-http-output-binding).
 
+
 ### Concepts
 
 When working with the `FunctionApp` there are some concepts to understand and work with. The `FunctionApp` represents the entire Function App, and it is to this structure the functions (with their triggers and output bindings) that should be run are registered to. Each function that is registered contains a `*azfunc.Context` and a trigger (`*triggers.HTTP`, `*triggers.Timer`, `*triggers.Queue` and `*triggers.Base`).
 
 The triggers is the triggering event and the data it contains, and the context contains output bindings (and writing to them), output error and logging.
+
 
 #### Triggers (input bindings)
 
@@ -76,12 +78,16 @@ func(ctx *azfunc.Context, trigger *triggers.Timer)
 
 Triggered by a message to an Azure Queue Storage queue.
 
+```go
+func(ctx *azfunc.Context, trigger *triggers.Queue)
+```
+
 **[Service Bus trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#ServiceBus)**
 
 Triggered by a message to an Azure Service Bus queue or topic subscription.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.Queue)
+func(ctx *azfunc.Context, trigger *triggers.ServiceBus)
 ```
 
 **[Base trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Base)**
@@ -93,18 +99,6 @@ needs to be parsed into a `struct` matching the expected incoming payload.
 func(ctx *azfunc.Context, trigger *triggers.Base)
 ```
 
-#### [Context](https://pkg.go.dev/github.com/KarlGW/azfunc#Context)
-
-The context is the Function context, named so due to it being called so in the Azure Function implementation of other languages (foremost the old way of handling JavaScript/Node.js functions).
-
-Assuming the `*azfunc.Context` is bound to the name `ctx`:
-
-* `ctx.Log()`:
-    * `ctx.Log().Info()` for info level logs.
-    * `ctx.Log.Error()` for error level logs.
-* `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created (will work as long as a binding with that same name is defined in the functions `function.json`)
-* `ctx.Err()` - Get the error set to the context.
-* `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will count as a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
 
 #### Output (output bindings)
 
@@ -123,6 +117,19 @@ Writes a message to a queue or topic subscription in Azure Service Bus.
 **[Base binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Base)**
 
 Base binding is a base that can be used for all not yet supported bindings.
+
+#### [Context](https://pkg.go.dev/github.com/KarlGW/azfunc#Context)
+
+The context is the Function context, named so due to it being called so in the Azure Function implementation of other languages (foremost the old way of handling JavaScript/Node.js functions).
+
+Assuming the `*azfunc.Context` is bound to the name `ctx`:
+
+* `ctx.Log()`:
+    * `ctx.Log().Info()` for info level logs.
+    * `ctx.Log.Error()` for error level logs.
+* `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Base` (will work as long as a binding with that same name is defined in the functions `function.json`).
+* `ctx.Err()` - Get the error set to the context.
+* `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will count as a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
 
 
 #### Error handling

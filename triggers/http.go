@@ -28,14 +28,14 @@ var (
 
 // HTTP represents an HTTP trigger.
 type HTTP struct {
-	URL        string
-	Method     string
-	Body       data.Raw
 	Headers    http.Header
 	Params     map[string]string
 	Query      map[string]string
-	Identities []HTTPIdentity
+	URL        string
+	Method     string
+	Body       data.Raw
 	Metadata   HTTPMetadata
+	Identities []HTTPIdentity
 }
 
 // HTTPMetadata represents the metadata for an HTTP trigger.
@@ -49,25 +49,25 @@ type HTTPMetadata struct {
 // HTTPIdentity represent a part of the Identities field
 // of the incoming trigger request.
 type HTTPIdentity struct {
-	IsAuthenticated    bool
-	AuthenticationType string
-	NameClaimType      string
-	RoleClaimType      string
 	Actor              any
 	BootstrapContext   any
 	Label              any
 	Name               any
+	AuthenticationType string
+	NameClaimType      string
+	RoleClaimType      string
 	Claims             []HTTPIdentityClaims
+	IsAuthenticated    bool
 }
 
 // HTTPIdentityClaims represent the claims of an HTTPIdentity.
 type HTTPIdentityClaims struct {
+	Properties     map[string]string
 	Issuer         string
 	OriginalIssuer string
 	Type           string
 	Value          string
 	ValueType      string
-	Properties     map[string]string
 }
 
 // Parse the body from the HTTP trigger into the provided value.
@@ -157,7 +157,8 @@ func NewHTTP(r *http.Request, options ...Option) (*HTTP, error) {
 
 // httpTrigger is the incoming request from the Function host.
 type httpTrigger struct {
-	Data struct {
+	Metadata HTTPMetadata
+	Data     struct {
 		Req struct {
 			URL        string `json:"Url"`
 			Method     string
@@ -168,5 +169,4 @@ type httpTrigger struct {
 			Identities []HTTPIdentity
 		} `json:"req"`
 	}
-	Metadata HTTPMetadata
 }

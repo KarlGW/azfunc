@@ -96,4 +96,4 @@ func TestOutput_JSON(t *testing.T) {
 	}
 }
 
-var output1 = []byte(`{"Outputs":{"queue":"{\"message\":\"hello\",\"number\":3}","res":{"statusCode":"200","body":"{\"message\":\"hello\",\"number\":2}","headers":{"Content-Type":"application/json"}}},"Logs":null,"ReturnValue":null}`)
+var output1 = []byte(`{"Outputs":{"queue":"{\"message\":\"hello\",\"number\":3}","res":{"headers":{"Content-Type":"application/json"},"statusCode":"200","body":"{\"message\":\"hello\",\"number\":2}"}},"ReturnValue":null,"Logs":null}`)
