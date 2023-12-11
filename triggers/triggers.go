@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	// ErrNotHTTPTrigger is returned when the provide trigger is not
-	// an HTTP trigger.
-	ErrNotHTTPTrigger = errors.New("not an HTTP trigger")
 	// ErrTriggerNameIncorrect is returned when the provided trigger
 	// name does not match the payload trigger name.
 	ErrTriggerNameIncorrect = errors.New("trigger name incorrect")
