@@ -10,26 +10,13 @@ import (
 	"time"
 
 	"github.com/KarlGW/azfunc/bindings"
-	"github.com/KarlGW/azfunc/triggers"
 )
 
 var (
 	// ErrNoFunction is returned when no function has been set to the
 	// FunctionApp.
 	ErrNoFunction = errors.New("at least one function must be set")
-	// ErrInvalidTrigger is returned when an invalid trigger has been
-	// provided.
-	ErrInvalidTrigger = errors.New("invalid trigger")
 )
-
-// logger is the interface that wraps around methods Debug, Error, Info
-// and Warn.
-type logger interface {
-	Debug(msg string, args ...any)
-	Error(msg string, args ...any)
-	Info(msg string, args ...any)
-	Warn(msg string, args ...any)
-}
 
 // FunctionApp represents a Function App with its configuration
 // and functions.
@@ -104,6 +91,7 @@ func (a FunctionApp) Start() error {
 		return err
 	case <-time.After(time.Millisecond * 10):
 		a.log.Info("function app started.")
+		close(errCh)
 	}
 
 	_, err := a.shutdown()
@@ -156,53 +144,15 @@ func (a FunctionApp) handler(fn function) http.Handler {
 			clients:  a.clients,
 		}
 
-		if err := a.executeFunc(r, ctx, fn.triggerName, fn.trigger); err != nil {
+		if err := fn.trigger.run(r, ctx); err != nil {
 			a.log.Error(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(ctx.Output.JSON())
 	})
-}
-
-// executeFunc executes a function.
-func (f FunctionApp) executeFunc(r *http.Request, ctx *Context, name string, fn any, options ...triggers.Option) error {
-	switch fn := fn.(type) {
-	case TriggerFunc:
-		trigger, err := triggers.NewBase(r, name, options...)
-		if err != nil {
-			return err
-		}
-		fn(ctx, trigger)
-	case HTTPTriggerFunc:
-		trigger, err := triggers.NewHTTP(r, options...)
-		if err != nil {
-			return err
-		}
-		fn(ctx, trigger)
-	case QueueTriggerFunc:
-		trigger, err := triggers.NewQueue(r, name, options...)
-		if err != nil {
-			return err
-		}
-		fn(ctx, trigger)
-	case ServiceBusTriggerFunc:
-		trigger, err := triggers.NewServiceBus(r, name, options...)
-		if err != nil {
-			return err
-		}
-		fn(ctx, trigger)
-	case TimerTriggerFunc:
-		trigger, err := triggers.NewTimer(r, options...)
-		if err != nil {
-			return err
-		}
-		fn(ctx, trigger)
-	default:
-		return ErrInvalidTrigger
-	}
-	return ctx.err
 }
 
 // WithService sets the provided service to the FunctionApp. Can be
@@ -231,18 +181,38 @@ func WithLogger(log logger) FunctionAppOption {
 	}
 }
 
-// noOpLogger is a placeholder for when no logger is provided to the
-// function app.
-type noOpLogger struct{}
+// services is intended to hold custom services to be used within the
+// Function App. Both services and clients both exists just for semantics,
+// and either can be used.
+type services map[string]any
 
-// Debug together with Error, Info and Warn satisfies the logger interface.
-func (l noOpLogger) Debug(msg string, args ...any) {}
+// Add a service.
+func (s services) Add(name string, service any) {
+	if s == nil {
+		s = make(services)
+	}
+	s[name] = service
+}
 
-// Error together with Debug, Info and Warn satisfies the logger interface.
-func (l noOpLogger) Error(msg string, args ...any) {}
+// Get a service.
+func (s services) Get(name string) any {
+	return s[name]
+}
 
-// Info together with Debug, Error and Warn satisfies the logger interface.
-func (l noOpLogger) Info(msg string, args ...any) {}
+// clients is intended to hold custom clients to be used within the
+// Function App. Both clients and services both exists just for semantics,
+// and either can be used.
+type clients map[string]any
 
-// Warn together with Debug, Info and Error satisfies the logger interface.
-func (l noOpLogger) Warn(msg string, args ...any) {}
+// Add a client.
+func (c clients) Add(name string, client any) {
+	if c == nil {
+		c = make(clients)
+	}
+	c[name] = client
+}
+
+// Get a client.
+func (c clients) Get(name string) any {
+	return c[name]
+}
