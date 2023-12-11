@@ -69,7 +69,7 @@ func TestOutput_JSON(t *testing.T) {
 				Outputs: map[string]Bindable{
 					"queue": &Base{
 						name: "queue",
-						Raw:  []byte(`{"message":"hello","number":3}`),
+						data: []byte(`{"message":"hello","number":3}`),
 					},
 				},
 				http: &HTTP{

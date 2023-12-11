@@ -1,6 +1,7 @@
 package bindings
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +15,11 @@ type HTTP struct {
 	Body       data.Raw
 	header     http.Header
 	name       string
+}
+
+// Data returns the data of the binding.
+func (b HTTP) Data() data.Raw {
+	return b.Body
 }
 
 // Name returns the name of the binding. In case of an HTTP binding
@@ -108,6 +114,12 @@ type httpBinding struct {
 	Body       data.Raw          `json:"body"`
 	Headers    map[string]string `json:"headers"`
 	name       string
+}
+
+// Data returns the data of the binding.
+func (b httpBinding) Data() data.Raw {
+	json, _ := json.Marshal(b)
+	return json
 }
 
 // Name returns the name of the binding. In case of an HTTP binding

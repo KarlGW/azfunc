@@ -27,7 +27,7 @@ func TestNewServiceBus(t *testing.T) {
 			},
 			want: &ServiceBus{
 				name: "queue",
-				Raw:  nil,
+				data: nil,
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func TestNewServiceBus(t *testing.T) {
 			},
 			want: &ServiceBus{
 				name: "queue",
-				Raw:  data.Raw(`{"message":"hello"}`),
+				data: data.Raw(`{"message":"hello"}`),
 			},
 		},
 	}
@@ -65,7 +65,7 @@ func TestServiceBus_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
 		got := &ServiceBus{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &ServiceBus{Raw: data.Raw(`{"message":"hello"}`)}
+		want := &ServiceBus{data: data.Raw(`{"message":"hello"}`)}
 
 		if diff := cmp.Diff(want, got, cmp.AllowUnexported(ServiceBus{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)

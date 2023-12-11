@@ -7,7 +7,12 @@ import "github.com/KarlGW/azfunc/data"
 // same data structure.
 type Base struct {
 	name string
-	data.Raw
+	data data.Raw
+}
+
+// Data returns the data of the binding.
+func (b Base) Data() data.Raw {
+	return b.data
 }
 
 // Name returns the name of the binding.
@@ -17,8 +22,8 @@ func (b Base) Name() string {
 
 // Write data to the binding.
 func (b *Base) Write(d []byte) (int, error) {
-	b.Raw = data.Raw(d)
-	return len(b.Raw), nil
+	b.data = data.Raw(d)
+	return len(b.data), nil
 }
 
 // NewBase creates a new base output binding.
@@ -29,6 +34,6 @@ func NewBase(name string, options ...Option) *Base {
 	}
 	return &Base{
 		name: name,
-		Raw:  opts.Data,
+		data: opts.Data,
 	}
 }

@@ -5,7 +5,12 @@ import "github.com/KarlGW/azfunc/data"
 // ServiceBus represents a service bus output binding.
 type ServiceBus struct {
 	name string
-	data.Raw
+	data data.Raw
+}
+
+// Data returns the data of the binding.
+func (b ServiceBus) Data() data.Raw {
+	return b.data
 }
 
 // Name returns the name of the binding.
@@ -15,8 +20,8 @@ func (b ServiceBus) Name() string {
 
 // Write data to the binding.
 func (b *ServiceBus) Write(d []byte) (int, error) {
-	b.Raw = data.Raw(d)
-	return len(b.Raw), nil
+	b.data = data.Raw(d)
+	return len(b.data), nil
 }
 
 // NewServiceBus creates a new service bus output binding.
@@ -27,6 +32,6 @@ func NewServiceBus(name string, options ...Option) *ServiceBus {
 	}
 	return &ServiceBus{
 		name: name,
-		Raw:  opts.Data,
+		data: opts.Data,
 	}
 }

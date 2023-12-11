@@ -27,7 +27,7 @@ func TestNewQueue(t *testing.T) {
 			},
 			want: &Queue{
 				name: "queue",
-				Raw:  nil,
+				data: nil,
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func TestNewQueue(t *testing.T) {
 			},
 			want: &Queue{
 				name: "queue",
-				Raw:  data.Raw(`{"message":"hello"}`),
+				data: data.Raw(`{"message":"hello"}`),
 			},
 		},
 	}
@@ -65,7 +65,7 @@ func TestQueue_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
 		got := &Queue{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &Queue{Raw: data.Raw(`{"message":"hello"}`)}
+		want := &Queue{data: data.Raw(`{"message":"hello"}`)}
 
 		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)

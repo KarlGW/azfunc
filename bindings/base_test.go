@@ -27,7 +27,7 @@ func TestNewBase(t *testing.T) {
 			},
 			want: &Base{
 				name: "queue",
-				Raw:  nil,
+				data: nil,
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func TestNewBase(t *testing.T) {
 			},
 			want: &Base{
 				name: "queue",
-				Raw:  data.Raw(`{"message":"hello"}`),
+				data: data.Raw(`{"message":"hello"}`),
 			},
 		},
 	}
@@ -65,7 +65,7 @@ func TestBase_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
 		got := &Base{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &Base{Raw: data.Raw(`{"message":"hello"}`)}
+		want := &Base{data: data.Raw(`{"message":"hello"}`)}
 
 		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Base{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
