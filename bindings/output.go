@@ -12,6 +12,31 @@ type Output struct {
 	http        *HTTP
 }
 
+// MarshalJSON implements custom marshaling to produce
+// the required JSON structure as expected by the
+// function host.
+func (o Output) MarshalJSON() ([]byte, error) {
+	type Alias Output
+
+	temp := struct {
+		Outputs map[string]any `json:"Outputs"`
+		Alias
+	}{
+		Outputs: make(map[string]any),
+		Alias:   Alias(o),
+	}
+
+	for key, binding := range o.Outputs {
+		if b, ok := binding.(*httpBinding); ok {
+			temp.Outputs[key] = b
+		} else {
+			temp.Outputs[key] = binding.Data()
+		}
+	}
+
+	return json.Marshal(temp)
+}
+
 // JSON returns the JSON encoding of Output.
 func (o Output) JSON() []byte {
 	if o.http != nil && !o.http.IsZero() {
@@ -69,11 +94,6 @@ func (o *Output) HTTP() *HTTP {
 		return o.http
 	}
 	return o.http
-}
-
-// HasHTTP checks if Output has an HTTP binding.
-func (o *Output) HasHTTP() bool {
-	return o.http != nil
 }
 
 // OutputOptions contains options for creating a new

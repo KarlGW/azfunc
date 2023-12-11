@@ -5,7 +5,12 @@ import "github.com/KarlGW/azfunc/data"
 // Queue represents a queue storage output binding.
 type Queue struct {
 	name string
-	data.Raw
+	data data.Raw
+}
+
+// Data returns the data of the binding.
+func (b Queue) Data() data.Raw {
+	return b.data
 }
 
 // Name returns the name of the binding.
@@ -15,8 +20,8 @@ func (b Queue) Name() string {
 
 // Write data to the binding.
 func (b *Queue) Write(d []byte) (int, error) {
-	b.Raw = data.Raw(d)
-	return len(b.Raw), nil
+	b.data = data.Raw(d)
+	return len(b.data), nil
 }
 
 // NewQueue creates a new queue storage output binding.
@@ -27,6 +32,6 @@ func NewQueue(name string, options ...Option) *Queue {
 	}
 	return &Queue{
 		name: name,
-		Raw:  opts.Data,
+		data: opts.Data,
 	}
 }
