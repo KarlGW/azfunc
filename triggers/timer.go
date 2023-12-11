@@ -13,7 +13,7 @@ type Timer struct {
 	Schedule       TimerSchedule
 	ScheduleStatus TimerScheduleStatus
 	IsPastDue      bool
-	Metadata
+	Metadata       Metadata
 }
 
 // TimerSchedule represents the Schedule field from the incoming
