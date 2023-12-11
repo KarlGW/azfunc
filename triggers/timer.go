@@ -10,10 +10,10 @@ import (
 
 // Timer represent a Timer trigger.
 type Timer struct {
-	Schedule       TimerSchedule
 	ScheduleStatus TimerScheduleStatus
-	IsPastDue      bool
 	Metadata       Metadata
+	Schedule       TimerSchedule
+	IsPastDue      bool
 }
 
 // TimerSchedule represents the Schedule field from the incoming
@@ -70,8 +70,8 @@ func NewTimer(r *http.Request, options ...Option) (*Timer, error) {
 type timerTrigger struct {
 	Data struct {
 		Timer struct {
-			Schedule       TimerSchedule
 			ScheduleStatus TimerScheduleStatus
+			Schedule       TimerSchedule
 			IsPastDue      bool
 		} `json:"timer"`
 	}

@@ -7,9 +7,9 @@ import (
 // Output represents an outgoing response to the Functuon Host.
 type Output struct {
 	Outputs     map[string]Bindable
-	Logs        []string
 	ReturnValue any
 	http        *HTTP
+	Logs        []string
 }
 
 // MarshalJSON implements custom marshaling to produce
@@ -99,10 +99,10 @@ func (o *Output) HTTP() *HTTP {
 // OutputOptions contains options for creating a new
 // Output.
 type OutputOptions struct {
-	Bindings    []Bindable
-	Logs        []string
 	ReturnValue any
 	http        *HTTP
+	Bindings    []Bindable
+	Logs        []string
 }
 
 // Output option is a function that sets OutputOptions.

@@ -11,8 +11,8 @@ import (
 
 // Queue represents a Queue Storage trigger.
 type Queue struct {
-	data     data.Raw
 	Metadata QueueMetadata
+	data     data.Raw
 }
 
 // QueueMetadata represents the metadata for a Queue Storage trigger.

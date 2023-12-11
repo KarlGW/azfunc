@@ -11,10 +11,10 @@ import (
 
 // HTTP represents an HTTP output binding.
 type HTTP struct {
-	StatusCode int
-	Body       data.Raw
 	header     http.Header
 	name       string
+	Body       data.Raw
+	StatusCode int
 }
 
 // Data returns the data of the binding.
@@ -110,10 +110,10 @@ func NewHTTP(options ...Option) *HTTP {
 // httpBinding is the Output binding representation of an
 // HTTP binding.
 type httpBinding struct {
-	StatusCode string            `json:"statusCode"`
-	Body       data.Raw          `json:"body"`
 	Headers    map[string]string `json:"headers"`
 	name       string
+	StatusCode string   `json:"statusCode"`
+	Body       data.Raw `json:"body"`
 }
 
 // Data returns the data of the binding.

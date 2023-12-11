@@ -17,7 +17,6 @@ type ServiceBus struct {
 
 // ServiceBusMetadata represents the metadata for a Service Bus trigger.
 type ServiceBusMetadata struct {
-	Client                ServiceBusMetadataClient
 	MessageReceiver       map[string]any
 	MessageSession        map[string]any
 	MessageActions        map[string]any
@@ -30,11 +29,12 @@ type ServiceBusMetadata struct {
 	MessageID             string
 	ContentType           string
 	SequenceNumber        string
-	ExpiresAtUTC          TimeISO8601 `json:"ExpiresAtUtc"`
-	ExpiresAt             TimeISO8601
-	EnqueuedTimeUTC       TimeISO8601 `json:"EnqueuedTimeUtc"`
-	EnqueuedTime          TimeISO8601
 	Metadata
+	ExpiresAtUTC    TimeISO8601 `json:"ExpiresAtUtc"`
+	ExpiresAt       TimeISO8601
+	EnqueuedTimeUTC TimeISO8601 `json:"EnqueuedTimeUtc"`
+	EnqueuedTime    TimeISO8601
+	Client          ServiceBusMetadataClient
 }
 
 // ServiceBusMetadataClient represents client of the service bus trigger

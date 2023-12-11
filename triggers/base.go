@@ -10,8 +10,8 @@ import (
 // Base represents a base Function App trigger. With custom handlers many
 // triggers that are not HTTP triggers share the same data structure.
 type Base struct {
-	data     data.Raw
 	Metadata map[string]any
+	data     data.Raw
 }
 
 // Parse the Raw data of the Base trigger into the provided
