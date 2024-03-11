@@ -12,6 +12,10 @@ import (
 	"github.com/KarlGW/azfunc/bindings"
 )
 
+const (
+	functionsCustomHandlerPort = "FUNCTIONS_CUSTOMHANDLER_PORT"
+)
+
 var (
 	// ErrNoFunction is returned when no function has been set to the
 	// FunctionApp.
@@ -42,7 +46,7 @@ type FunctionAppOption func(*FunctionApp)
 
 // NewFunction app creates and configures a FunctionApp.
 func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
-	port, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT")
+	port, ok := os.LookupEnv(functionsCustomHandlerPort)
 	if !ok {
 		port = "8080"
 	}
@@ -50,7 +54,7 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 	router := http.NewServeMux()
 	app := &FunctionApp{
 		httpServer: &http.Server{
-			Addr:         os.Getenv("FUNCTIONS_CUSTOMHANDLER_HOST") + ":" + port,
+			Addr:         os.Getenv(functionsCustomHandlerPort) + ":" + port,
 			Handler:      router,
 			ReadTimeout:  time.Second * 30,
 			WriteTimeout: time.Second * 30,

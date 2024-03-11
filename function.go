@@ -8,7 +8,7 @@ import (
 // in a FunctionApp.
 type function struct {
 	name     string
-	trigger  runnable
+	trigger  triggerable
 	bindings []bindings.Bindable
 }
 

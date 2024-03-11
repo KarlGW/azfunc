@@ -6,8 +6,8 @@ import (
 	"github.com/KarlGW/azfunc/triggers"
 )
 
-// runnable is the interface that wraps around the method run.
-type runnable interface {
+// triggerable is the interface that wraps around the method run.
+type triggerable interface {
 	run(r *http.Request, ctx *Context, options ...triggers.Option) error
 }
 
