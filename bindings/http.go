@@ -19,7 +19,7 @@ type HTTP struct {
 // MarshalJSON implements custom marshaling to create the
 // required JSON structure as expected by the function host.
 func (b HTTP) MarshalJSON() ([]byte, error) {
-	headers := make(map[string]string)
+	headers := make(map[string]string, len(b.header))
 	for k, v := range b.header {
 		headers[k] = v[0]
 	}
