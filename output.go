@@ -52,7 +52,7 @@ func (o Output) MarshalJSON() ([]byte, error) {
 
 // JSON returns the JSON encoding of Output.
 func (o Output) JSON() []byte {
-	if o.http != nil && !o.http.IsZero() {
+	if o.http != nil {
 		o.Outputs[o.http.Name()] = o.http
 	}
 	b, _ := json.Marshal(o)
@@ -102,7 +102,7 @@ func (o Output) Binding(name string) Bindable {
 // HTTP returns the HTTP binding of output if any is set.
 // If not set it will create, set and return it.
 func (o *Output) HTTP() *bindings.HTTP {
-	if o.http == nil || o.http.IsZero() {
+	if o.http == nil {
 		o.http = bindings.NewHTTP()
 		return o.http
 	}

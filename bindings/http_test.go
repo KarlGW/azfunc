@@ -19,8 +19,8 @@ func TestNewHTTP(t *testing.T) {
 			input: nil,
 			want: &HTTP{
 				name:       "res",
-				StatusCode: http.StatusOK,
-				Body:       nil,
+				statusCode: http.StatusOK,
+				body:       nil,
 				header:     http.Header{},
 			},
 		},
@@ -36,8 +36,8 @@ func TestNewHTTP(t *testing.T) {
 			},
 			want: &HTTP{
 				name:       "httpoutput",
-				StatusCode: http.StatusNotFound,
-				Body:       data.Raw(`{"message":"not found"}`),
+				statusCode: http.StatusNotFound,
+				body:       data.Raw(`{"message":"not found"}`),
 				header:     http.Header{"Content-Type": {"application/json"}},
 			},
 		},
@@ -58,7 +58,7 @@ func TestHTTP_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
 		got := &HTTP{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &HTTP{Body: data.Raw(`{"message":"hello"}`)}
+		want := &HTTP{body: data.Raw(`{"message":"hello"}`)}
 
 		if diff := cmp.Diff(want, got, cmp.AllowUnexported(HTTP{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
@@ -70,7 +70,7 @@ func TestHTTP_WriteHeader(t *testing.T) {
 	t.Run("WriteHeader", func(t *testing.T) {
 		got := &HTTP{}
 		got.WriteHeader(http.StatusNotFound)
-		want := &HTTP{StatusCode: http.StatusNotFound}
+		want := &HTTP{statusCode: http.StatusNotFound}
 
 		if diff := cmp.Diff(want, got, cmp.AllowUnexported(HTTP{})); diff != "" {
 			t.Errorf("WriteHeader() = unexpected result (-want +got)\n%s\n", diff)
@@ -99,8 +99,8 @@ func TestHTTP_WriteResponse(t *testing.T) {
 				body:       []byte(`{"message":"hello"}`),
 			},
 			want: &HTTP{
-				StatusCode: http.StatusCreated,
-				Body:       data.Raw(`{"message":"hello"}`),
+				statusCode: http.StatusCreated,
+				body:       data.Raw(`{"message":"hello"}`),
 			},
 		},
 		{
@@ -117,8 +117,8 @@ func TestHTTP_WriteResponse(t *testing.T) {
 				},
 			},
 			want: &HTTP{
-				StatusCode: http.StatusCreated,
-				Body:       data.Raw(`{"message":"hello"}`),
+				statusCode: http.StatusCreated,
+				body:       data.Raw(`{"message":"hello"}`),
 				header:     http.Header{"Content-Type": {"application/json"}},
 			},
 		},
