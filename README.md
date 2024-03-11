@@ -215,7 +215,7 @@ func main() {
         ctx.Output.HTTP().WriteHeader(http.StatusOK)
         ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
         ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
-	}))
+    }))
 
     if err := app.Start(); err != nil {
         // Handle error.
