@@ -3,8 +3,6 @@ package triggers
 import (
 	"errors"
 	"time"
-
-	"github.com/KarlGW/azfunc/data"
 )
 
 var (
@@ -15,14 +13,6 @@ var (
 	// with the payload from the Function host.
 	ErrTriggerPayloadMalformed = errors.New("trigger payload malformed")
 )
-
-// Triggerable is the interface that wraps around methods Data and Write.
-type Triggerable interface {
-	// Data returns the raw data of the trigger.
-	Data() data.Raw
-	// Parse the raw data of the trigger into the provided value.
-	Parse(v any) error
-}
 
 // Metadata represents the metadata of the incoming trigger
 // request.
