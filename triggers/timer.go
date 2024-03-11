@@ -45,7 +45,8 @@ func (t Timer) Data() data.Raw {
 }
 
 // NewTimer creates and returns a Timer trigger from the provided
-// *http.Request.
+// *http.Request. The name on the trigger in function.json must
+// be "timer".
 func NewTimer(r *http.Request, options ...Option) (*Timer, error) {
 	opts := Options{}
 	for _, option := range options {
