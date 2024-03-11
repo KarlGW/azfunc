@@ -1,15 +1,11 @@
 package azfunc
 
-import (
-	"github.com/KarlGW/azfunc/bindings"
-)
-
 // function is an internal structure that represents a function
 // in a FunctionApp.
 type function struct {
 	name     string
 	trigger  triggerable
-	bindings []bindings.Bindable
+	bindings []Bindable
 }
 
 // FunctionOption sets options to the function.
@@ -71,10 +67,10 @@ func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc) FunctionOption {
 }
 
 // Binding sets the provided binding to the function.
-func Binding(binding bindings.Bindable) FunctionOption {
+func Binding(binding Bindable) FunctionOption {
 	return func(f *function) {
 		if f.bindings == nil {
-			f.bindings = []bindings.Bindable{binding}
+			f.bindings = []Bindable{binding}
 			return
 		}
 		f.bindings = append(f.bindings, binding)

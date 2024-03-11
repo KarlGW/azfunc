@@ -1,7 +1,5 @@
 package azfunc
 
-import "github.com/KarlGW/azfunc/bindings"
-
 // Context represents the function context and contains output,
 // bindings, services and clients.
 type Context struct {
@@ -16,7 +14,7 @@ type Context struct {
 	// user to perform type assertion to handle these services.
 	clients clients
 	// Output contains bindings.
-	Output bindings.Output
+	Output Output
 }
 
 // Log returns the logger of the Context.

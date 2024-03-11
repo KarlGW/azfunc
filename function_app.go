@@ -8,8 +8,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/KarlGW/azfunc/bindings"
 )
 
 const (
@@ -142,7 +140,7 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 func (a FunctionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
-			Output:   bindings.NewOutput(bindings.WithBindings(fn.bindings...)),
+			Output:   NewOutput(WithBindings(fn.bindings...)),
 			log:      a.log,
 			services: a.services,
 			clients:  a.clients,
