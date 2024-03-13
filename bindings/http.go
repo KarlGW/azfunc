@@ -19,13 +19,13 @@ type HTTP struct {
 
 // HTTPOptions contains options for an HTTP output binding.
 type HTTPOptions struct {
-	// Header sets the body of an HTTP binding.
+	// Header sets the body of the binding.
 	Header http.Header
 	// Name sets the name of the binding.
 	Name string
 	// Body sets the body of the binding.
 	Body data.Raw
-	// StatusCode sets the status code on the binding.
+	// StatusCode sets the status code of the binding.
 	StatusCode int
 }
 
