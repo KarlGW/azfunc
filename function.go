@@ -11,7 +11,12 @@ import (
 )
 
 const (
+	// functionsCustomHandlerPort is the environment variable that
+	// contains the port for the custom handler.
 	functionsCustomHandlerPort = "FUNCTIONS_CUSTOMHANDLER_PORT"
+	// functionsCustomHandlerHost is the environment variable that
+	// contains the host for the custom handler.
+	functionsCustomHandlerHost = "FUNCTIONS_CUSTOMHANDLER_HOST"
 )
 
 var (
@@ -74,7 +79,7 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 	router := http.NewServeMux()
 	app := &FunctionApp{
 		httpServer: &http.Server{
-			Addr:         os.Getenv(functionsCustomHandlerPort) + ":" + port,
+			Addr:         os.Getenv(functionsCustomHandlerHost) + ":" + port,
 			Handler:      router,
 			ReadTimeout:  time.Second * 30,
 			WriteTimeout: time.Second * 30,
