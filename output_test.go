@@ -68,11 +68,11 @@ func TestOutput_JSON(t *testing.T) {
 			name: "Parse output to JSON",
 			input: Output{
 				Outputs: map[string]bindable{
-					"queue": bindings.NewBase("queue", func(o *bindings.Options) {
+					"queue": bindings.NewBase("queue", func(o *bindings.BaseOptions) {
 						o.Data = []byte(`{"message":"hello","number":3}`)
 					}),
 				},
-				http: bindings.NewHTTP(func(o *bindings.Options) {
+				http: bindings.NewHTTP(func(o *bindings.HTTPOptions) {
 					o.StatusCode = http.StatusOK
 					o.Body = data.Raw(`{"message":"hello","number":2}`)
 					o.Header = http.Header{

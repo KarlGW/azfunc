@@ -16,7 +16,7 @@ func TestContext_Output_HTTP_Write(t *testing.T) {
 	ctx.Output.AddBindings(bindings.NewHTTP())
 	ctx.Output.HTTP().Write([]byte(`{"message":"hello"}`))
 
-	want := bindings.NewHTTP(func(o *bindings.Options) {
+	want := bindings.NewHTTP(func(o *bindings.HTTPOptions) {
 		o.Body = data.Raw(`{"message":"hello"}`)
 	})
 	got := ctx.Output.HTTP()
