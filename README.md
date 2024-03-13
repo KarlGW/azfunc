@@ -61,6 +61,7 @@ The triggers is the triggering event and the data it contains, and the context c
 **[HTTP trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#HTTP)**
 
 Triggered by an incoming HTTP event. The trigger contains the HTTP data (headers, url, query, params and body).
+Name on the trigger in `function.json` must be `req`.
 
 ```go
 func(ctx *azfunc.Context, trigger *triggers.HTTP)
@@ -69,6 +70,7 @@ func(ctx *azfunc.Context, trigger *triggers.HTTP)
 **[Timer trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Timer)**
 
 Triggered by a schedule. The trigger contains the timer data (next and last run etc).
+Name on the trigger in `function.json` must be `timer`.
 
 ```go
 func(ctx *azfunc.Context, trigger *triggers.Timer)
@@ -215,7 +217,7 @@ func main() {
         ctx.Output.HTTP().WriteHeader(http.StatusOK)
         ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
         ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
-	}))
+    }))
 
     if err := app.Start(); err != nil {
         // Handle error.

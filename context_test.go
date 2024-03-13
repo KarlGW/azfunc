@@ -11,43 +11,45 @@ import (
 
 func TestContext_Output_HTTP_Write(t *testing.T) {
 	ctx := Context{
-		Output: bindings.Output{},
+		Output: Output{},
 	}
 	ctx.Output.AddBindings(bindings.NewHTTP())
 	ctx.Output.HTTP().Write([]byte(`{"message":"hello"}`))
 
-	want := &bindings.HTTP{Body: data.Raw(`{"message":"hello"}`)}
+	want := bindings.NewHTTP(func(o *bindings.Options) {
+		o.Body = data.Raw(`{"message":"hello"}`)
+	})
 	got := ctx.Output.HTTP()
 
-	if diff := cmp.Diff(want.Body, got.Body, cmp.AllowUnexported(bindings.HTTP{})); diff != "" {
+	if diff := cmp.Diff(want.Data(), got.Data(), cmp.AllowUnexported(bindings.HTTP{})); diff != "" {
 		t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 	}
 }
 
 func TestContext_Output_HTTP_WriteHeader(t *testing.T) {
 	ctx := Context{
-		Output: bindings.Output{},
+		Output: Output{},
 	}
 	ctx.Output.AddBindings(bindings.NewHTTP())
 	ctx.Output.HTTP().WriteHeader(http.StatusNotFound)
 
-	want := &bindings.HTTP{}
+	want := bindings.NewHTTP()
 	want.WriteHeader(http.StatusNotFound)
 	got := ctx.Output.HTTP()
 
-	if diff := cmp.Diff(want.StatusCode, got.StatusCode, cmp.AllowUnexported(bindings.HTTP{})); diff != "" {
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(bindings.HTTP{})); diff != "" {
 		t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 	}
 }
 
 func TestContext_Output_HTTP_Header_Add(t *testing.T) {
 	ctx := Context{
-		Output: bindings.Output{},
+		Output: Output{},
 	}
 	ctx.Output.AddBindings(bindings.NewHTTP())
 	ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
 
-	want := &bindings.HTTP{}
+	want := bindings.NewHTTP()
 	want.Header().Add("Content-Type", "application/json")
 	got := ctx.Output.HTTP()
 
@@ -58,7 +60,7 @@ func TestContext_Output_HTTP_Header_Add(t *testing.T) {
 
 func TestContext_Output_Trigger_Write(t *testing.T) {
 	ctx := Context{
-		Output: bindings.Output{},
+		Output: Output{},
 	}
 	ctx.Output.AddBindings(bindings.NewBase("queue"))
 	ctx.Output.Binding("queue").Write([]byte(`{"message":"hello"}`))

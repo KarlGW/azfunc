@@ -130,7 +130,8 @@ func (t HTTP) MultipartForm(maxMemory int64) (*multipart.Form, error) {
 }
 
 // NewHTTP creates and returns an HTTP trigger from the provided
-// *http.Request.
+// *http.Request. The name on the trigger in function.json must
+// be "req".
 func NewHTTP(r *http.Request, options ...Option) (*HTTP, error) {
 	opts := Options{}
 	for _, option := range options {

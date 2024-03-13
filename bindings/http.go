@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/KarlGW/azfunc/data"
 )
@@ -13,13 +12,32 @@ import (
 type HTTP struct {
 	header     http.Header
 	name       string
-	Body       data.Raw
-	StatusCode int
+	body       data.Raw
+	statusCode int
+}
+
+// MarshalJSON implements custom marshaling to create the
+// required JSON structure as expected by the function host.
+func (b HTTP) MarshalJSON() ([]byte, error) {
+	headers := make(map[string]string, len(b.header))
+	for k, v := range b.header {
+		headers[k] = v[0]
+	}
+
+	return json.Marshal(struct {
+		Headers    map[string]string `json:"headers"`
+		StatusCode string            `json:"statusCode"`
+		Body       data.Raw          `json:"body"`
+	}{
+		Headers:    headers,
+		StatusCode: strconv.Itoa(b.statusCode),
+		Body:       b.body,
+	})
 }
 
 // Data returns the data of the binding.
 func (b HTTP) Data() data.Raw {
-	return b.Body
+	return b.body
 }
 
 // Name returns the name of the binding. In case of an HTTP binding
@@ -33,14 +51,14 @@ func (b HTTP) Name() string {
 
 // Write the provided data to the body of the HTTP bindings.
 func (b *HTTP) Write(d []byte) (int, error) {
-	b.Body = data.Raw(d)
-	return len(b.Body), nil
+	b.body = data.Raw(d)
+	return len(b.body), nil
 }
 
 // WriteHeader sets the response header with the provided
 // status code.
 func (b *HTTP) WriteHeader(statusCode int) {
-	b.StatusCode = statusCode
+	b.statusCode = statusCode
 }
 
 // Header returns the header(s) of the HTTP binding.
@@ -60,28 +78,9 @@ func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...Option) {
 		option(&opts)
 	}
 
-	b.StatusCode = statusCode
-	b.Body = data.Raw(body)
+	b.statusCode = statusCode
+	b.body = data.Raw(body)
 	b.header = opts.Header
-}
-
-// IsZero checks if the HTTP binding is unset.
-func (b HTTP) IsZero() bool {
-	return b.StatusCode == 0 && b.Body == nil && b.header == nil
-}
-
-// toHTTPBinding returns the httpBinding representation
-// of HTTP.
-func (b HTTP) toHTTPBinding() *httpBinding {
-	headers := make(map[string]string)
-	for k, v := range b.header {
-		headers[k] = strings.Join(v, ", ")
-	}
-	return &httpBinding{
-		StatusCode: strconv.Itoa(b.StatusCode),
-		Body:       b.Body,
-		Headers:    headers,
-	}
 }
 
 // NewHTTP creates a new HTTP output binding.
@@ -101,38 +100,8 @@ func NewHTTP(options ...Option) *HTTP {
 
 	return &HTTP{
 		name:       opts.Name,
-		StatusCode: opts.StatusCode,
-		Body:       opts.Body,
+		statusCode: opts.StatusCode,
+		body:       opts.Body,
 		header:     opts.Header,
 	}
-}
-
-// httpBinding is the Output binding representation of an
-// HTTP binding.
-type httpBinding struct {
-	Headers    map[string]string `json:"headers"`
-	name       string
-	StatusCode string   `json:"statusCode"`
-	Body       data.Raw `json:"body"`
-}
-
-// Data returns the data of the binding.
-func (b httpBinding) Data() data.Raw {
-	json, _ := json.Marshal(b)
-	return json
-}
-
-// Name returns the name of the binding. In case of an HTTP binding
-// it is always "res".
-func (b httpBinding) Name() string {
-	if len(b.name) > 0 {
-		return b.name
-	}
-	return "res"
-}
-
-// Write the provided data to the body of the HTTP bindings.
-func (b *httpBinding) Write(d []byte) (int, error) {
-	b.Body = data.Raw(d)
-	return len(b.Body), nil
 }
