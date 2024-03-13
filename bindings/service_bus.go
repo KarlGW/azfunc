@@ -8,6 +8,17 @@ type ServiceBus struct {
 	data data.Raw
 }
 
+// ServiceBusOptions contains options for a ServiceBus output binding.
+type ServiceBusOptions struct {
+	// Name sets the name of the binding.
+	Name string
+	// Data sets the data of the binding.
+	Data data.Raw
+}
+
+// ServiceBusOption is a function that sets options on a ServiceBus output binding.
+type ServiceBusOption func(o *ServiceBusOptions)
+
 // Data returns the data of the binding.
 func (b ServiceBus) Data() data.Raw {
 	return b.data
@@ -25,8 +36,8 @@ func (b *ServiceBus) Write(d []byte) (int, error) {
 }
 
 // NewServiceBus creates a new service bus output binding.
-func NewServiceBus(name string, options ...Option) *ServiceBus {
-	opts := Options{}
+func NewServiceBus(name string, options ...ServiceBusOption) *ServiceBus {
+	opts := ServiceBusOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

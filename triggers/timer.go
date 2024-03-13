@@ -16,6 +16,12 @@ type Timer struct {
 	IsPastDue      bool
 }
 
+// TimerOptions contains options for a Timer trigger.
+type TimerOptions struct{}
+
+// TimerOption is a function that sets options on a Timer trigger.
+type TimerOption func(o *TimerOptions)
+
 // TimerSchedule represents the Schedule field from the incoming
 // request.
 type TimerSchedule struct {
@@ -47,8 +53,8 @@ func (t Timer) Data() data.Raw {
 // NewTimer creates and returns a Timer trigger from the provided
 // *http.Request. The name on the trigger in function.json must
 // be "timer".
-func NewTimer(r *http.Request, options ...Option) (*Timer, error) {
-	opts := Options{}
+func NewTimer(r *http.Request, options ...TimerOption) (*Timer, error) {
+	opts := TimerOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

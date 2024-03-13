@@ -16,7 +16,7 @@ func TestNewBase(t *testing.T) {
 		input struct {
 			req     *http.Request
 			name    string
-			options []Option
+			options []BaseOption
 		}
 		want    *Base
 		wantErr error
@@ -26,7 +26,7 @@ func TestNewBase(t *testing.T) {
 			input: struct {
 				req     *http.Request
 				name    string
-				options []Option
+				options []BaseOption
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(baseRequest1)),

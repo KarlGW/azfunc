@@ -15,6 +15,12 @@ type Queue struct {
 	data     data.Raw
 }
 
+// QueueOptions contains options for a Queue Storage trigger.
+type QueueOptions struct{}
+
+// QueueOption is a function that sets options on a Queue Storage trigger.
+type QueueOption func(o *QueueOptions)
+
 // QueueMetadata represents the metadata for a Queue Storage trigger.
 type QueueMetadata struct {
 	DequeueCount    string
@@ -39,8 +45,8 @@ func (t Queue) Data() data.Raw {
 
 // NewQueue creates and returns a new Queue Storage trigger from the
 // provided *http.Request.
-func NewQueue(r *http.Request, name string, options ...Option) (*Queue, error) {
-	opts := Options{}
+func NewQueue(r *http.Request, name string, options ...QueueOption) (*Queue, error) {
+	opts := QueueOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

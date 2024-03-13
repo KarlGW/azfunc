@@ -14,6 +14,12 @@ type Base struct {
 	data     data.Raw
 }
 
+// BaseOptions contains options for a Base trigger.
+type BaseOptions struct{}
+
+// BaseOption is a function that sets options on a Base trigger.
+type BaseOption func(o *BaseOptions)
+
 // Parse the Raw data of the Base trigger into the provided
 // value.
 func (t Base) Parse(v any) error {
@@ -27,8 +33,8 @@ func (t Base) Data() data.Raw {
 
 // NewBase creates an returns a Base trigger from the provided
 // *http.Request.
-func NewBase(r *http.Request, name string, options ...Option) (*Base, error) {
-	opts := Options{}
+func NewBase(r *http.Request, name string, options ...BaseOption) (*Base, error) {
+	opts := BaseOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

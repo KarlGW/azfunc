@@ -17,7 +17,7 @@ func TestNewQueue(t *testing.T) {
 		input struct {
 			req     *http.Request
 			name    string
-			options []Option
+			options []QueueOption
 		}
 		want    *Queue
 		wantErr error
@@ -27,7 +27,7 @@ func TestNewQueue(t *testing.T) {
 			input: struct {
 				req     *http.Request
 				name    string
-				options []Option
+				options []QueueOption
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(queueRequest1)),

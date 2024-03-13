@@ -12,7 +12,7 @@ func TestNewServiceBus(t *testing.T) {
 		name  string
 		input struct {
 			name    string
-			options []Option
+			options []ServiceBusOption
 		}
 		want *ServiceBus
 	}{
@@ -20,7 +20,7 @@ func TestNewServiceBus(t *testing.T) {
 			name: "defaults",
 			input: struct {
 				name    string
-				options []Option
+				options []ServiceBusOption
 			}{
 				name:    "queue",
 				options: nil,
@@ -34,11 +34,11 @@ func TestNewServiceBus(t *testing.T) {
 			name: "with options",
 			input: struct {
 				name    string
-				options []Option
+				options []ServiceBusOption
 			}{
 				name: "queue",
-				options: []Option{
-					func(o *Options) {
+				options: []ServiceBusOption{
+					func(o *ServiceBusOptions) {
 						o.Data = data.Raw(`{"message":"hello"}`)
 					},
 				},

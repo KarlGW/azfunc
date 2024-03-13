@@ -17,7 +17,7 @@ func TestNewServiceBus(t *testing.T) {
 		input struct {
 			req     *http.Request
 			name    string
-			options []Option
+			options []ServiceBusOption
 		}
 		want    *ServiceBus
 		wantErr error
@@ -27,7 +27,7 @@ func TestNewServiceBus(t *testing.T) {
 			input: struct {
 				req     *http.Request
 				name    string
-				options []Option
+				options []ServiceBusOption
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(serviceBusRequest1)),
