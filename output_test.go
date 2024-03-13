@@ -71,10 +71,6 @@ func TestOutput_JSON(t *testing.T) {
 					"queue": bindings.NewBase("queue", func(o *bindings.Options) {
 						o.Data = []byte(`{"message":"hello","number":3}`)
 					}),
-					/* 					"queue": &Base{
-						name: "queue",
-						data: []byte(`{"message":"hello","number":3}`),
-					}, */
 				},
 				http: bindings.NewHTTP(func(o *bindings.Options) {
 					o.StatusCode = http.StatusOK
@@ -83,13 +79,6 @@ func TestOutput_JSON(t *testing.T) {
 						"Content-Type": {"application/json"},
 					}
 				}),
-				/* http: &HTTP{
-					StatusCode: http.StatusOK,
-					Body:       data.Raw(`{"message":"hello","number":2}`),
-					header: http.Header{
-						"Content-Type": {"application/json"},
-					},
-				}, */
 				Logs:        nil,
 				ReturnValue: nil,
 			},
