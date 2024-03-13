@@ -15,7 +15,7 @@ func TestNewTimer(t *testing.T) {
 		name  string
 		input struct {
 			req     *http.Request
-			options []Option
+			options []TimerOption
 		}
 		want    *Timer
 		wantErr error
@@ -24,7 +24,7 @@ func TestNewTimer(t *testing.T) {
 			name: "NewTimer",
 			input: struct {
 				req     *http.Request
-				options []Option
+				options []TimerOption
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(timerRequest1)),

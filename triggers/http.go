@@ -38,6 +38,14 @@ type HTTP struct {
 	Identities []HTTPIdentity
 }
 
+// HTTPOptions contains options for an HTTP trigger.
+type HTTPOptions struct {
+	Name string
+}
+
+// HTTPOption is a function that sets options on an HTTP trigger.
+type HTTPOption func(o *HTTPOptions)
+
 // HTTPMetadata represents the metadata for an HTTP trigger.
 type HTTPMetadata struct {
 	Headers map[string]string
@@ -132,8 +140,8 @@ func (t HTTP) MultipartForm(maxMemory int64) (*multipart.Form, error) {
 // NewHTTP creates and returns an HTTP trigger from the provided
 // *http.Request. The name on the trigger in function.json must
 // be "req".
-func NewHTTP(r *http.Request, options ...Option) (*HTTP, error) {
-	opts := Options{}
+func NewHTTP(r *http.Request, options ...HTTPOption) (*HTTP, error) {
+	opts := HTTPOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

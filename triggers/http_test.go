@@ -20,7 +20,7 @@ func TestNewHTTP(t *testing.T) {
 		name  string
 		input struct {
 			req     *http.Request
-			options []Option
+			options []HTTPOption
 		}
 		want    *HTTP
 		wantErr error
@@ -29,7 +29,7 @@ func TestNewHTTP(t *testing.T) {
 			name: "NewHTTP",
 			input: struct {
 				req     *http.Request
-				options []Option
+				options []HTTPOption
 			}{
 				req: &http.Request{
 					Body: io.NopCloser(bytes.NewBuffer(httpRequest1)),

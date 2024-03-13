@@ -15,6 +15,13 @@ type ServiceBus struct {
 	Metadata ServiceBusMetadata
 }
 
+// ServiceBusOptions contains options for a Service Bus trigger.
+type ServiceBusOptions struct{}
+
+// ServiceBusOption is a function that sets options on a Service Bus
+// trigger.
+type ServiceBusOption func(o *ServiceBusOptions)
+
 // ServiceBusMetadata represents the metadata for a Service Bus trigger.
 type ServiceBusMetadata struct {
 	MessageReceiver       map[string]any
@@ -59,8 +66,8 @@ func (t ServiceBus) Data() data.Raw {
 
 // NewServiceBus creates and returns a new Service Bus trigger from the
 // provided *http.Request.
-func NewServiceBus(r *http.Request, name string, options ...Option) (*ServiceBus, error) {
-	opts := Options{}
+func NewServiceBus(r *http.Request, name string, options ...ServiceBusOption) (*ServiceBus, error) {
+	opts := ServiceBusOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
