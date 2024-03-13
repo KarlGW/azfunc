@@ -12,7 +12,7 @@ func TestNewBase(t *testing.T) {
 		name  string
 		input struct {
 			name    string
-			options []Option
+			options []BaseOption
 		}
 		want *Base
 	}{
@@ -20,7 +20,7 @@ func TestNewBase(t *testing.T) {
 			name: "defaults",
 			input: struct {
 				name    string
-				options []Option
+				options []BaseOption
 			}{
 				name:    "queue",
 				options: nil,
@@ -34,11 +34,11 @@ func TestNewBase(t *testing.T) {
 			name: "with options",
 			input: struct {
 				name    string
-				options []Option
+				options []BaseOption
 			}{
 				name: "queue",
-				options: []Option{
-					func(o *Options) {
+				options: []BaseOption{
+					func(o *BaseOptions) {
 						o.Data = data.Raw(`{"message":"hello"}`)
 					},
 				},

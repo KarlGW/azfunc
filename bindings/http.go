@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/KarlGW/azfunc/data"
 )
@@ -15,6 +16,21 @@ type HTTP struct {
 	body       data.Raw
 	statusCode int
 }
+
+// HTTPOptions contains options for an HTTP output binding.
+type HTTPOptions struct {
+	// Header sets the body of an HTTP binding.
+	Header http.Header
+	// Name sets the name of the binding.
+	Name string
+	// Body sets the body of the binding.
+	Body data.Raw
+	// StatusCode sets the status code on the binding.
+	StatusCode int
+}
+
+// HTTPOption is a function that sets options on an HTTP output binding.
+type HTTPOption func(o *HTTPOptions)
 
 // MarshalJSON implements custom marshaling to create the
 // required JSON structure as expected by the function host.
@@ -72,8 +88,8 @@ func (b *HTTP) Header() http.Header {
 
 // WriteResponse writes the provided status code, body and options to
 // the HTTP binding. Supports option WithHeader.
-func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...Option) {
-	opts := Options{}
+func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...HTTPOption) {
+	opts := HTTPOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
@@ -84,8 +100,8 @@ func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...Option) {
 }
 
 // NewHTTP creates a new HTTP output binding.
-func NewHTTP(options ...Option) *HTTP {
-	opts := Options{
+func NewHTTP(options ...HTTPOption) *HTTP {
+	opts := HTTPOptions{
 		Header: http.Header{},
 	}
 	for _, option := range options {
@@ -103,5 +119,17 @@ func NewHTTP(options ...Option) *HTTP {
 		statusCode: opts.StatusCode,
 		body:       opts.Body,
 		header:     opts.Header,
+	}
+}
+
+// WithHeader adds the provided header to a HTTP binding.
+func WithHeader(header http.Header) HTTPOption {
+	return func(o *HTTPOptions) {
+		if o.Header == nil {
+			o.Header = http.Header{}
+		}
+		for k, v := range header {
+			o.Header.Add(k, strings.Join(v, ", "))
+		}
 	}
 }

@@ -10,6 +10,17 @@ type Base struct {
 	data data.Raw
 }
 
+// BaseOptions contains options for a Base output binding.
+type BaseOptions struct {
+	// Name sets the name of the binding.
+	Name string
+	// Data sets the data of the binding.
+	Data data.Raw
+}
+
+// BaseOption is a function that sets options on a Base output binding
+type BaseOption func(o *BaseOptions)
+
 // Data returns the data of the binding.
 func (b Base) Data() data.Raw {
 	return b.data
@@ -27,8 +38,8 @@ func (b *Base) Write(d []byte) (int, error) {
 }
 
 // NewBase creates a new base output binding.
-func NewBase(name string, options ...Option) *Base {
-	opts := Options{}
+func NewBase(name string, options ...BaseOption) *Base {
+	opts := BaseOptions{}
 	for _, option := range options {
 		option(&opts)
 	}

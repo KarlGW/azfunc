@@ -11,7 +11,7 @@ import (
 func TestNewHTTP(t *testing.T) {
 	var tests = []struct {
 		name  string
-		input []Option
+		input []HTTPOption
 		want  *HTTP
 	}{
 		{
@@ -26,8 +26,8 @@ func TestNewHTTP(t *testing.T) {
 		},
 		{
 			name: "with options",
-			input: []Option{
-				func(o *Options) {
+			input: []HTTPOption{
+				func(o *HTTPOptions) {
 					o.Name = "httpoutput"
 					o.StatusCode = http.StatusNotFound
 					o.Body = data.Raw(`{"message":"not found"}`)
@@ -84,7 +84,7 @@ func TestHTTP_WriteResponse(t *testing.T) {
 		input struct {
 			statusCode int
 			body       []byte
-			options    []Option
+			options    []HTTPOption
 		}
 		want *HTTP
 	}{
@@ -93,7 +93,7 @@ func TestHTTP_WriteResponse(t *testing.T) {
 			input: struct {
 				statusCode int
 				body       []byte
-				options    []Option
+				options    []HTTPOption
 			}{
 				statusCode: http.StatusCreated,
 				body:       []byte(`{"message":"hello"}`),
@@ -108,11 +108,11 @@ func TestHTTP_WriteResponse(t *testing.T) {
 			input: struct {
 				statusCode int
 				body       []byte
-				options    []Option
+				options    []HTTPOption
 			}{
 				statusCode: http.StatusCreated,
 				body:       []byte(`{"message":"hello"}`),
-				options: []Option{
+				options: []HTTPOption{
 					WithHeader(http.Header{"Content-Type": {"application/json"}}),
 				},
 			},

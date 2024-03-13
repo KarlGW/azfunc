@@ -8,6 +8,17 @@ type Queue struct {
 	data data.Raw
 }
 
+// QueueOptions contains options for a Queue output binding.
+type QueueOptions struct {
+	// Name sets the name of the binding.
+	Name string
+	// Data sets the data of the binding.
+	Data data.Raw
+}
+
+// QueueOption is a function that sets options on a Queue output binding.
+type QueueOption func(o *QueueOptions)
+
 // Data returns the data of the binding.
 func (b Queue) Data() data.Raw {
 	return b.data
@@ -25,8 +36,8 @@ func (b *Queue) Write(d []byte) (int, error) {
 }
 
 // NewQueue creates a new queue storage output binding.
-func NewQueue(name string, options ...Option) *Queue {
-	opts := Options{}
+func NewQueue(name string, options ...QueueOption) *Queue {
+	opts := QueueOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
