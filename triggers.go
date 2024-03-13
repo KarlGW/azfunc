@@ -126,11 +126,12 @@ func (t queueTrigger) run(ctx *Context, r *http.Request) error {
 
 // QueueTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func QueueTrigger(name string, fn QueueTriggerFunc) FunctionOption {
+func QueueTrigger(name string, fn QueueTriggerFunc, options ...triggers.QueueOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = queueTrigger{
-			fn:   fn,
-			name: name,
+			fn:      fn,
+			name:    name,
+			options: options,
 		}
 	}
 }
