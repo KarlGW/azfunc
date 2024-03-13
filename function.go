@@ -5,7 +5,7 @@ package azfunc
 type function struct {
 	name     string
 	trigger  triggerable
-	bindings []Bindable
+	bindings []bindable
 }
 
 // FunctionOption sets options to the function.
@@ -67,10 +67,10 @@ func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc) FunctionOption {
 }
 
 // Binding sets the provided binding to the function.
-func Binding(binding Bindable) FunctionOption {
+func Binding(binding bindable) FunctionOption {
 	return func(f *function) {
 		if f.bindings == nil {
-			f.bindings = []Bindable{binding}
+			f.bindings = []bindable{binding}
 			return
 		}
 		f.bindings = append(f.bindings, binding)

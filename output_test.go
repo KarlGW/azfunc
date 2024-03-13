@@ -19,7 +19,7 @@ func TestNewOutput(t *testing.T) {
 			name:  "Output with defaults",
 			input: nil,
 			want: Output{
-				Outputs:     map[string]Bindable{},
+				Outputs:     map[string]bindable{},
 				Logs:        nil,
 				ReturnValue: nil,
 			},
@@ -28,7 +28,7 @@ func TestNewOutput(t *testing.T) {
 			name: "Output with options",
 			input: []OutputOption{
 				func(o *OutputOptions) {
-					o.Bindings = []Bindable{
+					o.Bindings = []bindable{
 						bindings.NewHTTP(),
 						bindings.NewBase("queue"),
 					}
@@ -37,7 +37,7 @@ func TestNewOutput(t *testing.T) {
 				},
 			},
 			want: Output{
-				Outputs: map[string]Bindable{
+				Outputs: map[string]bindable{
 					"queue": bindings.NewBase("queue"),
 				},
 				Logs:        []string{"Log message"},
@@ -67,7 +67,7 @@ func TestOutput_JSON(t *testing.T) {
 		{
 			name: "Parse output to JSON",
 			input: Output{
-				Outputs: map[string]Bindable{
+				Outputs: map[string]bindable{
 					"queue": bindings.NewBase("queue", func(o *bindings.Options) {
 						o.Data = []byte(`{"message":"hello","number":3}`)
 					}),

@@ -7,8 +7,8 @@ import (
 	"github.com/KarlGW/azfunc/data"
 )
 
-// Bindable is the interface that wraps around methods Data, Name and Write.
-type Bindable interface {
+// bindable is the interface that wraps around methods Data, Name and Write.
+type bindable interface {
 	// Data returns the data of the binding.
 	Data() data.Raw
 	// Name returns the name of the binding.
@@ -19,7 +19,7 @@ type Bindable interface {
 
 // Output represents an outgoing response to the Functuon Host.
 type Output struct {
-	Outputs     map[string]Bindable
+	Outputs     map[string]bindable
 	ReturnValue any
 	http        *bindings.HTTP
 	Logs        []string
@@ -60,9 +60,9 @@ func (o Output) JSON() []byte {
 }
 
 // AddBindings one or more bindings to Output.
-func (o *Output) AddBindings(bindables ...Bindable) {
+func (o *Output) AddBindings(bindables ...bindable) {
 	if o.Outputs == nil {
-		o.Outputs = make(map[string]Bindable, len(bindables))
+		o.Outputs = make(map[string]bindable, len(bindables))
 	}
 
 	for _, binding := range bindables {
@@ -90,7 +90,7 @@ func (o *Output) SetReturnValue(v any) {
 // Binding returns the binding with the provided name, if no binding
 // with that name exists, return a new base binding with the
 // provided name.
-func (o Output) Binding(name string) Bindable {
+func (o Output) Binding(name string) bindable {
 	binding, ok := o.Outputs[name]
 	if !ok {
 		o.Outputs[name] = bindings.NewBase(name)
@@ -114,7 +114,7 @@ func (o *Output) HTTP() *bindings.HTTP {
 type OutputOptions struct {
 	ReturnValue any
 	http        *bindings.HTTP
-	Bindings    []Bindable
+	Bindings    []bindable
 	Logs        []string
 }
 
@@ -146,7 +146,7 @@ func NewOutput(options ...OutputOption) Output {
 }
 
 // WithBindings add one or more bindings to OutputOptions
-func WithBindings(bindables ...Bindable) OutputOption {
+func WithBindings(bindables ...bindable) OutputOption {
 	return func(o *OutputOptions) {
 		for _, binding := range bindables {
 			if b, ok := binding.(*bindings.HTTP); ok {
