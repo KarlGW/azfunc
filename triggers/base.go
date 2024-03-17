@@ -20,13 +20,13 @@ type BaseOptions struct{}
 // BaseOption is a function that sets options on a Base trigger.
 type BaseOption func(o *BaseOptions)
 
-// Parse the Raw data of the Base trigger into the provided
+// Parse the data of the Base trigger into the provided
 // value.
 func (t Base) Parse(v any) error {
 	return json.Unmarshal(t.data, &v)
 }
 
-// Data returns the Raw data of the Base trigger.
+// Data returns the data of the Base trigger.
 func (t Base) Data() data.Raw {
 	return t.data
 }
