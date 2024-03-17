@@ -134,7 +134,7 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
 
 * `ctx.Log()`:
     * `ctx.Log().Info()` for info level logs.
-    * `ctx.Log.Error()` for error level logs.
+    * `ctx.Log().Error()` for error level logs.
 * `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Base` (will work as long as a binding with that same name is defined in the functions `function.json`).
 * `ctx.Err()` - Get the error set to the context.
 * `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will count as a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
