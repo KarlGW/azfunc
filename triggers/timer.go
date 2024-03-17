@@ -17,7 +17,9 @@ type Timer struct {
 }
 
 // TimerOptions contains options for a Timer trigger.
-type TimerOptions struct{}
+type TimerOptions struct {
+	Name string
+}
 
 // TimerOption is a function that sets options on a Timer trigger.
 type TimerOption func(o *TimerOptions)
@@ -51,10 +53,13 @@ func (t Timer) Data() data.Raw {
 }
 
 // NewTimer creates and returns a Timer trigger from the provided
-// *http.Request. The name on the trigger in function.json must
-// be "timer".
+// *http.Request. By default it will use the name "timer" for the
+// trigger. This can be overridden with providing a name
+// in the options.
 func NewTimer(r *http.Request, options ...TimerOption) (*Timer, error) {
-	opts := TimerOptions{}
+	opts := TimerOptions{
+		Name: "timer",
+	}
 	for _, option := range options {
 		option(&opts)
 	}
@@ -65,22 +70,17 @@ func NewTimer(r *http.Request, options ...TimerOption) (*Timer, error) {
 	}
 	defer r.Body.Close()
 
-	return &Timer{
-		Schedule:       t.Data.Timer.Schedule,
-		ScheduleStatus: t.Data.Timer.ScheduleStatus,
-		IsPastDue:      t.Data.Timer.IsPastDue,
-		Metadata:       t.Metadata,
-	}, nil
+	d, ok := t.Data[opts.Name]
+	if !ok {
+		return nil, ErrTriggerNameIncorrect
+	}
+	d.Metadata = t.Metadata
+
+	return &d, nil
 }
 
 // timerTrigger is the incoming request from the Function host.
 type timerTrigger struct {
-	Data struct {
-		Timer struct {
-			ScheduleStatus TimerScheduleStatus
-			Schedule       TimerSchedule
-			IsPastDue      bool
-		} `json:"timer"`
-	}
+	Data     map[string]Timer
 	Metadata Metadata
 }
