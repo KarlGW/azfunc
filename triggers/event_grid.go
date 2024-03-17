@@ -64,7 +64,7 @@ func (t EventGrid) Parse(v any) error {
 }
 
 // NewEventGrid creates and returns an Event Grid trigger from the provided
-// *http.Request. The
+// *http.Request.
 func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*EventGrid, error) {
 	opts := EventGridOptions{}
 	for _, option := range options {
