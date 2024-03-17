@@ -31,8 +31,8 @@ func (s EventGridSchema) String() string {
 }
 
 // EventGrid represents an Event Grid trigger. It handles both
-// Cloud Events and Event Grid events. For both types of events
-// the 'Topic' are used to describe the source of the event. This
+// Cloud Events and Event Grid events. For both types of events,
+// the 'Topic' is used to describe the source of the event. This
 // to match the nomenclature of the Event Grid service.
 type EventGrid struct {
 	Time     time.Time
