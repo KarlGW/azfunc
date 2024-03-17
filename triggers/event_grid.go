@@ -46,9 +46,7 @@ type EventGrid struct {
 }
 
 // EventGridOptions contains options for an Event Grid trigger.
-type EventGridOptions struct {
-	Schema EventGridSchema
-}
+type EventGridOptions struct{}
 
 // EventGridOption is a function that sets options on an Event Grid
 // trigger.
@@ -68,9 +66,7 @@ func (t EventGrid) Parse(v any) error {
 // NewEventGrid creates and returns an Event Grid trigger from the provided
 // *http.Request. The
 func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*EventGrid, error) {
-	opts := EventGridOptions{
-		Schema: EventGridSchemaCloudEvents,
-	}
+	opts := EventGridOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
