@@ -83,11 +83,6 @@ func (t HTTP) Parse(v any) error {
 	return json.Unmarshal(t.Body, &v)
 }
 
-// Data returns the data (body) of the HTTP trigger.
-func (t HTTP) Data() data.Raw {
-	return t.Body
-}
-
 // Form parses the HTTP trigger for form data sent with Content-Type
 // application/x-www-form-urlencoded and returns it as url.Values.
 func (t HTTP) Form() (url.Values, error) {

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-
-	"github.com/KarlGW/azfunc/data"
 )
 
 // Timer represent a Timer trigger.
@@ -36,20 +34,6 @@ type TimerScheduleStatus struct {
 	Last        time.Time
 	Next        time.Time
 	LastUpdated time.Time
-}
-
-// Parse together with Data satisfies the Triggerable interface. It
-// is a no-op method. A timer trigger contains no other data needed
-// to be parsed. Use the fields directly.
-func (t Timer) Parse(v any) error {
-	return nil
-}
-
-// Data together with Parse satisfies the Triggerable interface. It
-// is a no-op method. A timer trigger contains no other data needed
-// to be parsed. Use the fields directly.
-func (t Timer) Data() data.Raw {
-	return nil
 }
 
 // NewTimer creates and returns a Timer trigger from the provided

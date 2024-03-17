@@ -35,7 +35,7 @@ func TestNewQueue(t *testing.T) {
 				name: "queue",
 			},
 			want: &Queue{
-				data: data.Raw(`{"message":"hello","number":2}`),
+				Data: data.Raw(`{"message":"hello","number":2}`),
 				Metadata: QueueMetadata{
 					DequeueCount:    "1",
 					ID:              "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",

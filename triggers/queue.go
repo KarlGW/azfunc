@@ -12,7 +12,7 @@ import (
 // Queue represents a Queue Storage trigger.
 type Queue struct {
 	Metadata QueueMetadata
-	data     data.Raw
+	Data     data.Raw
 }
 
 // QueueOptions contains options for a Queue Storage trigger.
@@ -35,12 +35,7 @@ type QueueMetadata struct {
 // Parse the data of the Queue Storage trigger into the provided
 // value.
 func (t Queue) Parse(v any) error {
-	return json.Unmarshal(t.data, &v)
-}
-
-// Data returns the data of the Queue Storage trigger.
-func (t Queue) Data() data.Raw {
-	return t.data
+	return json.Unmarshal(t.Data, &v)
 }
 
 // NewQueue creates and returns a new Queue Storage trigger from the
@@ -66,7 +61,7 @@ func NewQueue(r *http.Request, name string, options ...QueueOption) (*Queue, err
 	t.Metadata.PopReceipt = strings.Trim(t.Metadata.PopReceipt, "\"")
 
 	return &Queue{
-		data:     d,
+		Data:     d,
 		Metadata: t.Metadata,
 	}, nil
 }
