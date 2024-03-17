@@ -36,7 +36,7 @@ func TestNewEventGrid(t *testing.T) {
 			},
 			want: &EventGrid{
 				ID:      "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-				Source:  "source",
+				Topic:   "topic",
 				Subject: "subject",
 				Type:    "created",
 				Time:    _testEventGridTime1,
@@ -68,7 +68,7 @@ func TestNewEventGrid(t *testing.T) {
 			},
 			want: &EventGrid{
 				ID:      "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-				Source:  "source",
+				Topic:   "topic",
 				Subject: "subject",
 				Type:    "created",
 				Time:    _testEventGridTime1,
@@ -172,11 +172,40 @@ func TestEventGrid_Parse(t *testing.T) {
 	}
 }
 
+func TestEventGridSchema_String(t *testing.T) {
+	var tests = []struct {
+		name  string
+		input EventGridSchema
+		want  string
+	}{
+		{
+			name:  "cloud events",
+			input: EventGridSchemaCloudEvents,
+			want:  "CloudEvents",
+		},
+		{
+			name:  "event grid",
+			input: EventGridSchemaEventGrid,
+			want:  "EventGrid",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.input.String()
+
+			if test.want != got {
+				t.Errorf("String() = unexpected result, want: %s, got: %s\n", test.want, got)
+			}
+		})
+	}
+}
+
 var eventGridCloudEventRequest1 = []byte(`{
 	"Data": {
 	  "event": {
 		"id": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-		"source": "source",
+		"source": "topic",
 		"specversion": "1.0",
 		"type": "created",
 		"subject": "subject",
@@ -199,7 +228,7 @@ var eventGridCloudEventRequest2 = []byte(`{
 	"Data": {
 	  "event": {
 		"id": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-		"source": "source",
+		"source": "topic",
 		"specversion": "1.0",
 		"type": "created",
 		"subject": "subject",
@@ -228,7 +257,7 @@ var eventGridEventRequest1 = []byte(`{
 	"Data": {
 	  "event": {
 		"id": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-		"topic": "source",
+		"topic": "topic",
 		"subject": "subject",
 		"eventType": "created",
 		"dataVersion": "1",

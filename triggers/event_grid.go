@@ -19,16 +19,26 @@ const (
 	EventGridSchemaEventGrid
 )
 
+// String returns the string representation of the EventGridSchema.
+func (s EventGridSchema) String() string {
+	switch s {
+	case EventGridSchemaCloudEvents:
+		return "CloudEvents"
+	case EventGridSchemaEventGrid:
+		return "EventGrid"
+	}
+	return ""
+}
+
 // EventGrid represents an Event Grid trigger. It handles both
-// Cloud Events and Event Grid events. Cloud events is the recommended
-// schema to use, and thus those property names are used.
-// The Even Grid schema properties 'Topic', 'EventType' and 'EventTime'
-// is set to the properties 'Source', 'Type' and 'Time' respectively.
+// Cloud Events and Event Grid events. For both types of events
+// the 'Topic' are used to describe the source of the event. This
+// to match the nomenclature of the Event Grid service.
 type EventGrid struct {
 	Time     time.Time
 	Metadata EventGridMetadata
 	ID       string
-	Source   string
+	Topic    string
 	Subject  string
 	Type     string
 	Data     data.Raw
@@ -75,15 +85,15 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 		return nil, ErrTriggerNameIncorrect
 	}
 
-	var source, typ string
+	var topic, typ string
 	var eventTime time.Time
 	var schema EventGridSchema
 	if len(d.SpecVersion) > 0 {
-		source, typ = d.Source, d.Type
+		topic, typ = d.Source, d.Type
 		eventTime = d.Time
 		schema = EventGridSchemaCloudEvents
 	} else if len(d.MetadataVersion) > 0 {
-		source, typ = d.Topic, d.EventType
+		topic, typ = d.Topic, d.EventType
 		eventTime = d.EventTime
 		schema = EventGridSchemaEventGrid
 	} else {
@@ -92,7 +102,7 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 
 	return &EventGrid{
 		ID:       d.ID,
-		Source:   source,
+		Topic:    topic,
 		Subject:  d.Subject,
 		Type:     typ,
 		Time:     eventTime,
@@ -113,8 +123,8 @@ type eventGridTrigger struct {
 // schema and the event grid schema.
 type event struct {
 	ID              string    `json:"id"`
-	Source          string    `json:"source"`
 	Topic           string    `json:"topic"`
+	Source          string    `json:"source"`
 	Subject         string    `json:"subject"`
 	Type            string    `json:"type"`
 	EventType       string    `json:"eventType"`

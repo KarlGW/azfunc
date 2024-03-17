@@ -90,6 +90,14 @@ Triggered by a message to an Azure Service Bus queue or topic subscription.
 func(ctx *azfunc.Context, trigger *triggers.ServiceBus)
 ```
 
+**[Event Grid trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#EventGrid)**
+
+Triggered by an event to an Azure Event Grid topic subscription.
+
+```go
+func(ctx *azfunc.Context, trigger *triggers.EventGrid)
+```
+
 **[Base trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Base)**
 
 Base trigger is a base that can be used for all not yet supported triggers. The data it contains
