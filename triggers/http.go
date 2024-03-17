@@ -31,7 +31,7 @@ type HTTP struct {
 	Headers    http.Header
 	Params     map[string]string
 	Query      map[string]string
-	URL        string
+	URL        string `json:"Url"`
 	Method     string
 	Body       data.Raw
 	Metadata   HTTPMetadata
@@ -83,7 +83,7 @@ func (t HTTP) Parse(v any) error {
 	return json.Unmarshal(t.Body, &v)
 }
 
-// Data returns the Raw data of the HTTP trigger.
+// Data returns the data (body) of the HTTP trigger.
 func (t HTTP) Data() data.Raw {
 	return t.Body
 }
@@ -138,10 +138,13 @@ func (t HTTP) MultipartForm(maxMemory int64) (*multipart.Form, error) {
 }
 
 // NewHTTP creates and returns an HTTP trigger from the provided
-// *http.Request. The name on the trigger in function.json must
-// be "req".
+// *http.Request. By default it will use the name "req" for the
+// trigger. This can be overridden with providing a name
+// in the options.
 func NewHTTP(r *http.Request, options ...HTTPOption) (*HTTP, error) {
-	opts := HTTPOptions{}
+	opts := HTTPOptions{
+		Name: "req",
+	}
 	for _, option := range options {
 		option(&opts)
 	}
@@ -152,30 +155,17 @@ func NewHTTP(r *http.Request, options ...HTTPOption) (*HTTP, error) {
 	}
 	defer r.Body.Close()
 
-	return &HTTP{
-		URL:        t.Data.Req.URL,
-		Method:     t.Data.Req.Method,
-		Body:       t.Data.Req.Body,
-		Headers:    t.Data.Req.Headers,
-		Params:     t.Data.Req.Params,
-		Query:      t.Data.Req.Query,
-		Identities: t.Data.Req.Identities,
-		Metadata:   t.Metadata,
-	}, nil
+	d, ok := t.Data[opts.Name]
+	if !ok {
+		return nil, ErrTriggerNameIncorrect
+	}
+	d.Metadata = t.Metadata
+
+	return &d, nil
 }
 
 // httpTrigger is the incoming request from the Function host.
 type httpTrigger struct {
+	Data     map[string]HTTP
 	Metadata HTTPMetadata
-	Data     struct {
-		Req struct {
-			URL        string `json:"Url"`
-			Method     string
-			Body       data.Raw
-			Headers    http.Header
-			Params     map[string]string
-			Query      map[string]string
-			Identities []HTTPIdentity
-		} `json:"req"`
-	}
 }
