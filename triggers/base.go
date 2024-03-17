@@ -11,7 +11,7 @@ import (
 // triggers that are not HTTP triggers share the same data structure.
 type Base struct {
 	Metadata map[string]any
-	data     data.Raw
+	Data     data.Raw
 }
 
 // BaseOptions contains options for a Base trigger.
@@ -20,15 +20,10 @@ type BaseOptions struct{}
 // BaseOption is a function that sets options on a Base trigger.
 type BaseOption func(o *BaseOptions)
 
-// Parse the Raw data of the Base trigger into the provided
+// Parse the data of the Base trigger into the provided
 // value.
 func (t Base) Parse(v any) error {
-	return json.Unmarshal(t.data, &v)
-}
-
-// Data returns the Raw data of the Base trigger.
-func (t Base) Data() data.Raw {
-	return t.data
+	return json.Unmarshal(t.Data, &v)
 }
 
 // NewBase creates an returns a Base trigger from the provided
@@ -51,7 +46,7 @@ func NewBase(r *http.Request, name string, options ...BaseOption) (*Base, error)
 	}
 
 	return &Base{
-		data:     d,
+		Data:     d,
 		Metadata: t.Metadata,
 	}, nil
 }

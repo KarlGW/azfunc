@@ -35,7 +35,7 @@ func TestNewServiceBus(t *testing.T) {
 				name: "queue",
 			},
 			want: &ServiceBus{
-				data: data.Raw(`{"message":"hello","number":2}`),
+				Data: data.Raw(`{"message":"hello","number":2}`),
 				Metadata: ServiceBusMetadata{
 					Client: ServiceBusMetadataClient{
 						FullyQualifiedNamespace: "namespace",

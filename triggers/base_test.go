@@ -34,7 +34,7 @@ func TestNewBase(t *testing.T) {
 				name: "base",
 			},
 			want: &Base{
-				data: data.Raw(`{"message":"hello","number":2}`),
+				Data: data.Raw(`{"message":"hello","number":2}`),
 				Metadata: map[string]any{
 					"sys": map[string]any{
 						"MethodName": "helloBase",

@@ -11,7 +11,7 @@ import (
 // ServiceBus represents a Service Bus trigger. It supports both
 // queues and topics with subscriptions.
 type ServiceBus struct {
-	data     data.Raw
+	Data     data.Raw
 	Metadata ServiceBusMetadata
 }
 
@@ -56,12 +56,7 @@ type ServiceBusMetadataClient struct {
 // Parse the data for the Service Bus trigger into the provided
 // value.
 func (t ServiceBus) Parse(v any) error {
-	return json.Unmarshal(t.data, &v)
-}
-
-// Data returns the data of the Service Bus trigger.
-func (t ServiceBus) Data() data.Raw {
-	return t.data
+	return json.Unmarshal(t.Data, &v)
 }
 
 // NewServiceBus creates and returns a new Service Bus trigger from the
@@ -88,7 +83,7 @@ func NewServiceBus(r *http.Request, name string, options ...ServiceBusOption) (*
 	t.Metadata.ContentType = strings.Trim(t.Metadata.ContentType, "\"")
 
 	return &ServiceBus{
-		data:     d,
+		Data:     d,
 		Metadata: t.Metadata,
 	}, nil
 }

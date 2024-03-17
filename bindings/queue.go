@@ -2,13 +2,13 @@ package bindings
 
 import "github.com/KarlGW/azfunc/data"
 
-// Queue represents a queue storage output binding.
+// Queue represents a Queue Storage output binding.
 type Queue struct {
 	name string
 	data data.Raw
 }
 
-// QueueOptions contains options for a Queue output binding.
+// QueueOptions contains options for a Queue Storage output binding.
 type QueueOptions struct {
 	// Name sets the name of the binding.
 	Name string
@@ -16,7 +16,7 @@ type QueueOptions struct {
 	Data data.Raw
 }
 
-// QueueOption is a function that sets options on a Queue output binding.
+// QueueOption is a function that sets options on a Queue Storage output binding.
 type QueueOption func(o *QueueOptions)
 
 // Data returns the data of the binding.
