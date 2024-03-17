@@ -88,7 +88,7 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 		topic, typ = d.Source, d.Type
 		eventTime = d.Time
 		schema = EventGridSchemaCloudEvents
-	} else if len(d.MetadataVersion) > 0 {
+	} else if len(d.EventType) > 0 {
 		topic, typ = d.Topic, d.EventType
 		eventTime = d.EventTime
 		schema = EventGridSchemaEventGrid
