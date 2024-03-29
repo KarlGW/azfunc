@@ -51,7 +51,7 @@ An example on how to create a function with a HTTP trigger and a HTTP output bin
 
 ### Concepts
 
-When working with the `FunctionApp` there are some concepts to understand and work with. The `FunctionApp` represents the entire Function App, and it is to this structure the functions (with their triggers and output bindings) that should be run are registered to. Each function that is registered contains a `*azfunc.Context` and a trigger (`*triggers.HTTP`, `*triggers.Timer`, `*triggers.Queue` and `*triggers.Base`).
+When working with the `FunctionApp` there are some concepts to understand and work with. The `FunctionApp` represents the entire Function App, and it is to this structure the functions (with their triggers and output bindings) that should be run are registered to. Each function that is registered contains a `*azfunc.Context` and a [trigger](#triggers-input-bindings).
 
 The triggers is the triggering event and the data it contains, and the context contains output bindings (and writing to them), output error and logging.
 
@@ -98,13 +98,13 @@ Triggered by an event to an Azure Event Grid topic subscription.
 func(ctx *azfunc.Context, trigger *triggers.EventGrid)
 ```
 
-**[Base trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Base)**
+**[Generic trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Generic)**
 
-Base trigger is a base that can be used for all not yet supported triggers. The data it contains
+Generic trigger is a generic trigger can be used for all not yet supported triggers. The data it contains
 needs to be parsed into a `struct` matching the expected incoming payload.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.Base)
+func(ctx *azfunc.Context, trigger *triggers.Generic)
 ```
 
 
@@ -122,9 +122,9 @@ Writes a message to a queue in Azure Queue Storage.
 
 Writes a message to a queue or topic subscription in Azure Service Bus.
 
-**[Base binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Base)**
+**[Generic binding](https://pkg.go.dev/github.com/KarlGW/azfunc/bindings#Generic)**
 
-Base binding is a base that can be used for all not yet supported bindings.
+Generic binding is a generic binding that can be used for all not yet supported bindings.
 
 #### [Context](https://pkg.go.dev/github.com/KarlGW/azfunc#Context)
 
@@ -135,7 +135,7 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
 * `ctx.Log()`:
     * `ctx.Log().Info()` for info level logs.
     * `ctx.Log().Error()` for error level logs.
-* `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Base` (will work as long as a binding with that same name is defined in the functions `function.json`).
+* `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Generic` (will work as long as a binding with that same name is defined in the functions `function.json`).
 * `ctx.Err()` - Get the error set to the context.
 * `ctx.SetError(err)` - Set an error to the context. This will signal to the underlying host that an error has occured and the execution will count as a failure. Use this followed by a `return` in the provided function to represent an "unrecoverable" error and exit early.
 

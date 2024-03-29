@@ -88,12 +88,12 @@ func (o *Output) SetReturnValue(v any) {
 }
 
 // Binding returns the binding with the provided name, if no binding
-// with that name exists, return a new base binding with the
+// with that name exists, return a new generic binding with the
 // provided name.
 func (o Output) Binding(name string) bindable {
 	binding, ok := o.Outputs[name]
 	if !ok {
-		o.Outputs[name] = bindings.NewBase(name)
+		o.Outputs[name] = bindings.NewGeneric(name)
 		return o.Outputs[name]
 	}
 	return binding

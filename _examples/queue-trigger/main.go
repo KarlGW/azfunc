@@ -11,7 +11,7 @@ import (
 func main() {
 	app := azfunc.NewFunctionApp()
 
-	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Base) {
+	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
 		// Parse the incoming queue trigger body into the custom type.
 		// To get the raw data of the queue message, use trigger.Data instead.
 		var t test
