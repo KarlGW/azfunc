@@ -7,25 +7,25 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewBase(t *testing.T) {
+func TestNewGeneric(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
 			name    string
-			options []BaseOption
+			options []GenericOption
 		}
-		want *Base
+		want *Generic
 	}{
 		{
 			name: "defaults",
 			input: struct {
 				name    string
-				options []BaseOption
+				options []GenericOption
 			}{
 				name:    "queue",
 				options: nil,
 			},
-			want: &Base{
+			want: &Generic{
 				name: "queue",
 				data: nil,
 			},
@@ -34,16 +34,16 @@ func TestNewBase(t *testing.T) {
 			name: "with options",
 			input: struct {
 				name    string
-				options []BaseOption
+				options []GenericOption
 			}{
 				name: "queue",
-				options: []BaseOption{
-					func(o *BaseOptions) {
+				options: []GenericOption{
+					func(o *GenericOptions) {
 						o.Data = data.Raw(`{"message":"hello"}`)
 					},
 				},
 			},
-			want: &Base{
+			want: &Generic{
 				name: "queue",
 				data: data.Raw(`{"message":"hello"}`),
 			},
@@ -52,41 +52,41 @@ func TestNewBase(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := NewBase(test.input.name, test.input.options...)
+			got := NewGeneric(test.input.name, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Base{})); diff != "" {
-				t.Errorf("NewBase() = unexpected (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Generic{})); diff != "" {
+				t.Errorf("NewGeneric() = unexpected (-want +got)\n%s\n", diff)
 			}
 		})
 	}
 }
 
-func TestBase_Write(t *testing.T) {
+func TestGeneric_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
-		got := &Base{}
+		got := &Generic{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &Base{data: data.Raw(`{"message":"hello"}`)}
+		want := &Generic{data: data.Raw(`{"message":"hello"}`)}
 
-		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Base{})); diff != "" {
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Generic{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 		}
 	})
 }
 
-func TestBase_Name(t *testing.T) {
+func TestGeneric_Name(t *testing.T) {
 	var tests = []struct {
 		name  string
-		input *Base
+		input *Generic
 		want  string
 	}{
 		{
 			name:  "default",
-			input: &Base{},
+			input: &Generic{},
 			want:  "",
 		},
 		{
 			name:  "with name",
-			input: &Base{name: "queue"},
+			input: &Generic{name: "queue"},
 			want:  "queue",
 		},
 	}
@@ -95,7 +95,7 @@ func TestBase_Name(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := test.input.Name()
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Base{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Generic{})); diff != "" {
 				t.Errorf("Name() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})

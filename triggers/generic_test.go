@@ -10,34 +10,34 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewBase(t *testing.T) {
+func TestNewGeneric(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
 			req     *http.Request
 			name    string
-			options []BaseOption
+			options []GenericOption
 		}
-		want    *Base
+		want    *Generic
 		wantErr error
 	}{
 		{
-			name: "NewBase",
+			name: "NewGeneric",
 			input: struct {
 				req     *http.Request
 				name    string
-				options []BaseOption
+				options []GenericOption
 			}{
 				req: &http.Request{
-					Body: io.NopCloser(bytes.NewBuffer(baseRequest1)),
+					Body: io.NopCloser(bytes.NewBuffer(genericRequest1)),
 				},
-				name: "base",
+				name: "generic",
 			},
-			want: &Base{
+			want: &Generic{
 				Data: data.Raw(`{"message":"hello","number":2}`),
 				Metadata: map[string]any{
 					"sys": map[string]any{
-						"MethodName": "helloBase",
+						"MethodName": "helloGeneric",
 						"UtcNow":     "2023-10-12T20:13:49.640002Z",
 						"RandGuid":   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
 					},
@@ -48,26 +48,26 @@ func TestNewBase(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, gotErr := NewBase(test.input.req, test.input.name, test.input.options...)
+			got, gotErr := NewGeneric(test.input.req, test.input.name, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Base{})); diff != "" {
-				t.Errorf("NewBase() = unexpected result (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Generic{})); diff != "" {
+				t.Errorf("NewGeneric() = unexpected result (-want +got)\n%s\n", diff)
 			}
 
 			if diff := cmp.Diff(test.wantErr, gotErr); diff != "" {
-				t.Errorf("NewBase() = unexpected error (-want +got)\n%s\n", diff)
+				t.Errorf("NewGeneric() = unexpected error (-want +got)\n%s\n", diff)
 			}
 		})
 	}
 }
 
-var baseRequest1 = []byte(`{
+var genericRequest1 = []byte(`{
 	"Data": {
-		"base": "{\"message\":\"hello\",\"number\":2}"
+		"generic": "{\"message\":\"hello\",\"number\":2}"
 	  },
 	  "Metadata": {
 		"sys": {
-		  "MethodName": "helloBase",
+		  "MethodName": "helloGeneric",
 		  "UtcNow": "2023-10-12T20:13:49.640002Z",
 		  "RandGuid": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741"
 		}

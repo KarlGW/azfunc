@@ -30,7 +30,7 @@ func TestNewOutput(t *testing.T) {
 				func(o *OutputOptions) {
 					o.Bindings = []bindable{
 						bindings.NewHTTP(),
-						bindings.NewBase("queue"),
+						bindings.NewGeneric("queue"),
 					}
 					o.Logs = []string{"Log message"}
 					o.ReturnValue = 0
@@ -38,7 +38,7 @@ func TestNewOutput(t *testing.T) {
 			},
 			want: Output{
 				Outputs: map[string]bindable{
-					"queue": bindings.NewBase("queue"),
+					"queue": bindings.NewGeneric("queue"),
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
@@ -51,7 +51,7 @@ func TestNewOutput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := NewOutput(test.input...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Output{}, bindings.HTTP{}, bindings.Base{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Output{}, bindings.HTTP{}, bindings.Generic{})); diff != "" {
 				t.Errorf("NewOutput() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
@@ -68,7 +68,7 @@ func TestOutput_JSON(t *testing.T) {
 			name: "Parse output to JSON",
 			input: Output{
 				Outputs: map[string]bindable{
-					"queue": bindings.NewBase("queue", func(o *bindings.BaseOptions) {
+					"queue": bindings.NewGeneric("queue", func(o *bindings.GenericOptions) {
 						o.Data = []byte(`{"message":"hello","number":3}`)
 					}),
 				},
