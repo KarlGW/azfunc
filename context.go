@@ -5,8 +5,6 @@ package azfunc
 type Context struct {
 	// log contains a logger.
 	log logger
-	// err contains error set to the Context.
-	err error
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	services services
@@ -20,16 +18,6 @@ type Context struct {
 // Log returns the logger of the Context.
 func (c Context) Log() logger {
 	return c.log
-}
-
-// Err returns the error set to the Context.
-func (c Context) Err() error {
-	return c.err
-}
-
-// SetError sets an error to the Context.
-func (c *Context) SetError(err error) {
-	c.err = err
 }
 
 // Services returns the services set in the Context.

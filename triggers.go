@@ -12,7 +12,7 @@ type triggerable interface {
 }
 
 // GenericTriggerFunc represents a generic function to be executed by the function app.
-type GenericTriggerFunc func(ctx *Context, trigger *triggers.Generic)
+type GenericTriggerFunc func(ctx *Context, trigger *triggers.Generic) error
 
 // genericTrigger contains the trigger func, name and options of the trigger.
 type genericTrigger struct {
@@ -27,8 +27,7 @@ func (t genericTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // GenericTrigger takes the provided name and function and sets it as
@@ -44,7 +43,7 @@ func GenericTrigger(name string, fn GenericTriggerFunc, options ...triggers.Gene
 }
 
 // HTTPTriggerFunc represents an HTTP trigger function to be executed by the function app.
-type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP)
+type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP) error
 
 // httpTrigger contains the trigger func and name of the trigger.
 type httpTrigger struct {
@@ -58,8 +57,7 @@ func (t httpTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // HTTPTrigger takes the provided function and sets it as
@@ -74,7 +72,7 @@ func HTTPTrigger(fn HTTPTriggerFunc, options ...triggers.HTTPOption) FunctionOpt
 }
 
 // TimerTriggerFunc represents a Timer trigger function tp be executed by the function app.
-type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer)
+type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer) error
 
 // timerTrigger contains the trigger func and name of the trigger.
 type timerTrigger struct {
@@ -88,8 +86,7 @@ func (t timerTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // TimerTrigger takes the provided function and sets it as
@@ -105,7 +102,7 @@ func TimerTrigger(fn TimerTriggerFunc, options ...triggers.TimerOption) Function
 
 // QueueTriggerFunc represents a Queue Storage trigger function to be exexuted
 // by the function app.
-type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue)
+type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue) error
 
 // queueTrigger contains the trigger func, name and options of the trigger.
 type queueTrigger struct {
@@ -120,8 +117,7 @@ func (t queueTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // QueueTrigger takes the provided name and function and sets it as
@@ -138,7 +134,7 @@ func QueueTrigger(name string, fn QueueTriggerFunc, options ...triggers.QueueOpt
 
 // ServiceBusTriggerFunc represents a Service Bus trigger function to be exexuted
 // by the function app.
-type ServiceBusTriggerFunc func(ctx *Context, trigger *triggers.ServiceBus)
+type ServiceBusTriggerFunc func(ctx *Context, trigger *triggers.ServiceBus) error
 
 // serviceBusTrigger contains the trigger func, name and options of the trigger.
 type serviceBusTrigger struct {
@@ -153,8 +149,7 @@ func (t serviceBusTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // ServiceBusTrigger takes the provided name and function and sets it as
@@ -171,7 +166,7 @@ func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc, options ...trigger
 
 // EventGridTriggerFunc represents an Event Grid trigger function to be executed by
 // the function app.
-type EventGridTriggerFunc func(ctx *Context, trigger *triggers.EventGrid)
+type EventGridTriggerFunc func(ctx *Context, trigger *triggers.EventGrid) error
 
 // eventGridTrigger contains the trigger func, name and options of the trigger.
 type eventGridTrigger struct {
@@ -186,8 +181,7 @@ func (t eventGridTrigger) run(ctx *Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	t.fn(ctx, tr)
-	return nil
+	return t.fn(ctx, tr)
 }
 
 // EventGridTrigger takes the provided name and function and sets it as
