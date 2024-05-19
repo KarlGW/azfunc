@@ -12,7 +12,7 @@ import (
 func main() {
 	app := azfunc.NewFunctionApp()
 
-	app.AddFunction("hello-http-queue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) {
+	app.AddFunction("hello-http-queue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) error {
 		// Parse the incoming trigger body into the custom type.
 		// To get the raw data of the body, use trigger.Data instead.
 		var t test
@@ -20,7 +20,7 @@ func main() {
 			// Send HTTP response back to the caller if parsing fails
 			// and exit the function.
 			ctx.Output.HTTP().WriteHeader(http.StatusBadRequest)
-			return
+			return nil
 		}
 		// Log parsed t.
 		ctx.Log().Info("request received", "body", t)
@@ -30,6 +30,7 @@ func main() {
 		ctx.Output.HTTP().Write([]byte(`{"message":"request received"}`))
 		// Create output to queue.
 		ctx.Output.Binding("queue").Write([]byte(`{"message":"request received"}`))
+		return nil
 	}))
 
 	if err := app.Start(); err != nil {

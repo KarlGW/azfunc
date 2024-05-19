@@ -11,8 +11,9 @@ import (
 func main() {
 	app := azfunc.NewFunctionApp()
 
-	app.AddFunction("hello-timer", azfunc.TimerTrigger(func(ctx *azfunc.Context, trigger *triggers.Timer) {
+	app.AddFunction("hello-timer", azfunc.TimerTrigger(func(ctx *azfunc.Context, trigger *triggers.Timer) error {
 		ctx.Log().Info("timer ran")
+		return nil
 	}))
 
 	if err := app.Start(); err != nil {

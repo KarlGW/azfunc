@@ -11,18 +11,18 @@ import (
 func main() {
 	app := azfunc.NewFunctionApp()
 
-	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) {
+	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) error {
 		// Parse the incoming queue trigger body into the custom type.
 		// To get the raw data of the queue message, use trigger.Data instead.
 		var t test
 		if err := trigger.Parse(&t); err != nil {
-			ctx.SetError(err)
-			return
+			return err
 		}
 		// Log parsed t.
 		ctx.Log().Info("queue message received", "content", t)
 		// Create output to queue.
 		ctx.Output.Binding("outqueue").Write([]byte(`{"message":"message received"}`))
+		return nil
 	}))
 
 	if err := app.Start(); err != nil {

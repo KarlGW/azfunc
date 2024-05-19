@@ -19,14 +19,14 @@ jobs:
   test:
     strategy:
       matrix:
-        version: [ '1.18' ]
-        os: [ ubuntu-20.04, 'windows-2022' ]
+        version: [ '1.21' ]
+        os: [ ubuntu-latest, 'windows-latest' ]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.version }}
     
@@ -39,9 +39,9 @@ jobs:
   release:
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     needs: [test]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Create release
       run: gh release create $TAG --generate-notes
