@@ -94,7 +94,7 @@ func main() {
     }))
 
     if err := app.Start(); err != nil {
-    // Handle error.
+        // Handle error.
     }
 }
 
