@@ -19,7 +19,7 @@ and from the Azure Function host when developing Azure Functions with Custom han
     * [Triggers (input bindings)](#triggers-input-bindings)
     * [Output (output bindings)](#output-output-bindings)
     * [Context](#context)
-    * [Error handling](#error-handling)
+  * [Error handling](#error-handling)
 
 
 ## Why use this module?
@@ -132,7 +132,7 @@ The triggers is the triggering event and the data it contains, and the context c
 Triggered by an incoming HTTP event. The trigger contains the HTTP data (headers, url, query, params and body).
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.HTTP)
+func(ctx *azfunc.Context, trigger *triggers.HTTP) error
 ```
 
 **[Timer trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Timer)**
@@ -140,7 +140,7 @@ func(ctx *azfunc.Context, trigger *triggers.HTTP)
 Triggered by a schedule. The trigger contains the timer data (next and last run etc).
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.Timer)
+func(ctx *azfunc.Context, trigger *triggers.Timer) error
 ```
 
 **[Queue trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Queue)**
@@ -148,7 +148,7 @@ func(ctx *azfunc.Context, trigger *triggers.Timer)
 Triggered by a message to an Azure Queue Storage queue.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.Queue)
+func(ctx *azfunc.Context, trigger *triggers.Queue) error
 ```
 
 **[Service Bus trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#ServiceBus)**
@@ -156,7 +156,7 @@ func(ctx *azfunc.Context, trigger *triggers.Queue)
 Triggered by a message to an Azure Service Bus queue or topic subscription.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.ServiceBus)
+func(ctx *azfunc.Context, trigger *triggers.ServiceBus) error
 ```
 
 **[Event Grid trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#EventGrid)**
@@ -164,7 +164,7 @@ func(ctx *azfunc.Context, trigger *triggers.ServiceBus)
 Triggered by an event to an Azure Event Grid topic subscription.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.EventGrid)
+func(ctx *azfunc.Context, trigger *triggers.EventGrid) error
 ```
 
 **[Generic trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/triggers#Generic)**
@@ -173,7 +173,7 @@ Generic trigger is a generic trigger can be used for all not yet supported trigg
 needs to be parsed into a `struct` matching the expected incoming payload.
 
 ```go
-func(ctx *azfunc.Context, trigger *triggers.Generic)
+func(ctx *azfunc.Context, trigger *triggers.Generic) error
 ```
 
 
@@ -207,11 +207,11 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
 * `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Generic` (will work as long as a binding with that same name is defined in the functions `function.json`).
 
 
-#### Error handling
+### Error handling
 
 The functions provided to the `FunctionApp` returns an error.
 
-As an example: A function is triggered and run, and encounters an error for one of it's calls. This error is deemed to be fatal and the function cannot carry on further. Thus we return the error.
+As an example: A function is triggered and run and encounters an error for one of it's calls. This error is deemed to be fatal and the function cannot carry on further. Thus we return the error.
 ```go
 func run(ctx *azfunc.Context, trigger *triggers.Queue) error {
     if err := someFunc(); err != nil {
@@ -219,22 +219,44 @@ func run(ctx *azfunc.Context, trigger *triggers.Queue) error {
         // that a non-recoverable error has occured.
         return err
     }
+    // ... ...
+    // ... ...
+    return nil
 }
 ```
 
-An example of when an error is not regarded as fatal, and not application breaking (like a malformed HTTP request), it can be handled like so:
+An example of when an error is not regarded as fatal and not application breaking (like a malformed HTTP request), it can be handled like so:
 
 ```go
 func run(ctx *azfunc.Context, trigger *triggers.HTTP) error {
     var incoming IncomingRequest
-    if err := trigge.Parse(&incoming); err != nil {
+    if err := trigger.Parse(&incoming); err != nil {
         // The incoming request body did not match the expected one,
         // this is equivalent of a HTTP 400 and should not signal to
         // the function host that it has failed.
         ctx.HTTP().WriteHeader(http.StatusBadRequest)
         return nil
     }
+    // ... ...
+    // ... ...
+    return nil
 }
 ```
 
+Example with named return:
 
+```go
+func run(ctx *azfunc.Context, trigger *triggers.HTTP) (err error) {
+    var incoming IncomingRequest
+    if err = trigger.Parse(&incoming); err != nil {
+        // The incoming request body did not match the expected one,
+        // this is equivalent of a HTTP 400 and should not signal to
+        // the function host that it has failed.
+        ctx.HTTP().WriteHeader(http.StatusBadRequest)
+        return
+    }
+    // ... ...
+    // ... ...
+    return
+}
+```
