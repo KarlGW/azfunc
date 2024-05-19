@@ -233,7 +233,8 @@ func run(ctx *azfunc.Context, trigger *triggers.HTTP) error {
     if err := trigger.Parse(&incoming); err != nil {
         // The incoming request body did not match the expected one,
         // this is equivalent of a HTTP 400 and should not signal to
-        // the function host that it has failed.
+        // the function host that it has failed, but still
+        // stop further exection and return.
         ctx.HTTP().WriteHeader(http.StatusBadRequest)
         return nil
     }
@@ -251,7 +252,8 @@ func run(ctx *azfunc.Context, trigger *triggers.HTTP) (err error) {
     if err = trigger.Parse(&incoming); err != nil {
         // The incoming request body did not match the expected one,
         // this is equivalent of a HTTP 400 and should not signal to
-        // the function host that it has failed.
+        // the function host that it has failed, but still
+        // stop further exection and return.
         ctx.HTTP().WriteHeader(http.StatusBadRequest)
         return
     }
