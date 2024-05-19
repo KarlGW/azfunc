@@ -70,8 +70,8 @@ go get github.com/KarlGW/azfunc
 package main
 
 import (
-	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
+    "github.com/KarlGW/azfunc"
+    "github.com/KarlGW/azfunc/triggers"
 )
 
 func main() {
@@ -95,7 +95,7 @@ func main() {
     }))
 
     if err := app.Start(); err != nil {
-        // Handle error.
+    // Handle error.
     }
 }
 
