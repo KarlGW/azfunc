@@ -79,7 +79,6 @@ func main() {
 
     app.AddFunction("hello-http", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) error {
         // Parse the incoming trigger body into the custom type.
-        // To get the raw data of the body, use trigger.Data instead.
         var t test
         if err := trigger.Parse(&t); err != nil {
             // Send response back to caller.
