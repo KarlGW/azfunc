@@ -62,7 +62,9 @@ type FunctionApp struct {
 	clients clients
 	// log provides logging for the FunctionApp. Defaults to a no-op
 	// logger.
-	log logger
+	log    logger
+	stopCh chan os.Signal
+	errCh  chan error
 }
 
 // FunctionAppOption is a function that sets options to a
@@ -87,6 +89,8 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 		},
 		functions: make(map[string]function),
 		router:    router,
+		stopCh:    make(chan os.Signal),
+		errCh:     make(chan error),
 	}
 	for _, option := range options {
 		option(app)
@@ -103,36 +107,44 @@ func (a FunctionApp) Start() error {
 	if len(a.functions) == 0 {
 		return ErrNoFunction
 	}
+	if a.stopCh == nil {
+		a.stopCh = make(chan os.Signal)
+	}
+	if a.errCh == nil {
+		a.errCh = make(chan error)
+	}
+
 	for name, function := range a.functions {
 		a.router.Handle("/"+name, a.handler(function))
 	}
 
-	errCh := make(chan error, 1)
 	go func() {
 		if err := a.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			errCh <- err
+			a.errCh <- err
 			return
 		}
 	}()
 
-	select {
-	case err := <-errCh:
-		return err
-	case <-time.After(time.Millisecond * 10):
-		a.log.Info("function app started.")
-		close(errCh)
-	}
+	go func() {
+		a.stop()
+	}()
 
-	_, err := a.shutdown()
-	if err != nil {
-		return err
+	a.log.Info("Function App started.")
+	for {
+		select {
+		case err := <-a.errCh:
+			close(a.errCh)
+			return err
+		case sig := <-a.stopCh:
+			a.log.Info("Function App stopped.", "reason", sig.String())
+			close(a.stopCh)
+			return nil
+		}
 	}
-
-	return nil
 }
 
-// shutdown the function app.
-func (a FunctionApp) shutdown() (os.Signal, error) {
+// stop the FunctionApp.
+func (a FunctionApp) stop() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-stop
@@ -142,9 +154,10 @@ func (a FunctionApp) shutdown() (os.Signal, error) {
 
 	a.httpServer.SetKeepAlivesEnabled(false)
 	if err := a.httpServer.Shutdown(ctx); err != nil {
-		return nil, err
+		a.errCh <- err
 	}
-	return sig, nil
+
+	a.stopCh <- sig
 }
 
 // AddFunction adds a function to the FunctionApp.
