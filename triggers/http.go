@@ -87,7 +87,7 @@ func (t HTTP) Parse(v any) error {
 // application/x-www-form-urlencoded and returns it as url.Values.
 func (t HTTP) Form() (url.Values, error) {
 	contentType := t.Headers.Get("Content-Type")
-	if strings.ToLower(contentType) != "application/x-www-form-urlencoded" {
+	if !strings.HasPrefix(strings.ToLower(contentType), "application/x-www-form-urlencoded") {
 		return nil, fmt.Errorf("%w: %s", ErrHTTPInvalidContentType, contentType)
 	}
 
