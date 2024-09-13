@@ -183,8 +183,33 @@ func TestHTTP_Form(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:    "Parse Form - invalid content type",
+			name: "Parse Form - charset in content type",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {"application/x-www-form-urlencoded; charset=UTF-8"},
+				},
+				Body: []byte(`field1=value1&field2=value2`),
+			},
+			want: url.Values{
+				"field1": {"value1"},
+				"field2": {"value2"},
+			},
+			wantErr: nil,
+		},
+		{
+			name:    "Parse Form - empty content type",
 			input:   &HTTP{},
+			want:    nil,
+			wantErr: ErrHTTPInvalidContentType,
+		},
+		{
+			name: "Parse Form - invalid content type",
+			input: &HTTP{
+				Headers: http.Header{
+					"Content-Type": {"application/x-www-urlencoded; charset=UTF-8"},
+				},
+				Body: []byte(`field1=value1&field2=value2`),
+			},
 			want:    nil,
 			wantErr: ErrHTTPInvalidContentType,
 		},
