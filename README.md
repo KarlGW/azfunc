@@ -20,6 +20,7 @@ and from the Azure Function host when developing Azure Functions with Custom han
     * [Output (output bindings)](#output-output-bindings)
     * [Context](#context)
   * [Error handling](#error-handling)
+* [TODO](#todo)
 
 
 ## Why use this module?
@@ -261,3 +262,9 @@ func run(ctx *azfunc.Context, trigger *triggers.HTTP) (err error) {
     return
 }
 ```
+
+## TODO
+
+* Add more triggers and output bindings.
+* Add examples on using Managed Identities for triggers and output bindings (this is already supported).
+* Add better documentation for `function.json` structure and relations between properties and functionality.
