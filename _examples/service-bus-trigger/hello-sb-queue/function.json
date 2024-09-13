@@ -1,0 +1,18 @@
+{
+  "bindings": [
+    {
+      "name": "queue",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "queueName": "items",
+      "connection": "ServiceBusConnection"
+    },
+    {
+      "name": "outqueue",
+      "type": "serviceBus",
+      "direction": "out",
+      "queueName": "out",
+      "connection": "ServiceBusConnection"
+    }
+  ]
+}
