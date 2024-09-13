@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	app := azfunc.NewFunctionApp()
+	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
 	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) error {
 		// Parse the incoming queue trigger body into the custom type.

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	app := azfunc.NewFunctionApp()
+	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
 	app.AddFunction("hello-http", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) error {
 		// Parse the incoming trigger body into the custom type.
