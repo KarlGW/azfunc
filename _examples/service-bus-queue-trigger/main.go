@@ -11,16 +11,16 @@ import (
 func main() {
 	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
-	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) error {
-		// Parse the incoming queue trigger body into the custom type.
-		// To get the raw data of the queue message, use trigger.Data instead.
+	app.AddFunction("hello-sb-queue", azfunc.ServiceBusTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.ServiceBus) error {
+		// Parse the incoming service bus queue trigger body into the custom type.
+		// To get the raw data of the service bus message, use trigger.Data instead.
 		var t test
 		if err := trigger.Parse(&t); err != nil {
 			return err
 		}
 		// Log parsed t.
-		ctx.Log().Info("queue message received", "content", t)
-		// Create output to queue.
+		ctx.Log().Info("service bus queue message received", "content", t)
+		// Create output to service bus queue.
 		ctx.Output.Binding("outqueue").Write([]byte(`{"message":"message received"}`))
 		return nil
 	}))
