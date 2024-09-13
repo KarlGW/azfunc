@@ -2,7 +2,7 @@
 
 > Example with a service bus queue trigger and service bus queue output binding
 
-This is an example of running an Azure Function with a service bus queue triggered function and service bus queue output binding. It is recommended to make use of the Function [Core](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) tools together with [azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite) to test and run this example application.
+This is an example of running an Azure Function with a service bus queue triggered function and service bus queue output binding. It is recommended to make use of the Function [Core](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) tools to test and run this example application.
 
 * [Run the function](#run-the-function)
 * [Application structure](#application-structure)
