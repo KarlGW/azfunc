@@ -62,7 +62,7 @@ func (o outputs) json() []byte {
 	return b
 }
 
-// addOutputs one or more output bindings to functionOutput.
+// Add one or more output bindings to functionOutput.
 func (o *outputs) Add(outputs ...outputable) {
 	if o.outputs == nil {
 		o.outputs = make(map[string]outputable, len(outputs))
