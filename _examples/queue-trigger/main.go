@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
+	"github.com/KarlGW/azfunc/trigger"
 )
 
 func main() {
 	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
-	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.Queue) error {
+	app.AddFunction("hello-queue", azfunc.QueueTrigger("queue", func(ctx *azfunc.Context, trigger *trigger.Queue) error {
 		// Parse the incoming queue trigger body into the custom type.
 		// To get the raw data of the queue message, use trigger.Data instead.
 		var t test

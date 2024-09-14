@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
+	"github.com/KarlGW/azfunc/trigger"
 )
 
 func main() {
 	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
-	app.AddFunction("hello-sb-queue", azfunc.ServiceBusTrigger("queue", func(ctx *azfunc.Context, trigger *triggers.ServiceBus) error {
+	app.AddFunction("hello-sb-queue", azfunc.ServiceBusTrigger("queue", func(ctx *azfunc.Context, trigger *trigger.ServiceBus) error {
 		// Parse the incoming service bus queue trigger body into the custom type.
 		// To get the raw data of the service bus message, use trigger.Data instead.
 		var t test

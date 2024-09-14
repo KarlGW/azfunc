@@ -6,13 +6,13 @@ import (
 	"os"
 
 	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
+	"github.com/KarlGW/azfunc/trigger"
 )
 
 func main() {
 	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
-	app.AddFunction("hello-http", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *triggers.HTTP) error {
+	app.AddFunction("hello-http", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *trigger.HTTP) error {
 		// Parse the incoming trigger body into the custom type.
 		// To get the raw data of the body, use trigger.Data instead.
 		var t test
