@@ -29,7 +29,7 @@ func main() {
 		ctx.Outputs.HTTP().Header().Add("Content-Type", "application/json")
 		ctx.Outputs.HTTP().Write([]byte(`{"message":"request received"}`))
 		// Create output to queue.
-		ctx.Outputs.Output("queue").Write([]byte(`{"message":"request received"}`))
+		ctx.Outputs.Binding("queue").Write([]byte(`{"message":"request received"}`))
 		return nil
 	}))
 
