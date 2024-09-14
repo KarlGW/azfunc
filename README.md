@@ -88,9 +88,9 @@ func main() {
         }
         // Do something with t.
         // Create the response.
-        ctx.Output.HTTP().WriteHeader(http.StatusOK)
-        ctx.Output.HTTP().Header().Add("Content-Type", "application/json")
-        ctx.Output.HTTP().Write([]byte(`{"message":"received"}`))
+        ctx.Outputs().HTTP().WriteHeader(http.StatusOK)
+        ctx.Outputs().HTTP().Header().Add("Content-Type", "application/json")
+        ctx.Outputs().HTTP().Write([]byte(`{"message":"received"}`))
         return nil
     }))
 
@@ -235,7 +235,7 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) error {
         // this is equivalent of a HTTP 400 and should not signal to
         // the function host that it has failed, but still
         // stop further exection and return.
-        ctx.HTTP().WriteHeader(http.StatusBadRequest)
+        ctx.Outputs().HTTP().WriteHeader(http.StatusBadRequest)
         return nil
     }
     // ... ...
@@ -254,7 +254,7 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) (err error) {
         // this is equivalent of a HTTP 400 and should not signal to
         // the function host that it has failed, but still
         // stop further exection and return.
-        ctx.HTTP().WriteHeader(http.StatusBadRequest)
+        ctx.Outputs().HTTP().WriteHeader(http.StatusBadRequest)
         return
     }
     // ... ...

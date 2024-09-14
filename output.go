@@ -17,29 +17,32 @@ type outputable interface {
 	Write([]byte) (int, error)
 }
 
-// Output represents an outgoing response to the Functuon Host.
-type Output struct {
-	Outputs     map[string]outputable
-	ReturnValue any
+// outputs represents an outgoing response to the Function Host.
+// Make private? This is not used by exposed functionality.
+type outputs struct {
+	outputs     map[string]outputable
+	returnValue any
 	http        *output.HTTP
-	Logs        []string
+	logs        []string
 }
 
 // MarshalJSON implements custom marshaling to produce
 // the required JSON structure as expected by the
 // function host.
-func (o Output) MarshalJSON() ([]byte, error) {
-	type Alias Output
+func (o outputs) MarshalJSON() ([]byte, error) {
+	type Alias outputs
 
 	temp := struct {
-		Outputs map[string]any `json:"Outputs"`
+		Outputs     map[string]any `json:"Outputs"`
+		ReturnValue any            `json:"ReturnValue"`
+		Logs        []string       `json:"Logs"`
 		Alias
 	}{
 		Outputs: make(map[string]any),
 		Alias:   Alias(o),
 	}
 
-	for key, binding := range o.Outputs {
+	for key, binding := range o.outputs {
 		if b, ok := binding.(*output.HTTP); ok {
 			temp.Outputs[key] = b
 		} else {
@@ -50,58 +53,64 @@ func (o Output) MarshalJSON() ([]byte, error) {
 	return json.Marshal(temp)
 }
 
-// JSON returns the JSON encoding of Output.
-func (o Output) JSON() []byte {
+// json returns the JSON encoding of Output.
+func (o outputs) json() []byte {
 	if o.http != nil {
-		o.Outputs[o.http.Name()] = o.http
+		o.outputs[o.http.Name()] = o.http
 	}
 	b, _ := json.Marshal(o)
 	return b
 }
 
-// AddBindings one or more output bindings to Output.
-func (o *Output) AddBindings(bindings ...outputable) {
-	if o.Outputs == nil {
-		o.Outputs = make(map[string]outputable, len(bindings))
+// addOutputs one or more output bindings to functionOutput.
+func (o *outputs) Add(outputs ...outputable) {
+	if o.outputs == nil {
+		o.outputs = make(map[string]outputable, len(outputs))
 	}
 
-	for _, binding := range bindings {
+	for _, binding := range outputs {
 		if b, ok := binding.(*output.HTTP); ok {
 			o.http = b
 		} else {
-			o.Outputs[binding.Name()] = binding
+			o.outputs[binding.Name()] = binding
 		}
 	}
 }
 
-// Log adds a message to the Logs of Output.
-func (o *Output) Log(msg string) {
-	if o.Logs == nil {
-		o.Logs = make([]string, 0)
-	}
-	o.Logs = append(o.Logs, msg)
+// SetReturnValue sets ReturnValue of Output.
+func (o *outputs) SetReturnValue(v any) {
+	o.returnValue = v
 }
 
-// SetReturnValue sets ReturnValue of Output.
-func (o *Output) SetReturnValue(v any) {
-	o.ReturnValue = v
+// Get returns the output binding with the provided name, if no output binding
+// with that name exists, return a new generic output binding with the
+// provided name.
+func (o outputs) Get(name string) outputable {
+	binding, ok := o.outputs[name]
+	if !ok {
+		o.outputs[name] = output.NewGeneric(name)
+		return o.outputs[name]
+	}
+	return binding
 }
 
 // Binding returns the output binding with the provided name, if no output binding
 // with that name exists, return a new generic output binding with the
 // provided name.
-func (o Output) Binding(name string) outputable {
-	binding, ok := o.Outputs[name]
-	if !ok {
-		o.Outputs[name] = output.NewGeneric(name)
-		return o.Outputs[name]
-	}
-	return binding
+func (o outputs) Binding(name string) outputable {
+	return o.Get(name)
+}
+
+// Output returns the output binding with the provided name, if no output binding
+// with that name exists, return a new generic output binding with the
+// provided name.
+func (o outputs) Output(name string) outputable {
+	return o.Get(name)
 }
 
 // HTTP returns the HTTP output binding if any is set.
 // If not set it will create, set and return it.
-func (o *Output) HTTP() *output.HTTP {
+func (o *outputs) HTTP() *output.HTTP {
 	if o.http == nil {
 		o.http = output.NewHTTP()
 		return o.http
@@ -109,22 +118,23 @@ func (o *Output) HTTP() *output.HTTP {
 	return o.http
 }
 
-// OutputOptions contains options for creating a new
+// outputsOptions contains options for creating a new
 // Output.
-type OutputOptions struct {
-	ReturnValue any
+type outputsOptions struct {
+	returnValue any
 	http        *output.HTTP
-	Bindings    []outputable
+	outputs     []outputable
 	Logs        []string
 }
 
-// Output option is a function that sets OutputOptions.
-type OutputOption func(o *OutputOptions)
+// outputsOption is a function that sets OutputOptions.
+type outputsOption func(o *outputsOptions)
 
-// NewOutput creates a new Output containing output bindings to be used for creating
+// newOutputs creates a new outputs containing output bindings to be used for creating
 // the response back to the Function host.
-func NewOutput(options ...OutputOption) Output {
-	opts := OutputOptions{}
+// make private?
+func newOutputs(options ...outputsOption) *outputs {
+	opts := outputsOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
@@ -135,24 +145,24 @@ func NewOutput(options ...OutputOption) Output {
 		copy(logs, opts.Logs)
 	}
 
-	output := Output{
-		Logs:        logs,
-		ReturnValue: opts.ReturnValue,
+	outputs := &outputs{
+		logs:        logs,
+		returnValue: opts.returnValue,
 		http:        opts.http,
 	}
-	output.AddBindings(opts.Bindings...)
+	outputs.Add(opts.outputs...)
 
-	return output
+	return outputs
 }
 
-// WithOutputs add one or more output bindings to OutputOptions
-func WithOutputs(outputables ...outputable) OutputOption {
-	return func(o *OutputOptions) {
-		for _, binding := range outputables {
+// withOutputs add one or more output bindings to OutputOptions
+func withOutputs(outputs ...outputable) outputsOption {
+	return func(o *outputsOptions) {
+		for _, binding := range outputs {
 			if b, ok := binding.(*output.HTTP); ok {
 				o.http = b
 			} else {
-				o.Bindings = append(o.Bindings, binding)
+				o.outputs = append(o.outputs, binding)
 			}
 		}
 	}
