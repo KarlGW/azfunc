@@ -221,7 +221,7 @@ func (a *functionApp) Register(name string, options ...FunctionOption) {
 func (a functionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
-			outputs:  newOutputs(withOutputs(fn.outputs...)),
+			Outputs:  newOutputs(withOutputs(fn.outputs...)),
 			log:      a.log,
 			services: a.services,
 			clients:  a.clients,
@@ -234,7 +234,7 @@ func (a functionApp) handler(fn function) http.Handler {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(ctx.Outputs().json())
+		w.Write(ctx.Outputs.json())
 	})
 }
 

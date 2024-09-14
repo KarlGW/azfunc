@@ -21,7 +21,7 @@ func main() {
 		// Log parsed t.
 		ctx.Log().Info("service bus queue message received", "content", t)
 		// Create output to service bus queue.
-		ctx.Outputs().Binding("outqueue").Write([]byte(`{"message":"message received"}`))
+		ctx.Outputs.Binding("outqueue").Write([]byte(`{"message":"message received"}`))
 		return nil
 	}))
 

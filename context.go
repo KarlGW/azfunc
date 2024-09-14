@@ -11,13 +11,8 @@ type Context struct {
 	// clients contains clients defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	clients clients
-	// outputs contains output bindings.
-	outputs *outputs
-}
-
-// Outputs returns the outputs set in the Context.
-func (c Context) Outputs() *outputs {
-	return c.outputs
+	// Outputs contains output bindings.
+	Outputs *outputs
 }
 
 // Log returns the logger of the Context.
