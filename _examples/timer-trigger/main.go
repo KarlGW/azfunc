@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/triggers"
+	"github.com/KarlGW/azfunc/trigger"
 )
 
 func main() {
 	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
 
-	app.AddFunction("hello-timer", azfunc.TimerTrigger(func(ctx *azfunc.Context, trigger *triggers.Timer) error {
+	app.AddFunction("hello-timer", azfunc.TimerTrigger(func(ctx *azfunc.Context, trigger *trigger.Timer) error {
 		ctx.Log().Info("timer ran")
 		return nil
 	}))

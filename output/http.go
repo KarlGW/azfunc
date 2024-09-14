@@ -1,4 +1,4 @@
-package bindings
+package output
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package bindings
+package output
 
 import (
 	"testing"
@@ -7,25 +7,25 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewServiceBus(t *testing.T) {
+func TestNewQueue(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input struct {
 			name    string
-			options []ServiceBusOption
+			options []QueueOption
 		}
-		want *ServiceBus
+		want *Queue
 	}{
 		{
 			name: "defaults",
 			input: struct {
 				name    string
-				options []ServiceBusOption
+				options []QueueOption
 			}{
 				name:    "queue",
 				options: nil,
 			},
-			want: &ServiceBus{
+			want: &Queue{
 				name: "queue",
 				data: nil,
 			},
@@ -34,16 +34,16 @@ func TestNewServiceBus(t *testing.T) {
 			name: "with options",
 			input: struct {
 				name    string
-				options []ServiceBusOption
+				options []QueueOption
 			}{
 				name: "queue",
-				options: []ServiceBusOption{
-					func(o *ServiceBusOptions) {
+				options: []QueueOption{
+					func(o *QueueOptions) {
 						o.Data = data.Raw(`{"message":"hello"}`)
 					},
 				},
 			},
-			want: &ServiceBus{
+			want: &Queue{
 				name: "queue",
 				data: data.Raw(`{"message":"hello"}`),
 			},
@@ -52,39 +52,50 @@ func TestNewServiceBus(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := NewServiceBus(test.want.name, test.input.options...)
+			got := NewQueue(test.input.name, test.input.options...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(ServiceBus{})); diff != "" {
-				t.Errorf("NewServiceBus() = unexpected (-want +got)\n%s\n", diff)
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
+				t.Errorf("NewQueue() = unexpected (-want +got)\n%s\n", diff)
 			}
 		})
 	}
 }
 
-func TestServiceBus_Write(t *testing.T) {
+func TestQueue_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
-		got := &ServiceBus{}
+		got := &Queue{}
 		got.Write([]byte(`{"message":"hello"}`))
-		want := &ServiceBus{data: data.Raw(`{"message":"hello"}`)}
+		want := &Queue{data: data.Raw(`{"message":"hello"}`)}
 
-		if diff := cmp.Diff(want, got, cmp.AllowUnexported(ServiceBus{})); diff != "" {
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
 		}
 	})
 }
 
-func TestServiceBus_Name(t *testing.T) {
+func TestQueue_Name(t *testing.T) {
 	var tests = []struct {
 		name  string
-		input *ServiceBus
+		input *Queue
 		want  string
-	}{}
+	}{
+		{
+			name:  "default",
+			input: &Queue{},
+			want:  "",
+		},
+		{
+			name:  "with name",
+			input: &Queue{name: "queue"},
+			want:  "queue",
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got := test.input.Name()
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(ServiceBus{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Queue{})); diff != "" {
 				t.Errorf("Name() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})

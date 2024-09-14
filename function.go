@@ -28,28 +28,28 @@ var (
 // function is an internal structure that represents a function
 // in a FunctionApp.
 type function struct {
-	name     string
-	trigger  triggerable
-	bindings []bindable
+	name    string
+	trigger triggerable
+	outputs []outputable
 }
 
 // FunctionOption sets options to the function.
 type FunctionOption func(f *function)
 
-// Binding sets the provided binding to the function.
-func Binding(binding bindable) FunctionOption {
+// WithOutput sets the provided output binding to the function.
+func WithOutput(output outputable) FunctionOption {
 	return func(f *function) {
-		if f.bindings == nil {
-			f.bindings = []bindable{binding}
+		if f.outputs == nil {
+			f.outputs = []outputable{output}
 			return
 		}
-		f.bindings = append(f.bindings, binding)
+		f.outputs = append(f.outputs, output)
 	}
 }
 
-// FunctionApp represents a Function App with its configuration
+// functionApp represents a Function App with its configuration
 // and functions.
-type FunctionApp struct {
+type functionApp struct {
 	httpServer *http.Server
 	router     *http.ServeMux
 	// functions that are set on the FunctionApp.
@@ -69,17 +69,48 @@ type FunctionApp struct {
 
 // FunctionAppOption is a function that sets options to a
 // FunctionApp.
-type FunctionAppOption func(*FunctionApp)
+type FunctionAppOption func(*functionApp)
 
-// NewFunction app creates and configures a FunctionApp.
-func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
+// NewFunctionApp creates and configures a FunctionApp.
+func NewFunctionApp(options ...FunctionAppOption) *functionApp {
 	port, ok := os.LookupEnv(functionsCustomHandlerPort)
 	if !ok {
 		port = "8080"
 	}
 
 	router := http.NewServeMux()
-	app := &FunctionApp{
+	app := &functionApp{
+		httpServer: &http.Server{
+			Addr:         os.Getenv(functionsCustomHandlerHost) + ":" + port,
+			Handler:      router,
+			ReadTimeout:  time.Second * 30,
+			WriteTimeout: time.Second * 30,
+			IdleTimeout:  time.Second * 60,
+		},
+		functions: make(map[string]function),
+		router:    router,
+		stopCh:    make(chan os.Signal),
+		errCh:     make(chan error),
+	}
+	for _, option := range options {
+		option(app)
+	}
+	if app.log == nil {
+		app.log = noOpLogger{}
+	}
+
+	return app
+}
+
+// New creates and configures a FunctionApp.
+func New(options ...FunctionAppOption) *functionApp {
+	port, ok := os.LookupEnv(functionsCustomHandlerPort)
+	if !ok {
+		port = "8080"
+	}
+
+	router := http.NewServeMux()
+	app := &functionApp{
 		httpServer: &http.Server{
 			Addr:         os.Getenv(functionsCustomHandlerHost) + ":" + port,
 			Handler:      router,
@@ -103,7 +134,7 @@ func NewFunctionApp(options ...FunctionAppOption) *FunctionApp {
 }
 
 // Start the FunctionApp.
-func (a FunctionApp) Start() error {
+func (a functionApp) Start() error {
 	if len(a.functions) == 0 {
 		return ErrNoFunction
 	}
@@ -144,7 +175,7 @@ func (a FunctionApp) Start() error {
 }
 
 // stop the FunctionApp.
-func (a FunctionApp) stop() {
+func (a functionApp) stop() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-stop
@@ -161,7 +192,7 @@ func (a FunctionApp) stop() {
 }
 
 // AddFunction adds a function to the FunctionApp.
-func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
+func (a *functionApp) AddFunction(name string, options ...FunctionOption) {
 	if a.functions == nil {
 		a.functions = make(map[string]function)
 	}
@@ -174,13 +205,23 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 	a.functions[name] = f
 }
 
+// Add a function to the FunctionApp.
+func (a *functionApp) Add(name string, options ...FunctionOption) {
+	a.AddFunction(name, options...)
+}
+
+// Register a function to the FunctionApp.
+func (a *functionApp) Register(name string, options ...FunctionOption) {
+	a.AddFunction(name, options...)
+}
+
 // handler takes the provided function, creates a *Context and a trigger
 // and executes the function on the route it has been configured
 // with (the function name).
-func (a FunctionApp) handler(fn function) http.Handler {
+func (a functionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
-			Output:   NewOutput(WithBindings(fn.bindings...)),
+			Outputs:  newOutputs(withOutputs(fn.outputs...)),
 			log:      a.log,
 			services: a.services,
 			clients:  a.clients,
@@ -193,7 +234,7 @@ func (a FunctionApp) handler(fn function) http.Handler {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(ctx.Output.JSON())
+		w.Write(ctx.Outputs.json())
 	})
 }
 
@@ -201,7 +242,7 @@ func (a FunctionApp) handler(fn function) http.Handler {
 // called multiple times. If a service with the same name
 // has been set it will be overwritten.
 func WithService(name string, service any) FunctionAppOption {
-	return func(f *FunctionApp) {
+	return func(f *functionApp) {
 		f.services.Add(name, service)
 	}
 }
@@ -210,7 +251,7 @@ func WithService(name string, service any) FunctionAppOption {
 // called multiple times. If a client with the same name
 // has been set it will be overwritten.
 func WithClient(name string, client any) FunctionAppOption {
-	return func(f *FunctionApp) {
+	return func(f *functionApp) {
 		f.clients.Add(name, client)
 	}
 }
@@ -218,7 +259,7 @@ func WithClient(name string, client any) FunctionAppOption {
 // WithLogger sets the provided logger to the FunctionApp.
 // The logger must satisfy the logger interface.
 func WithLogger(log logger) FunctionAppOption {
-	return func(f *FunctionApp) {
+	return func(f *functionApp) {
 		f.log = log
 	}
 }
