@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/output"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -19,7 +19,7 @@ func TestNewOutput(t *testing.T) {
 			name:  "Output with defaults",
 			input: nil,
 			want: Output{
-				Outputs:     map[string]bindable{},
+				Outputs:     map[string]outputable{},
 				Logs:        nil,
 				ReturnValue: nil,
 			},
@@ -28,21 +28,21 @@ func TestNewOutput(t *testing.T) {
 			name: "Output with options",
 			input: []OutputOption{
 				func(o *OutputOptions) {
-					o.Bindings = []bindable{
-						bindings.NewHTTP(),
-						bindings.NewGeneric("queue"),
+					o.Bindings = []outputable{
+						output.NewHTTP(),
+						output.NewGeneric("queue"),
 					}
 					o.Logs = []string{"Log message"}
 					o.ReturnValue = 0
 				},
 			},
 			want: Output{
-				Outputs: map[string]bindable{
-					"queue": bindings.NewGeneric("queue"),
+				Outputs: map[string]outputable{
+					"queue": output.NewGeneric("queue"),
 				},
 				Logs:        []string{"Log message"},
 				ReturnValue: 0,
-				http:        bindings.NewHTTP(),
+				http:        output.NewHTTP(),
 			},
 		},
 	}
@@ -51,7 +51,7 @@ func TestNewOutput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := NewOutput(test.input...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Output{}, bindings.HTTP{}, bindings.Generic{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Output{}, output.HTTP{}, output.Generic{})); diff != "" {
 				t.Errorf("NewOutput() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
@@ -67,12 +67,12 @@ func TestOutput_JSON(t *testing.T) {
 		{
 			name: "Parse output to JSON",
 			input: Output{
-				Outputs: map[string]bindable{
-					"queue": bindings.NewGeneric("queue", func(o *bindings.GenericOptions) {
+				Outputs: map[string]outputable{
+					"queue": output.NewGeneric("queue", func(o *output.GenericOptions) {
 						o.Data = []byte(`{"message":"hello","number":3}`)
 					}),
 				},
-				http: bindings.NewHTTP(func(o *bindings.HTTPOptions) {
+				http: output.NewHTTP(func(o *output.HTTPOptions) {
 					o.StatusCode = http.StatusOK
 					o.Body = data.Raw(`{"message":"hello","number":2}`)
 					o.Header = http.Header{

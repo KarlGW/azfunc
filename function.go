@@ -28,22 +28,22 @@ var (
 // function is an internal structure that represents a function
 // in a FunctionApp.
 type function struct {
-	name     string
-	trigger  triggerable
-	bindings []bindable
+	name    string
+	trigger triggerable
+	outputs []outputable
 }
 
 // FunctionOption sets options to the function.
 type FunctionOption func(f *function)
 
-// Binding sets the provided binding to the function.
-func Binding(binding bindable) FunctionOption {
+// WithOutput sets the provided output binding to the function.
+func WithOutput(output outputable) FunctionOption {
 	return func(f *function) {
-		if f.bindings == nil {
-			f.bindings = []bindable{binding}
+		if f.outputs == nil {
+			f.outputs = []outputable{output}
 			return
 		}
-		f.bindings = append(f.bindings, binding)
+		f.outputs = append(f.outputs, output)
 	}
 }
 
@@ -180,7 +180,7 @@ func (a *FunctionApp) AddFunction(name string, options ...FunctionOption) {
 func (a FunctionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Context{
-			Output:   NewOutput(WithBindings(fn.bindings...)),
+			Output:   NewOutput(WithOutputs(fn.outputs...)),
 			log:      a.log,
 			services: a.services,
 			clients:  a.clients,

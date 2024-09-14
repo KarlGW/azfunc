@@ -3,12 +3,12 @@ package azfunc
 import (
 	"encoding/json"
 
-	"github.com/KarlGW/azfunc/bindings"
 	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/output"
 )
 
-// bindable is the interface that wraps around methods Data, Name and Write.
-type bindable interface {
+// outputable is the interface that wraps around methods Data, Name and Write.
+type outputable interface {
 	// Data returns the data of the binding.
 	Data() data.Raw
 	// Name returns the name of the binding.
@@ -19,9 +19,9 @@ type bindable interface {
 
 // Output represents an outgoing response to the Functuon Host.
 type Output struct {
-	Outputs     map[string]bindable
+	Outputs     map[string]outputable
 	ReturnValue any
-	http        *bindings.HTTP
+	http        *output.HTTP
 	Logs        []string
 }
 
@@ -40,7 +40,7 @@ func (o Output) MarshalJSON() ([]byte, error) {
 	}
 
 	for key, binding := range o.Outputs {
-		if b, ok := binding.(*bindings.HTTP); ok {
+		if b, ok := binding.(*output.HTTP); ok {
 			temp.Outputs[key] = b
 		} else {
 			temp.Outputs[key] = binding.Data()
@@ -59,14 +59,14 @@ func (o Output) JSON() []byte {
 	return b
 }
 
-// AddBindings one or more bindings to Output.
-func (o *Output) AddBindings(bindables ...bindable) {
+// AddBindings one or more output bindings to Output.
+func (o *Output) AddBindings(bindings ...outputable) {
 	if o.Outputs == nil {
-		o.Outputs = make(map[string]bindable, len(bindables))
+		o.Outputs = make(map[string]outputable, len(bindings))
 	}
 
-	for _, binding := range bindables {
-		if b, ok := binding.(*bindings.HTTP); ok {
+	for _, binding := range bindings {
+		if b, ok := binding.(*output.HTTP); ok {
 			o.http = b
 		} else {
 			o.Outputs[binding.Name()] = binding
@@ -87,23 +87,23 @@ func (o *Output) SetReturnValue(v any) {
 	o.ReturnValue = v
 }
 
-// Binding returns the binding with the provided name, if no binding
-// with that name exists, return a new generic binding with the
+// Binding returns the output binding with the provided name, if no output binding
+// with that name exists, return a new generic output binding with the
 // provided name.
-func (o Output) Binding(name string) bindable {
+func (o Output) Binding(name string) outputable {
 	binding, ok := o.Outputs[name]
 	if !ok {
-		o.Outputs[name] = bindings.NewGeneric(name)
+		o.Outputs[name] = output.NewGeneric(name)
 		return o.Outputs[name]
 	}
 	return binding
 }
 
-// HTTP returns the HTTP binding of output if any is set.
+// HTTP returns the HTTP output binding if any is set.
 // If not set it will create, set and return it.
-func (o *Output) HTTP() *bindings.HTTP {
+func (o *Output) HTTP() *output.HTTP {
 	if o.http == nil {
-		o.http = bindings.NewHTTP()
+		o.http = output.NewHTTP()
 		return o.http
 	}
 	return o.http
@@ -113,15 +113,15 @@ func (o *Output) HTTP() *bindings.HTTP {
 // Output.
 type OutputOptions struct {
 	ReturnValue any
-	http        *bindings.HTTP
-	Bindings    []bindable
+	http        *output.HTTP
+	Bindings    []outputable
 	Logs        []string
 }
 
 // Output option is a function that sets OutputOptions.
 type OutputOption func(o *OutputOptions)
 
-// NewOutput creates a new Output containing binding to be used for creating
+// NewOutput creates a new Output containing output bindings to be used for creating
 // the response back to the Function host.
 func NewOutput(options ...OutputOption) Output {
 	opts := OutputOptions{}
@@ -145,11 +145,11 @@ func NewOutput(options ...OutputOption) Output {
 	return output
 }
 
-// WithBindings add one or more bindings to OutputOptions
-func WithBindings(bindables ...bindable) OutputOption {
+// WithOutputs add one or more output bindings to OutputOptions
+func WithOutputs(outputables ...outputable) OutputOption {
 	return func(o *OutputOptions) {
-		for _, binding := range bindables {
-			if b, ok := binding.(*bindings.HTTP); ok {
+		for _, binding := range outputables {
+			if b, ok := binding.(*output.HTTP); ok {
 				o.http = b
 			} else {
 				o.Bindings = append(o.Bindings, binding)

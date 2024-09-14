@@ -3,7 +3,7 @@ package azfunc
 import (
 	"net/http"
 
-	"github.com/KarlGW/azfunc/triggers"
+	"github.com/KarlGW/azfunc/trigger"
 )
 
 // triggerable is the interface that wraps around the method run.
@@ -12,18 +12,18 @@ type triggerable interface {
 }
 
 // GenericTriggerFunc represents a generic function to be executed by the function app.
-type GenericTriggerFunc func(ctx *Context, trigger *triggers.Generic) error
+type GenericTriggerFunc func(ctx *Context, trigger *trigger.Generic) error
 
 // genericTrigger contains the trigger func, name and options of the trigger.
 type genericTrigger struct {
 	fn      GenericTriggerFunc
 	name    string
-	options []triggers.GenericOption
+	options []trigger.GenericOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t genericTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewGeneric(r, t.name, t.options...)
+	tr, err := trigger.NewGeneric(r, t.name, t.options...)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func (t genericTrigger) run(ctx *Context, r *http.Request) error {
 
 // GenericTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func GenericTrigger(name string, fn GenericTriggerFunc, options ...triggers.GenericOption) FunctionOption {
+func GenericTrigger(name string, fn GenericTriggerFunc, options ...trigger.GenericOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = genericTrigger{
 			fn:      fn,
@@ -43,17 +43,17 @@ func GenericTrigger(name string, fn GenericTriggerFunc, options ...triggers.Gene
 }
 
 // HTTPTriggerFunc represents an HTTP trigger function to be executed by the function app.
-type HTTPTriggerFunc func(ctx *Context, trigger *triggers.HTTP) error
+type HTTPTriggerFunc func(ctx *Context, trigger *trigger.HTTP) error
 
 // httpTrigger contains the trigger func and name of the trigger.
 type httpTrigger struct {
 	fn      HTTPTriggerFunc
-	options []triggers.HTTPOption
+	options []trigger.HTTPOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t httpTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewHTTP(r, t.options...)
+	tr, err := trigger.NewHTTP(r, t.options...)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (t httpTrigger) run(ctx *Context, r *http.Request) error {
 
 // HTTPTrigger takes the provided function and sets it as
 // the function to be run by the trigger.
-func HTTPTrigger(fn HTTPTriggerFunc, options ...triggers.HTTPOption) FunctionOption {
+func HTTPTrigger(fn HTTPTriggerFunc, options ...trigger.HTTPOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = httpTrigger{
 			fn:      fn,
@@ -72,17 +72,17 @@ func HTTPTrigger(fn HTTPTriggerFunc, options ...triggers.HTTPOption) FunctionOpt
 }
 
 // TimerTriggerFunc represents a Timer trigger function tp be executed by the function app.
-type TimerTriggerFunc func(ctx *Context, trigger *triggers.Timer) error
+type TimerTriggerFunc func(ctx *Context, trigger *trigger.Timer) error
 
 // timerTrigger contains the trigger func and name of the trigger.
 type timerTrigger struct {
 	fn      TimerTriggerFunc
-	options []triggers.TimerOption
+	options []trigger.TimerOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t timerTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewTimer(r, t.options...)
+	tr, err := trigger.NewTimer(r, t.options...)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (t timerTrigger) run(ctx *Context, r *http.Request) error {
 
 // TimerTrigger takes the provided function and sets it as
 // the function to be run by the trigger.
-func TimerTrigger(fn TimerTriggerFunc, options ...triggers.TimerOption) FunctionOption {
+func TimerTrigger(fn TimerTriggerFunc, options ...trigger.TimerOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = timerTrigger{
 			fn:      fn,
@@ -102,18 +102,18 @@ func TimerTrigger(fn TimerTriggerFunc, options ...triggers.TimerOption) Function
 
 // QueueTriggerFunc represents a Queue Storage trigger function to be exexuted
 // by the function app.
-type QueueTriggerFunc func(ctx *Context, trigger *triggers.Queue) error
+type QueueTriggerFunc func(ctx *Context, trigger *trigger.Queue) error
 
 // queueTrigger contains the trigger func, name and options of the trigger.
 type queueTrigger struct {
 	fn      QueueTriggerFunc
 	name    string
-	options []triggers.QueueOption
+	options []trigger.QueueOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t queueTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewQueue(r, t.name, t.options...)
+	tr, err := trigger.NewQueue(r, t.name, t.options...)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (t queueTrigger) run(ctx *Context, r *http.Request) error {
 
 // QueueTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func QueueTrigger(name string, fn QueueTriggerFunc, options ...triggers.QueueOption) FunctionOption {
+func QueueTrigger(name string, fn QueueTriggerFunc, options ...trigger.QueueOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = queueTrigger{
 			fn:      fn,
@@ -134,18 +134,18 @@ func QueueTrigger(name string, fn QueueTriggerFunc, options ...triggers.QueueOpt
 
 // ServiceBusTriggerFunc represents a Service Bus trigger function to be exexuted
 // by the function app.
-type ServiceBusTriggerFunc func(ctx *Context, trigger *triggers.ServiceBus) error
+type ServiceBusTriggerFunc func(ctx *Context, trigger *trigger.ServiceBus) error
 
 // serviceBusTrigger contains the trigger func, name and options of the trigger.
 type serviceBusTrigger struct {
 	fn      ServiceBusTriggerFunc
 	name    string
-	options []triggers.ServiceBusOption
+	options []trigger.ServiceBusOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t serviceBusTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewServiceBus(r, t.name, t.options...)
+	tr, err := trigger.NewServiceBus(r, t.name, t.options...)
 	if err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func (t serviceBusTrigger) run(ctx *Context, r *http.Request) error {
 
 // ServiceBusTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc, options ...triggers.ServiceBusOption) FunctionOption {
+func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc, options ...trigger.ServiceBusOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = serviceBusTrigger{
 			fn:      fn,
@@ -166,18 +166,18 @@ func ServiceBusTrigger(name string, fn ServiceBusTriggerFunc, options ...trigger
 
 // EventGridTriggerFunc represents an Event Grid trigger function to be executed by
 // the function app.
-type EventGridTriggerFunc func(ctx *Context, trigger *triggers.EventGrid) error
+type EventGridTriggerFunc func(ctx *Context, trigger *trigger.EventGrid) error
 
 // eventGridTrigger contains the trigger func, name and options of the trigger.
 type eventGridTrigger struct {
 	fn      EventGridTriggerFunc
 	name    string
-	options []triggers.EventGridOption
+	options []trigger.EventGridOption
 }
 
 // run creates the trigger and runs the trigger func.
 func (t eventGridTrigger) run(ctx *Context, r *http.Request) error {
-	tr, err := triggers.NewEventGrid(r, t.name, t.options...)
+	tr, err := trigger.NewEventGrid(r, t.name, t.options...)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (t eventGridTrigger) run(ctx *Context, r *http.Request) error {
 
 // EventGridTrigger takes the provided name and function and sets it as
 // the function to be run by the trigger.
-func EventGridTrigger(name string, fn EventGridTriggerFunc, options ...triggers.EventGridOption) FunctionOption {
+func EventGridTrigger(name string, fn EventGridTriggerFunc, options ...trigger.EventGridOption) FunctionOption {
 	return func(f *function) {
 		f.trigger = eventGridTrigger{
 			fn:      fn,
