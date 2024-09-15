@@ -92,17 +92,13 @@ func NewFunctionApp(options ...FunctionAppOption) *functionApp {
 		},
 		functions: make(map[string]function),
 		router:    router,
+		log:       setupLogger(),
 		stopCh:    make(chan os.Signal),
 		errCh:     make(chan error),
 	}
+
 	for _, option := range options {
 		option(app)
-	}
-	if app.log == nil {
-		app.log = NewLogger()
-	}
-	if parseBool(os.Getenv(functionsDisableLogging)) {
-		app.log = noOpLogger{}
 	}
 
 	return app
@@ -291,4 +287,12 @@ func (c clients) Get(name string) any {
 // Everything but "true" and "1" will return false.
 func parseBool(s string) bool {
 	return s == "true" || s == "1"
+}
+
+// setupLogger sets up the logger for the function app.
+func setupLogger() logger {
+	if parseBool(os.Getenv(functionsDisableLogging)) {
+		return noOpLogger{}
+	}
+	return NewLogger()
 }
