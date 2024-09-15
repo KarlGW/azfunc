@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
+	app := azfunc.NewFunctionApp()
 
 	app.AddFunction("hello-timer", azfunc.TimerTrigger(func(ctx *azfunc.Context, trigger *trigger.Timer) error {
 		ctx.Log().Info("timer ran")
