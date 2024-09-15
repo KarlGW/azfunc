@@ -289,7 +289,8 @@ func parseBool(s string) bool {
 	return s == "true" || s == "1"
 }
 
-// setupLogger sets up the logger for the function app.
+// setupLogger determines if logging should be disabled or not
+// based on an environment variable.
 func setupLogger() logger {
 	if parseBool(os.Getenv(functionsDisableLogging)) {
 		return noOpLogger{}
