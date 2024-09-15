@@ -68,6 +68,7 @@ func newContext(ctx context.Context, options ...contextOption) *Context {
 		c = ctx
 	}
 
+	c.Outputs = opts.outputs
 	c.log = opts.log
 	c.services = opts.services
 	c.clients = opts.clients
