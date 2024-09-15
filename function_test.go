@@ -41,7 +41,6 @@ func TestSetupLogger(t *testing.T) {
 			}
 
 			got := setupLogger()
-
 			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Logger{}, noOpLogger{}), cmpopts.IgnoreFields(Logger{}, "stdout", "stderr")); diff != "" {
 				t.Errorf("setupLogger() = unexpected result (-want +got)\n%s\n", diff)
 			}
@@ -85,7 +84,6 @@ func TestParseBool(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got := parseBool(test.input)
-
 			if test.want != got {
 				t.Errorf("parseBool() = unexpected result, want: %v, got: %v\n", test.want, got)
 			}
