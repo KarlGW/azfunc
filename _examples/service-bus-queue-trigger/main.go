@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
+	app := azfunc.NewFunctionApp()
 
 	app.AddFunction("hello-sb-queue", azfunc.ServiceBusTrigger("queue", func(ctx *azfunc.Context, trigger *trigger.ServiceBus) error {
 		// Parse the incoming service bus queue trigger body into the custom type.

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	app := azfunc.NewFunctionApp(azfunc.WithLogger(azfunc.NewLogger()))
+	app := azfunc.NewFunctionApp()
 
 	app.AddFunction("hello-http-queue", azfunc.HTTPTrigger(func(ctx *azfunc.Context, trigger *trigger.HTTP) error {
 		// Parse the incoming trigger body into the custom type.

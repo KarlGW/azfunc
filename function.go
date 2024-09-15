@@ -17,6 +17,9 @@ const (
 	// functionsCustomHandlerHost is the environment variable that
 	// contains the host for the custom handler.
 	functionsCustomHandlerHost = "FUNCTIONS_CUSTOMHANDLER_HOST"
+	// functionsDisableLogging is the environment variable that
+	// disables logging for the function app.
+	functionsDisableLogging = "FUNCTIONS_DISABLE_LOGGING"
 )
 
 var (
@@ -89,14 +92,13 @@ func NewFunctionApp(options ...FunctionAppOption) *functionApp {
 		},
 		functions: make(map[string]function),
 		router:    router,
+		log:       setupLogger(),
 		stopCh:    make(chan os.Signal),
 		errCh:     make(chan error),
 	}
+
 	for _, option := range options {
 		option(app)
-	}
-	if app.log == nil {
-		app.log = noOpLogger{}
 	}
 
 	return app
@@ -104,33 +106,7 @@ func NewFunctionApp(options ...FunctionAppOption) *functionApp {
 
 // New creates and configures a FunctionApp.
 func New(options ...FunctionAppOption) *functionApp {
-	port, ok := os.LookupEnv(functionsCustomHandlerPort)
-	if !ok {
-		port = "8080"
-	}
-
-	router := http.NewServeMux()
-	app := &functionApp{
-		httpServer: &http.Server{
-			Addr:         os.Getenv(functionsCustomHandlerHost) + ":" + port,
-			Handler:      router,
-			ReadTimeout:  time.Second * 30,
-			WriteTimeout: time.Second * 30,
-			IdleTimeout:  time.Second * 60,
-		},
-		functions: make(map[string]function),
-		router:    router,
-		stopCh:    make(chan os.Signal),
-		errCh:     make(chan error),
-	}
-	for _, option := range options {
-		option(app)
-	}
-	if app.log == nil {
-		app.log = noOpLogger{}
-	}
-
-	return app
+	return NewFunctionApp(options...)
 }
 
 // Start the FunctionApp.
@@ -264,6 +240,13 @@ func WithLogger(log logger) FunctionAppOption {
 	}
 }
 
+// WithDisableLogging disables logging for the FunctionApp.
+func WithDisableLogging() FunctionAppOption {
+	return func(f *functionApp) {
+		f.log = noOpLogger{}
+	}
+}
+
 // services is intended to hold custom services to be used within the
 // Function App. Both services and clients both exists just for semantics,
 // and either can be used.
@@ -298,4 +281,19 @@ func (c clients) Add(name string, client any) {
 // Get a client.
 func (c clients) Get(name string) any {
 	return c[name]
+}
+
+// parseBool parses a string to a boolean.
+// Everything but "true" and "1" will return false.
+func parseBool(s string) bool {
+	return s == "true" || s == "1"
+}
+
+// setupLogger determines if logging should be disabled or not
+// based on an environment variable.
+func setupLogger() logger {
+	if parseBool(os.Getenv(functionsDisableLogging)) {
+		return noOpLogger{}
+	}
+	return NewLogger()
 }
