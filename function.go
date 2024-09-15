@@ -220,12 +220,12 @@ func (a *functionApp) Register(name string, options ...FunctionOption) {
 // with (the function name).
 func (a functionApp) handler(fn function) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := &Context{
-			Outputs:  newOutputs(withOutputs(fn.outputs...)),
-			log:      a.log,
-			services: a.services,
-			clients:  a.clients,
-		}
+		ctx := newContext(context.Background(), func(o *contextOptions) {
+			o.outputs = newOutputs(withOutputs(fn.outputs...))
+			o.log = a.log
+			o.services = a.services
+			o.clients = a.clients
+		})
 
 		if err := fn.trigger.run(ctx, r); err != nil {
 			a.log.Error(err.Error())
