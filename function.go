@@ -18,7 +18,7 @@ const (
 	// contains the host for the custom handler.
 	functionsCustomHandlerHost = "FUNCTIONS_CUSTOMHANDLER_HOST"
 	// functionsDisableLogging is the environment variable that
-	// disables logging for the FunctionApp.
+	// disables logging for the function app.
 	functionsDisableLogging = "FUNCTIONS_DISABLE_LOGGING"
 )
 
