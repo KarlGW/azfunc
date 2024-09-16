@@ -2,9 +2,11 @@ package output
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/uuid"
 )
 
 // EventGrid represents an Event Grid output binding.
@@ -54,14 +56,14 @@ func NewEventGrid(name string, options ...EventGridOption) *EventGrid {
 
 // CloudEvent represents a CloudEvent.
 type CloudEvent struct {
-	Data        any       `json:"data"`
+	Data        any       `json:"data,omitempty"`
 	SpecVersion string    `json:"specversion"`
 	Type        string    `json:"type"`
 	Source      string    `json:"source"`
 	ID          string    `json:"id"`
 	Time        time.Time `json:"time"`
-	Subject     string    `json:"subject"`
-	DataSchema  string    `json:"dataschema"`
+	Subject     string    `json:"subject,omitempty"`
+	DataSchema  string    `json:"dataschema,omitempty"`
 }
 
 // JSON returns the JSON representation of the CloudEvent.
@@ -70,21 +72,55 @@ func (e CloudEvent) JSON() []byte {
 	return b
 }
 
+// CloudEventOptions contains options for a CloudEvent.
+type CloudEventOptions struct {
+	Subject    string
+	DataSchema string
+}
+
+// CloudEventOption is a function that sets options on a CloudEvent.
+type CloudEventOption func(o *CloudEventOptions)
+
 // NewCloudEvent creates a new CloudEvent.
-func NewCloudEvent() CloudEvent {
-	return CloudEvent{}
+func NewCloudEvent(source, eventType string, data any, options ...CloudEventOption) (CloudEvent, error) {
+	if len(source) == 0 {
+		return CloudEvent{}, fmt.Errorf("source is required")
+	}
+	if len(eventType) == 0 {
+		return CloudEvent{}, fmt.Errorf("type (eventType) is required")
+	}
+
+	opts := CloudEventOptions{}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	id, err := uuid.New()
+	if err != nil {
+		return CloudEvent{}, err
+	}
+
+	return CloudEvent{
+		Data:        data,
+		SpecVersion: "1.0",
+		Type:        eventType,
+		Source:      source,
+		ID:          id,
+		Time:        time.Now().UTC(),
+		Subject:     opts.Subject,
+		DataSchema:  opts.DataSchema,
+	}, nil
 }
 
 // EventGridEvent represents an event (EventGrid schema).
 type EventGridEvent struct {
-	Data            any       `json:"data"`
-	Topic           string    `json:"topic"`
-	Subject         string    `json:"subject"`
-	EventType       string    `json:"eventType"`
-	EventTime       time.Time `json:"eventTime"`
-	ID              string    `json:"id"`
-	DataVersion     string    `json:"dataVersion"`
-	MetadataVersion string    `json:"metadataVersion"`
+	Data        any       `json:"data"`
+	Topic       string    `json:"topic"`
+	Subject     string    `json:"subject"`
+	EventType   string    `json:"eventType"`
+	EventTime   time.Time `json:"eventTime"`
+	ID          string    `json:"id"`
+	DataVersion string    `json:"dataVersion"`
 }
 
 // JSON returns the JSON representation of the EventGridEvent.
@@ -93,12 +129,43 @@ func (e EventGridEvent) JSON() []byte {
 	return b
 }
 
-// NewEventGridEvent creates a new EventGridEvent (EventGrid schema).
-func NewEventGridEvent() EventGridEvent {
-	return EventGridEvent{}
+// EventGridEventOptions contains options for an EventGridEvent.
+type EventGridEventOptions struct {
+	Topic string
 }
 
-// NewEvent creates a new event. Default schema is CloudEvents.
-func NewEvent() data.JSONMarshaler {
-	return nil
+// EventGridEventOption is a function that sets options on an EventGridEvent.
+type EventGridEventOption func(o *EventGridEventOptions)
+
+// NewEventGridEvent creates a new EventGridEvent (EventGrid schema).
+func NewEventGridEvent(subject, eventType string, data any, options ...EventGridEventOption) (EventGridEvent, error) {
+	if len(subject) == 0 {
+		return EventGridEvent{}, fmt.Errorf("subject is required")
+	}
+	if len(eventType) == 0 {
+		return EventGridEvent{}, fmt.Errorf("eventType is required")
+	}
+	if data == nil {
+		return EventGridEvent{}, fmt.Errorf("data is required")
+	}
+
+	opts := EventGridEventOptions{}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	id, err := uuid.New()
+	if err != nil {
+		return EventGridEvent{}, err
+	}
+
+	return EventGridEvent{
+		Data:        data,
+		Topic:       opts.Topic,
+		Subject:     subject,
+		EventType:   eventType,
+		EventTime:   time.Now().UTC(),
+		ID:          id,
+		DataVersion: "1.0",
+	}, nil
 }
