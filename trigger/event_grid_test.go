@@ -36,7 +36,7 @@ func TestNewEventGrid(t *testing.T) {
 			},
 			want: &EventGrid{
 				ID:      "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-				Topic:   "topic",
+				Source:  "source",
 				Subject: "subject",
 				Type:    "created",
 				Time:    _testEventGridTime1,
@@ -205,7 +205,7 @@ var eventGridCloudEventRequest1 = []byte(`{
 	"Data": {
 	  "event": {
 		"id": "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
-		"source": "topic",
+		"source": "source",
 		"specversion": "1.0",
 		"type": "created",
 		"subject": "subject",

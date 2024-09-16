@@ -31,14 +31,14 @@ func (s EventGridSchema) String() string {
 }
 
 // EventGrid represents an Event Grid trigger. It handles both
-// Cloud Events and Event Grid events. For both types of events,
-// the 'Topic' is used to describe the source of the event. This
-// to match the nomenclature of the Event Grid service.
+// Cloud Events and Event Grid events. CloudEvents contains
+// source where as an Event Grid event contains topic.
 type EventGrid struct {
 	Time     time.Time
 	Metadata EventGridMetadata
 	ID       string
 	Topic    string
+	Source   string
 	Subject  string
 	Type     string
 	Data     data.Raw
@@ -81,15 +81,15 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 		return nil, ErrTriggerNameIncorrect
 	}
 
-	var topic, typ string
+	var eventType string
 	var eventTime time.Time
 	var schema EventGridSchema
 	if len(d.SpecVersion) > 0 {
-		topic, typ = d.Source, d.Type
+		eventType = d.Type
 		eventTime = d.Time
 		schema = EventGridSchemaCloudEvents
 	} else if len(d.EventType) > 0 {
-		topic, typ = d.Topic, d.EventType
+		eventType = d.EventType
 		eventTime = d.EventTime
 		schema = EventGridSchemaEventGrid
 	} else {
@@ -98,9 +98,10 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 
 	return &EventGrid{
 		ID:       d.ID,
-		Topic:    topic,
+		Topic:    d.Topic,
+		Source:   d.Source,
 		Subject:  d.Subject,
-		Type:     typ,
+		Type:     eventType,
 		Time:     eventTime,
 		Data:     d.Data,
 		Metadata: t.Metadata,
