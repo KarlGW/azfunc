@@ -2,11 +2,18 @@ package output
 
 import (
 	"testing"
+	"time"
 
+	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/eventgrid"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestNewEventGrid(t *testing.T) {
+	type testEvent struct {
+		Message string `json:"message"`
+	}
+
 	var tests = []struct {
 		name  string
 		input struct {
@@ -14,7 +21,46 @@ func TestNewEventGrid(t *testing.T) {
 			options []EventGridOption
 		}
 		want *EventGrid
-	}{}
+	}{
+		{
+			name: "defaults",
+			input: struct {
+				name    string
+				options []EventGridOption
+			}{
+				name:    "event",
+				options: nil,
+			},
+			want: &EventGrid{
+				name: "event",
+				data: nil,
+			},
+		},
+		{
+			name: "with options",
+			input: struct {
+				name    string
+				options []EventGridOption
+			}{
+				name: "event",
+				options: []EventGridOption{
+					func(o *EventGridOptions) {
+						o.Data = func() data.Raw {
+							event, _ := eventgrid.NewCloudEvent("source", "type", testEvent{Message: "hello"}, func(o *eventgrid.CloudEventOptions) {
+								o.ID = "12345"
+								o.Time = time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)
+							})
+							return event.JSON()
+						}()
+					},
+				},
+			},
+			want: &EventGrid{
+				name: "event",
+				data: data.Raw(`{"data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345","time":"2024-01-01T00:00:00+01:00"}`),
+			},
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -29,7 +75,34 @@ func TestNewEventGrid(t *testing.T) {
 
 func TestEventGrid_Write(t *testing.T) {
 	t.Run("Write", func(t *testing.T) {
+		got := &EventGrid{}
+		got.Write([]byte(`{"data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345","time":"2024-01-01T00:00:00+01:00"}`))
+		want := &EventGrid{data: data.Raw(`{"data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345","time":"2024-01-01T00:00:00+01:00"}`)}
 
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(EventGrid{})); diff != "" {
+			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
+		}
+	})
+}
+
+func TestEventGrid_WriteEvent(t *testing.T) {
+	type testEvent struct {
+		Message string `json:"message"`
+	}
+
+	t.Run("WriteEvent", func(t *testing.T) {
+		event, _ := eventgrid.NewCloudEvent("source", "type", testEvent{Message: "hello"}, func(o *eventgrid.CloudEventOptions) {
+			o.ID = "12345"
+			o.Time = time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)
+		})
+
+		got := &EventGrid{}
+		got.WriteEvent(event)
+		want := &EventGrid{data: data.Raw(`{"data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345","time":"2024-01-01T00:00:00+01:00"}`)}
+
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(EventGrid{})); diff != "" {
+			t.Errorf("Write() = unexpected result (-want +got)\n%s\n", diff)
+		}
 	})
 }
 
