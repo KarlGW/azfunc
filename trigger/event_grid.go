@@ -6,29 +6,8 @@ import (
 	"time"
 
 	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/eventgrid"
 )
-
-// EventGridSchema is the type of schema that the Event Grid trigger
-// is using.
-type EventGridSchema int
-
-const (
-	// EventGridSchemaCloudEvents is the CloudEvents schema.
-	EventGridSchemaCloudEvents EventGridSchema = iota
-	// EventGridSchemaEventGrid is the Event Grid schema.
-	EventGridSchemaEventGrid
-)
-
-// String returns the string representation of the EventGridSchema.
-func (s EventGridSchema) String() string {
-	switch s {
-	case EventGridSchemaCloudEvents:
-		return "CloudEvents"
-	case EventGridSchemaEventGrid:
-		return "EventGrid"
-	}
-	return ""
-}
 
 // EventGrid represents an Event Grid trigger. It handles both
 // Cloud Events and Event Grid events. CloudEvents contains
@@ -37,16 +16,22 @@ type EventGrid struct {
 	Time     time.Time
 	Metadata EventGridMetadata
 	ID       string
-	Topic    string
-	Source   string
-	Subject  string
-	Type     string
-	Data     data.Raw
-	Schema   EventGridSchema
+	// Topic is the topic of the event. It is the same as the source
+	// for Cloud Events.
+	Topic string
+	// Source is the source of the event. It is the same as the topic
+	// for Event Grid events.
+	Source  string
+	Subject string
+	Type    string
+	Data    data.Raw
+	Schema  eventgrid.Schema
 }
 
 // EventGridOptions contains options for an Event Grid trigger.
-type EventGridOptions struct{}
+type EventGridOptions struct {
+	Schema eventgrid.Schema
+}
 
 // EventGridOption is a function that sets options on an Event Grid
 // trigger.
@@ -83,15 +68,17 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 
 	var eventType string
 	var eventTime time.Time
-	var schema EventGridSchema
+	var schema eventgrid.Schema
 	if len(d.SpecVersion) > 0 {
 		eventType = d.Type
 		eventTime = d.Time
-		schema = EventGridSchemaCloudEvents
+		schema = eventgrid.SchemaCloudEvents
+		d.Topic = d.Source
 	} else if len(d.EventType) > 0 {
 		eventType = d.EventType
 		eventTime = d.EventTime
-		schema = EventGridSchemaEventGrid
+		schema = eventgrid.SchemaEventGrid
+		d.Source = d.Topic
 	} else {
 		return nil, ErrTriggerPayloadMalformed
 	}
