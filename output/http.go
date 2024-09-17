@@ -34,9 +34,9 @@ type HTTPOption func(o *HTTPOptions)
 
 // MarshalJSON implements custom marshaling to create the
 // required JSON structure as expected by the function host.
-func (b HTTP) MarshalJSON() ([]byte, error) {
-	headers := make(map[string]string, len(b.header))
-	for k, v := range b.header {
+func (o HTTP) MarshalJSON() ([]byte, error) {
+	headers := make(map[string]string, len(o.header))
+	for k, v := range o.header {
 		headers[k] = v[0]
 	}
 
@@ -46,57 +46,57 @@ func (b HTTP) MarshalJSON() ([]byte, error) {
 		Body       data.Raw          `json:"body"`
 	}{
 		Headers:    headers,
-		StatusCode: strconv.Itoa(b.statusCode),
-		Body:       b.body,
+		StatusCode: strconv.Itoa(o.statusCode),
+		Body:       o.body,
 	})
 }
 
 // Data returns the data of the binding.
-func (b HTTP) Data() data.Raw {
-	return b.body
+func (o HTTP) Data() data.Raw {
+	return o.body
 }
 
 // Name returns the name of the binding. In case of an HTTP binding
 // it is always "res".
-func (b HTTP) Name() string {
-	if len(b.name) > 0 {
-		return b.name
+func (o HTTP) Name() string {
+	if len(o.name) > 0 {
+		return o.name
 	}
 	return "res"
 }
 
 // Write the provided data to the body of the HTTP bindings.
-func (b *HTTP) Write(d []byte) (int, error) {
-	b.body = data.Raw(d)
-	return len(b.body), nil
+func (o *HTTP) Write(d []byte) (int, error) {
+	o.body = data.Raw(d)
+	return len(o.body), nil
 }
 
 // WriteHeader sets the response header with the provided
 // status code.
-func (b *HTTP) WriteHeader(statusCode int) {
-	b.statusCode = statusCode
+func (o *HTTP) WriteHeader(statusCode int) {
+	o.statusCode = statusCode
 }
 
 // Header returns the header(s) of the HTTP binding.
-func (b *HTTP) Header() http.Header {
-	if b.header == nil {
-		b.header = http.Header{}
-		return b.header
+func (o *HTTP) Header() http.Header {
+	if o.header == nil {
+		o.header = http.Header{}
+		return o.header
 	}
-	return b.header
+	return o.header
 }
 
 // WriteResponse writes the provided status code, body and options to
 // the HTTP binding. Supports option WithHeader.
-func (b *HTTP) WriteResponse(statusCode int, body []byte, options ...HTTPOption) {
+func (o *HTTP) WriteResponse(statusCode int, body []byte, options ...HTTPOption) {
 	opts := HTTPOptions{}
 	for _, option := range options {
 		option(&opts)
 	}
 
-	b.statusCode = statusCode
-	b.body = data.Raw(body)
-	b.header = opts.Header
+	o.statusCode = statusCode
+	o.body = data.Raw(body)
+	o.header = opts.Header
 }
 
 // NewHTTP creates a new HTTP output binding.
