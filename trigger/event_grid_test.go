@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KarlGW/azfunc/data"
 	"github.com/KarlGW/azfunc/eventgrid"
 	"github.com/google/go-cmp/cmp"
 )
@@ -42,10 +41,16 @@ func TestNewEventGrid(t *testing.T) {
 				Subject: "subject",
 				Type:    "created",
 				Time:    _testEventGridTime1,
-				Data:    data.Raw(`{"id":"4e773554-f6b7-4ea2-b07d-4c5fd5aba741","name":"test"}`),
-				Schema:  eventgrid.SchemaCloudEvents,
+				Data: map[string]any{
+					"id":   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
+					"name": "test",
+				},
+				Schema: eventgrid.SchemaCloudEvents,
 				Metadata: EventGridMetadata{
-					Data: data.Raw(`{"id":"4e773554-f6b7-4ea2-b07d-4c5fd5aba741","name":"test"}`),
+					Data: map[string]any{
+						"id":   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
+						"name": "test",
+					},
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "testevent",
@@ -75,10 +80,16 @@ func TestNewEventGrid(t *testing.T) {
 				Subject: "subject",
 				Type:    "created",
 				Time:    _testEventGridTime1,
-				Data:    data.Raw(`{"id":"4e773554-f6b7-4ea2-b07d-4c5fd5aba741","name":"test"}`),
-				Schema:  eventgrid.SchemaEventGrid,
+				Data: map[string]any{
+					"id":   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
+					"name": "test",
+				},
+				Schema: eventgrid.SchemaEventGrid,
 				Metadata: EventGridMetadata{
-					Data: data.Raw(`{"id":"4e773554-f6b7-4ea2-b07d-4c5fd5aba741","name":"test"}`),
+					Data: map[string]any{
+						"id":   "4e773554-f6b7-4ea2-b07d-4c5fd5aba741",
+						"name": "test",
+					},
 					Metadata: Metadata{
 						Sys: MetadataSys{
 							MethodName: "testevent",

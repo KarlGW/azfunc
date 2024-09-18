@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/KarlGW/azfunc/data"
 	"github.com/KarlGW/azfunc/eventgrid"
 )
 
@@ -24,7 +23,7 @@ type EventGrid struct {
 	Source  string
 	Subject string
 	Type    string
-	Data    data.Raw
+	Data    any
 	Schema  eventgrid.Schema
 }
 
@@ -40,12 +39,16 @@ type EventGridOption func(o *EventGridOptions)
 // EventGridMetadata represents the metadata for an Event Grid trigger.
 type EventGridMetadata struct {
 	Metadata
-	Data data.Raw `json:"data"`
+	Data any `json:"data"`
 }
 
 // Parse the data from the Event Grid trigger into the provided value.
 func (t EventGrid) Parse(v any) error {
-	return json.Unmarshal(t.Data, &v)
+	b, err := json.Marshal(t.Data)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &v)
 }
 
 // NewEventGrid creates and returns an Event Grid trigger from the provided
@@ -117,5 +120,5 @@ type event struct {
 	SpecVersion     string    `json:"specversion"`
 	DataVersion     string    `json:"dataVersion"`
 	MetadataVersion string    `json:"metadataVersion"`
-	Data            data.Raw  `json:"data"`
+	Data            any       `json:"data"`
 }

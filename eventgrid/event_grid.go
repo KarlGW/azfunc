@@ -7,24 +7,14 @@ import (
 )
 
 // Schema represents the schema of the event.
-type Schema int
+type Schema string
 
 const (
 	// CloudEvents is the CloudEvents schema.
-	SchemaCloudEvents Schema = iota
+	SchemaCloudEvents Schema = "CloudEvents"
 	// EventGrid is the Event Grid schema.
-	SchemaEventGrid Schema = iota
+	SchemaEventGrid Schema = "EventGrid"
 )
-
-func (s Schema) String() string {
-	switch s {
-	case SchemaCloudEvents:
-		return "CloudEvents"
-	case SchemaEventGrid:
-		return "EventGrid"
-	}
-	return ""
-}
 
 // EventProvider is an interface that represents an event provider.
 type EventProvider interface {

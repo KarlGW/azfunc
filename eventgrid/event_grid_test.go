@@ -6,7 +6,7 @@ func TestSchema_String(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input Schema
-		want  string
+		want  Schema
 	}{
 		{
 			name:  "cloud events",
@@ -22,7 +22,7 @@ func TestSchema_String(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := test.input.String()
+			got := test.input
 
 			if test.want != got {
 				t.Errorf("String() = unexpected result, want: %s, got: %s\n", test.want, got)
