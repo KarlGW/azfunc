@@ -57,7 +57,7 @@ func TestNewEventGrid(t *testing.T) {
 			},
 			want: &EventGrid{
 				name: "event",
-				data: data.Raw(`{"data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345","time":"2024-01-01T00:00:00+01:00"}`),
+				data: data.Raw(`{"time":"2024-01-01T00:00:00+01:00","data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345"}`),
 			},
 		},
 	}
