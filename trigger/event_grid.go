@@ -28,9 +28,7 @@ type EventGrid struct {
 }
 
 // EventGridOptions contains options for an Event Grid trigger.
-type EventGridOptions struct {
-	Schema eventgrid.Schema
-}
+type EventGridOptions struct{}
 
 // EventGridOption is a function that sets options on an Event Grid
 // trigger.
