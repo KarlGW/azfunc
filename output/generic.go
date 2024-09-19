@@ -22,19 +22,19 @@ type GenericOptions struct {
 type GenericOption func(o *GenericOptions)
 
 // Data returns the data of the binding.
-func (b Generic) Data() data.Raw {
-	return b.data
+func (o Generic) Data() data.Raw {
+	return o.data
 }
 
 // Name returns the name of the binding.
-func (b Generic) Name() string {
-	return b.name
+func (o Generic) Name() string {
+	return o.name
 }
 
 // Write data to the binding.
-func (b *Generic) Write(d []byte) (int, error) {
-	b.data = data.Raw(d)
-	return len(b.data), nil
+func (o *Generic) Write(d []byte) (int, error) {
+	o.data = data.Raw(d)
+	return len(o.data), nil
 }
 
 // NewGeneric creates a new generic output binding.

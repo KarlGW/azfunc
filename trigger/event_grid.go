@@ -5,44 +5,26 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/KarlGW/azfunc/eventgrid"
 )
-
-// EventGridSchema is the type of schema that the Event Grid trigger
-// is using.
-type EventGridSchema int
-
-const (
-	// EventGridSchemaCloudEvents is the CloudEvents schema.
-	EventGridSchemaCloudEvents EventGridSchema = iota
-	// EventGridSchemaEventGrid is the Event Grid schema.
-	EventGridSchemaEventGrid
-)
-
-// String returns the string representation of the EventGridSchema.
-func (s EventGridSchema) String() string {
-	switch s {
-	case EventGridSchemaCloudEvents:
-		return "CloudEvents"
-	case EventGridSchemaEventGrid:
-		return "EventGrid"
-	}
-	return ""
-}
 
 // EventGrid represents an Event Grid trigger. It handles both
-// Cloud Events and Event Grid events. For both types of events,
-// the 'Topic' is used to describe the source of the event. This
-// to match the nomenclature of the Event Grid service.
+// Cloud Events and Event Grid events. CloudEvents contains
+// source where as an Event Grid event contains topic.
 type EventGrid struct {
 	Time     time.Time
 	Metadata EventGridMetadata
 	ID       string
-	Topic    string
-	Subject  string
-	Type     string
-	Data     data.Raw
-	Schema   EventGridSchema
+	// Topic is the topic of the event. It is the same as the source
+	// for Cloud Events.
+	Topic string
+	// Source is the source of the event. It is the same as the topic
+	// for Event Grid events.
+	Source  string
+	Subject string
+	Type    string
+	Data    any
+	Schema  eventgrid.Schema
 }
 
 // EventGridOptions contains options for an Event Grid trigger.
@@ -54,13 +36,17 @@ type EventGridOption func(o *EventGridOptions)
 
 // EventGridMetadata represents the metadata for an Event Grid trigger.
 type EventGridMetadata struct {
+	Data any `json:"data"`
 	Metadata
-	Data data.Raw `json:"data"`
 }
 
 // Parse the data from the Event Grid trigger into the provided value.
 func (t EventGrid) Parse(v any) error {
-	return json.Unmarshal(t.Data, &v)
+	b, err := json.Marshal(t.Data)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &v)
 }
 
 // NewEventGrid creates and returns an Event Grid trigger from the provided
@@ -81,26 +67,29 @@ func NewEventGrid(r *http.Request, name string, options ...EventGridOption) (*Ev
 		return nil, ErrTriggerNameIncorrect
 	}
 
-	var topic, typ string
+	var eventType string
 	var eventTime time.Time
-	var schema EventGridSchema
+	var schema eventgrid.Schema
 	if len(d.SpecVersion) > 0 {
-		topic, typ = d.Source, d.Type
+		eventType = d.Type
 		eventTime = d.Time
-		schema = EventGridSchemaCloudEvents
+		schema = eventgrid.SchemaCloudEvents
+		d.Topic = d.Source
 	} else if len(d.EventType) > 0 {
-		topic, typ = d.Topic, d.EventType
+		eventType = d.EventType
 		eventTime = d.EventTime
-		schema = EventGridSchemaEventGrid
+		schema = eventgrid.SchemaEventGrid
+		d.Source = d.Topic
 	} else {
 		return nil, ErrTriggerPayloadMalformed
 	}
 
 	return &EventGrid{
 		ID:       d.ID,
-		Topic:    topic,
+		Topic:    d.Topic,
+		Source:   d.Source,
 		Subject:  d.Subject,
-		Type:     typ,
+		Type:     eventType,
 		Time:     eventTime,
 		Data:     d.Data,
 		Metadata: t.Metadata,
@@ -118,16 +107,16 @@ type eventGridTrigger struct {
 // all the properties that are included in both the cloud events
 // schema and the event grid schema.
 type event struct {
+	Time            time.Time `json:"time"`
+	EventTime       time.Time `json:"eventTime"`
+	Data            any       `json:"data"`
 	ID              string    `json:"id"`
 	Topic           string    `json:"topic"`
 	Source          string    `json:"source"`
 	Subject         string    `json:"subject"`
 	Type            string    `json:"type"`
 	EventType       string    `json:"eventType"`
-	Time            time.Time `json:"time"`
-	EventTime       time.Time `json:"eventTime"`
 	SpecVersion     string    `json:"specversion"`
 	DataVersion     string    `json:"dataVersion"`
 	MetadataVersion string    `json:"metadataVersion"`
-	Data            data.Raw  `json:"data"`
 }

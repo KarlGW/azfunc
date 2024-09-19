@@ -20,19 +20,19 @@ type QueueOptions struct {
 type QueueOption func(o *QueueOptions)
 
 // Data returns the data of the binding.
-func (b Queue) Data() data.Raw {
-	return b.data
+func (o Queue) Data() data.Raw {
+	return o.data
 }
 
 // Name returns the name of the binding.
-func (b Queue) Name() string {
-	return b.name
+func (o Queue) Name() string {
+	return o.name
 }
 
 // Write data to the binding.
-func (b *Queue) Write(d []byte) (int, error) {
-	b.data = data.Raw(d)
-	return len(b.data), nil
+func (o *Queue) Write(d []byte) (int, error) {
+	o.data = data.Raw(d)
+	return len(o.data), nil
 }
 
 // NewQueue creates a new queue storage output binding.

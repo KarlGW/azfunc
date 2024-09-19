@@ -20,19 +20,19 @@ type ServiceBusOptions struct {
 type ServiceBusOption func(o *ServiceBusOptions)
 
 // Data returns the data of the binding.
-func (b ServiceBus) Data() data.Raw {
-	return b.data
+func (o ServiceBus) Data() data.Raw {
+	return o.data
 }
 
 // Name returns the name of the binding.
-func (b ServiceBus) Name() string {
-	return b.name
+func (o ServiceBus) Name() string {
+	return o.name
 }
 
 // Write data to the binding.
-func (b *ServiceBus) Write(d []byte) (int, error) {
-	b.data = data.Raw(d)
-	return len(b.data), nil
+func (o *ServiceBus) Write(d []byte) (int, error) {
+	o.data = data.Raw(d)
+	return len(o.data), nil
 }
 
 // NewServiceBus creates a new service bus output binding.

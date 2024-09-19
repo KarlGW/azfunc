@@ -161,7 +161,7 @@ func(ctx *azfunc.Context, trigger *trigger.ServiceBus) error
 
 **[Event Grid trigger](https://pkg.go.dev/github.com/KarlGW/azfunc/trigger#EventGrid)**
 
-Triggered by an event to an Azure Event Grid topic subscription.
+Triggered by an event to an Azure Event Grid topic subscription. Supports CloudEvents and Event Grid schemas.
 
 ```go
 func(ctx *azfunc.Context, trigger *trigger.EventGrid) error
@@ -190,6 +190,10 @@ Writes a message to a queue in Azure Queue Storage.
 **[Service Bus output](https://pkg.go.dev/github.com/KarlGW/azfunc/output#Queue)**
 
 Writes a message to a queue or topic subscription in Azure Service Bus.
+
+**[Event Grid output](https://pkg.go.dev/github.com/KarlGW/azfunc/output#EventGrid)**
+
+Writes an event to Event Grid topic. Supports CloudEvents and Event Grid schemas.
 
 **[Generic output](https://pkg.go.dev/github.com/KarlGW/azfunc/output#Generic)**
 
