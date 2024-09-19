@@ -8,13 +8,14 @@ import (
 
 // Event represents an event (Event Grid schema).
 type Event struct {
-	Data        any       `json:"data"`
-	Topic       string    `json:"topic"`
-	Subject     string    `json:"subject"`
-	Type        string    `json:"eventType"`
-	Time        time.Time `json:"eventTime"`
-	ID          string    `json:"id"`
-	DataVersion string    `json:"dataVersion"`
+	Data            any       `json:"data"`
+	Topic           string    `json:"topic"`
+	Subject         string    `json:"subject"`
+	Type            string    `json:"eventType"`
+	Time            time.Time `json:"eventTime"`
+	ID              string    `json:"id"`
+	DataVersion     string    `json:"dataVersion,omitempty"`
+	MetadataVersion string    `json:"metadataVersion,omitempty"`
 }
 
 // JSON returns the JSON representation of the Event.
@@ -25,10 +26,11 @@ func (e Event) JSON() []byte {
 
 // EventOptions contains options for an Event.
 type EventOptions struct {
-	Topic       string
-	ID          string
-	Time        time.Time
-	DataVersion string
+	Topic           string
+	ID              string
+	Time            time.Time
+	DataVersion     string
+	MetadataVersion string
 }
 
 // EventOption is a function that sets options on an Event.
@@ -47,7 +49,8 @@ func NewEvent(subject, eventType string, data any, options ...EventGridEventOpti
 	}
 
 	opts := EventOptions{
-		DataVersion: "1.0",
+		DataVersion:     "1.0",
+		MetadataVersion: "1",
 	}
 	for _, option := range options {
 		option(&opts)
@@ -65,12 +68,13 @@ func NewEvent(subject, eventType string, data any, options ...EventGridEventOpti
 	}
 
 	return Event{
-		Data:        data,
-		Topic:       opts.Topic,
-		Subject:     subject,
-		Type:        eventType,
-		Time:        opts.Time,
-		ID:          opts.ID,
-		DataVersion: opts.DataVersion,
+		Data:            data,
+		Topic:           opts.Topic,
+		Subject:         subject,
+		Type:            eventType,
+		Time:            opts.Time,
+		ID:              opts.ID,
+		DataVersion:     opts.DataVersion,
+		MetadataVersion: opts.MetadataVersion,
 	}, nil
 }

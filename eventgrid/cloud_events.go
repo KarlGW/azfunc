@@ -8,12 +8,12 @@ import (
 
 // CloudEvent represents a CloudEvent.
 type CloudEvent struct {
+	Time        time.Time `json:"time"`
 	Data        any       `json:"data,omitempty"`
 	SpecVersion string    `json:"specversion"`
 	Type        string    `json:"type"`
 	Source      string    `json:"source"`
 	ID          string    `json:"id"`
-	Time        time.Time `json:"time"`
 	Subject     string    `json:"subject,omitempty"`
 	DataSchema  string    `json:"dataschema,omitempty"`
 }
@@ -26,11 +26,11 @@ func (e CloudEvent) JSON() []byte {
 
 // CloudEventOptions contains options for a CloudEvent.
 type CloudEventOptions struct {
+	Time        time.Time
 	ID          string
 	Subject     string
 	DataSchema  string
 	SpecVersion string
-	Time        time.Time
 }
 
 // CloudEventOption is a function that sets options on a CloudEvent.

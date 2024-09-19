@@ -38,8 +38,8 @@ type EventGridOption func(o *EventGridOptions)
 
 // EventGridMetadata represents the metadata for an Event Grid trigger.
 type EventGridMetadata struct {
-	Metadata
 	Data any `json:"data"`
+	Metadata
 }
 
 // Parse the data from the Event Grid trigger into the provided value.
@@ -109,16 +109,16 @@ type eventGridTrigger struct {
 // all the properties that are included in both the cloud events
 // schema and the event grid schema.
 type event struct {
+	Time            time.Time `json:"time"`
+	EventTime       time.Time `json:"eventTime"`
+	Data            any       `json:"data"`
 	ID              string    `json:"id"`
 	Topic           string    `json:"topic"`
 	Source          string    `json:"source"`
 	Subject         string    `json:"subject"`
 	Type            string    `json:"type"`
 	EventType       string    `json:"eventType"`
-	Time            time.Time `json:"time"`
-	EventTime       time.Time `json:"eventTime"`
 	SpecVersion     string    `json:"specversion"`
 	DataVersion     string    `json:"dataVersion"`
 	MetadataVersion string    `json:"metadataVersion"`
-	Data            any       `json:"data"`
 }
