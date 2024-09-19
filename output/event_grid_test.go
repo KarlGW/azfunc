@@ -48,7 +48,7 @@ func TestNewEventGrid(t *testing.T) {
 						o.Data = func() data.Raw {
 							event, _ := eventgrid.NewCloudEvent("source", "type", testEvent{Message: "hello"}, func(o *eventgrid.CloudEventOptions) {
 								o.ID = "12345"
-								o.Time = time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)
+								o.Time = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 							})
 							return event.JSON()
 						}()
@@ -57,7 +57,7 @@ func TestNewEventGrid(t *testing.T) {
 			},
 			want: &EventGrid{
 				name: "event",
-				data: data.Raw(`{"time":"2024-01-01T00:00:00+01:00","data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345"}`),
+				data: data.Raw(`{"time":"2024-01-01T00:00:00Z","data":{"message":"hello"},"specversion":"1.0","type":"type","source":"source","id":"12345"}`),
 			},
 		},
 	}
