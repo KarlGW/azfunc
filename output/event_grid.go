@@ -2,7 +2,6 @@ package output
 
 import (
 	"github.com/KarlGW/azfunc/data"
-	"github.com/KarlGW/azfunc/eventgrid"
 )
 
 // EventGrid represents an Event Grid output binding.
@@ -36,12 +35,6 @@ func (o EventGrid) Name() string {
 func (o *EventGrid) Write(d []byte) (int, error) {
 	o.data = data.Raw(d)
 	return len(o.data), nil
-}
-
-// WriteEvent writes an event to the output binding.
-func (o *EventGrid) WriteEvent(event eventgrid.EventProvider) error {
-	o.data = data.Raw(event.JSON())
-	return nil
 }
 
 // NewEventGrid creates a new Event Grid output binding.

@@ -16,12 +16,6 @@ const (
 	SchemaEventGrid Schema = "EventGrid"
 )
 
-// EventProvider is an interface that represents an event provider.
-type EventProvider interface {
-	Schema() Schema
-	JSON() []byte
-}
-
 // newUUID is a function that generates a new UUID.
 var newUUID = func() (string, error) {
 	return uuid.New()

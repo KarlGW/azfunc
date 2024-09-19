@@ -18,11 +18,6 @@ type CloudEvent struct {
 	DataSchema  string    `json:"dataschema,omitempty"`
 }
 
-// Schema returns the schema of the event.
-func (s CloudEvent) Schema() Schema {
-	return SchemaCloudEvents
-}
-
 // JSON returns the JSON representation of the CloudEvent.
 func (e CloudEvent) JSON() []byte {
 	b, _ := json.Marshal(e)

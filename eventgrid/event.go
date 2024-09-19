@@ -17,11 +17,6 @@ type Event struct {
 	DataVersion string    `json:"dataVersion"`
 }
 
-// Schema returns the schema of the event.
-func (s Event) Schema() Schema {
-	return SchemaEventGrid
-}
-
 // JSON returns the JSON representation of the Event.
 func (e Event) JSON() []byte {
 	b, _ := json.Marshal(e)
