@@ -79,40 +79,56 @@ func newInvocationLogger() invocationLogger {
 	}
 }
 
-// Debug together with Error, Info and Warn satisfies the logger interface.
+// Debug logs at [LevelDebug].
 func (l invocationLogger) Debug(msg string, args ...any) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+
+	if len(l.w.entries) == 0 {
+		l.w.entries = make([]string, 0)
+	}
 
 	l.l.Debug(msg, args...)
 	index := len(l.w.entries) - 1
 	l.w.entries[index] = strings.TrimSuffix(l.w.entries[index], "\n")
 }
 
-// Error together with Debug, Info and Warn satisfies the logger interface.
+// Error logs at [LevelError].
 func (l invocationLogger) Error(msg string, args ...any) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+
+	if len(l.w.entries) == 0 {
+		l.w.entries = make([]string, 0)
+	}
 
 	l.l.Error(msg, args...)
 	index := len(l.w.entries) - 1
 	l.w.entries[index] = strings.TrimSuffix(l.w.entries[index], "\n")
 }
 
-// Info together with Debug, Error and Warn satisfies the logger interface.
+// Info logs at [LevelInfo].
 func (l invocationLogger) Info(msg string, args ...any) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+
+	if len(l.w.entries) == 0 {
+		l.w.entries = make([]string, 0)
+	}
 
 	l.l.Info(msg, args...)
 	index := len(l.w.entries) - 1
 	l.w.entries[index] = strings.TrimSuffix(l.w.entries[index], "\n")
 }
 
-// Warn together with Debug, Info and Error satisfies the logger interface.
+// Warn logs at [LevelWarn].
 func (l invocationLogger) Warn(msg string, args ...any) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+
+	if len(l.w.entries) == 0 {
+		l.w.entries = make([]string, 0)
+	}
 
 	l.l.Warn(msg, args...)
 	index := len(l.w.entries) - 1
@@ -121,6 +137,9 @@ func (l invocationLogger) Warn(msg string, args ...any) {
 
 // Write a message to the log.
 func (l invocationLogger) Write(msg string) {
+	if len(l.w.entries) == 0 {
+		l.w.entries = make([]string, 0)
+	}
 	l.w.Write([]byte(msg))
 }
 
@@ -132,13 +151,16 @@ func (l invocationLogger) Entries() []string {
 	return l.w.entries
 }
 
-// stringWriter writes to an string slice. Used by the invocationLogger.
+// stringWriter writes to a string slice. Used by the invocationLogger.
 type stringWriter struct {
 	entries []string
 }
 
 // Write an entry to the stringWriter.
 func (w *stringWriter) Write(p []byte) (n int, err error) {
+	if len(w.entries) == 0 {
+		w.entries = make([]string, 0)
+	}
 	w.entries = append(w.entries, string(p))
 	return len(p), nil
 }
