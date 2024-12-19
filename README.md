@@ -279,8 +279,8 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) (err error) {
 
 There are two main approaches to logging, both provided in the `azfunc.Context`.
 
-- `ctx.Log()` - Logs to `stdout` (Debug, Info) and `stderr` (Error, Warning).
-- `ctx.Outputs.Log()` - Writes log entries to the output to the function host (invocation logs). It contains the same methods as `ctx.Log()` together with `Write()` which takes a custom string.
+- `ctx.Log()` - Logs to `stdout` (Debug, Info) and `stderr` (Error, Warning). These logs are written in "real time".
+- `ctx.Outputs.Log()` - Writes log entries to the output to the function host (invocation logs). It contains the same methods as `ctx.Log()` together with `Write()` which takes a custom string. These logs are written when the function has run and returned its response to the function host.
 
 Both methods are visible in application insights.
 
