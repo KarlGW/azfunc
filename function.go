@@ -233,7 +233,6 @@ func WithClient(name string, client any) FunctionAppOption {
 }
 
 // WithLogger sets the provided Logger to the FunctionApp.
-// The Logger must satisfy the Logger interface.
 func WithLogger(log Logger) FunctionAppOption {
 	return func(f *functionApp) {
 		f.log = log
