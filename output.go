@@ -18,28 +18,25 @@ type outputable interface {
 }
 
 // outputs represents an outgoing response to the Function Host.
-// Make private? This is not used by exposed functionality.
 type outputs struct {
 	outputs     map[string]outputable
-	returnValue any
+	log         InvocationLogger
 	http        *output.HTTP
-	logs        []string
+	returnValue any
 }
 
 // MarshalJSON implements custom marshaling to produce
 // the required JSON structure as expected by the
 // function host.
 func (o outputs) MarshalJSON() ([]byte, error) {
-	type Alias outputs
-
 	temp := struct {
 		Outputs     map[string]any `json:"Outputs"`
 		ReturnValue any            `json:"ReturnValue"`
 		Logs        []string       `json:"Logs"`
-		Alias
 	}{
-		Outputs: make(map[string]any),
-		Alias:   Alias(o),
+		Outputs:     make(map[string]any),
+		ReturnValue: o.returnValue,
+		Logs:        o.log.Entries(),
 	}
 
 	for key, binding := range o.outputs {
@@ -53,7 +50,35 @@ func (o outputs) MarshalJSON() ([]byte, error) {
 	return json.Marshal(temp)
 }
 
-// json returns the JSON encoding of Output.
+// outputsOptions contains options for creating a new
+// outputs.
+type outputsOptions struct {
+	http    *output.HTTP
+	outputs []outputable
+}
+
+// outputsOption is a function that sets outputsOptions.
+type outputsOption func(o *outputsOptions)
+
+// newOutputs creates a new outputs containing output bindings to be used for creating
+// the response back to the Function host.
+// make private?
+func newOutputs(options ...outputsOption) *outputs {
+	opts := outputsOptions{}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	outputs := &outputs{
+		http: opts.http,
+		log:  newInvocationLogger(),
+	}
+	outputs.Add(opts.outputs...)
+
+	return outputs
+}
+
+// json returns the JSON encoding of outputs.
 func (o outputs) json() []byte {
 	if o.http != nil {
 		o.outputs[o.http.Name()] = o.http
@@ -62,7 +87,7 @@ func (o outputs) json() []byte {
 	return b
 }
 
-// Add one or more output bindings to functionOutput.
+// Add one or more output bindings to outputs.
 func (o *outputs) Add(outputs ...outputable) {
 	if o.outputs == nil {
 		o.outputs = make(map[string]outputable, len(outputs))
@@ -118,41 +143,12 @@ func (o *outputs) HTTP() *output.HTTP {
 	return o.http
 }
 
-// outputsOptions contains options for creating a new
-// Output.
-type outputsOptions struct {
-	returnValue any
-	http        *output.HTTP
-	outputs     []outputable
-	Logs        []string
-}
-
-// outputsOption is a function that sets OutputOptions.
-type outputsOption func(o *outputsOptions)
-
-// newOutputs creates a new outputs containing output bindings to be used for creating
-// the response back to the Function host.
-// make private?
-func newOutputs(options ...outputsOption) *outputs {
-	opts := outputsOptions{}
-	for _, option := range options {
-		option(&opts)
-	}
-
-	var logs []string
-	if len(opts.Logs) > 0 {
-		logs = make([]string, len(opts.Logs))
-		copy(logs, opts.Logs)
-	}
-
-	outputs := &outputs{
-		logs:        logs,
-		returnValue: opts.returnValue,
-		http:        opts.http,
-	}
-	outputs.Add(opts.outputs...)
-
-	return outputs
+// Log returns the invocation logger. The invocation logger writes
+// to the outputs logs field that is used by the function host
+// to handle logging. The log entries are not written until
+// the function has run to completion.
+func (o outputs) Log() InvocationLogger {
+	return o.log
 }
 
 // withOutputs add one or more output bindings to OutputOptions

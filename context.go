@@ -8,8 +8,8 @@ import (
 // bindings, services and clients.
 type Context struct {
 	context.Context
-	// log contains a logger.
-	log logger
+	// log contains a Logger.
+	log Logger
 	// services contains services defined by the user. It is up to the
 	// user to perform type assertion to handle these services.
 	services services
@@ -20,8 +20,8 @@ type Context struct {
 	Outputs *outputs
 }
 
-// Log returns the logger of the Context.
-func (c Context) Log() logger {
+// Log returns the the logger configured for the function app.
+func (c Context) Log() Logger {
 	return c.log
 }
 
@@ -44,7 +44,7 @@ func (c *Context) SetLogger(l logger) {
 // contextOptions contains options for creating a new Context.
 type contextOptions struct {
 	outputs  *outputs
-	log      logger
+	log      Logger
 	services services
 	clients  clients
 }

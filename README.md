@@ -20,6 +20,7 @@ and from the Azure Function host when developing Azure Functions with Custom han
     * [Outputs (output bindings)](#outputs-output-bindings)
     * [Context](#context)
   * [Error handling](#error-handling)
+  * [Logging](#logging)
 * [TODO](#todo)
 
 
@@ -206,10 +207,17 @@ The context is the Function context, named so due to it being called so in the A
 Assuming the `*azfunc.Context` is bound to the name `ctx`:
 
 * `ctx.Log()`:
-    * `ctx.Log().Info()` for info level logs.
-    * `ctx.Log().Error()` for error level logs.
+  * `ctx.Log().Debug()` for debug level logs.
+  * `ctx.Log().Error()` for error level logs.
+  * `ctx.Log().Info()` for info level logs.
+  * `ctx.Log().Warn()` for warning level logs.
 * `ctx.Binding("<binding-name>")` - Provides access to the binding by name. If the binding it hasn't been provided together with the function at registration, it will created as a `*bindings.Generic` (will work as long as a binding with that same name is defined in the functions `function.json`).
-
+* `ctx.Outputs`:
+  * `ctx.Outputs.Log().Debug()` for debug level logs.
+  * `ctx.Outputs.Log().Error()` for error level logs.
+  * `ctx.Outputs.Log().Info()` for info level logs.
+  * `ctx.Outputs.Log().Warn()` for warning level logs.
+  * `ctx.Outputs.Log().Write()` for custom string logs.
 
 ### Error handling
 
@@ -266,6 +274,15 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) (err error) {
     return
 }
 ```
+
+### Logging
+
+There are two main approaches to logging, both provided in the `azfunc.Context`.
+
+- `ctx.Log()` - Logs to `stdout` (Debug, Info) and `stderr` (Error, Warning). These logs are written in "real time".
+- `ctx.Outputs.Log()` - Writes log entries to the output to the function host (invocation logs). It contains the same methods as `ctx.Log()` together with `Write()` which takes a custom string. These logs are written when the function has run and returned its response to the function host.
+
+Both methods are visible in application insights.
 
 ## TODO
 

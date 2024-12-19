@@ -12,7 +12,7 @@ func TestSetupLogger(t *testing.T) {
 	var tests = []struct {
 		name  string
 		input map[string]string
-		want  logger
+		want  Logger
 	}{
 		{
 			name:  "defaults",
@@ -41,7 +41,7 @@ func TestSetupLogger(t *testing.T) {
 			}
 
 			got := setupLogger()
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(Logger{}, noOpLogger{}), cmpopts.IgnoreFields(Logger{}, "stdout", "stderr")); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(logger{}, noOpLogger{}), cmpopts.IgnoreFields(logger{}, "stdout", "stderr")); diff != "" {
 				t.Errorf("setupLogger() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})

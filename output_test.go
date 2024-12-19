@@ -7,6 +7,7 @@ import (
 	"github.com/KarlGW/azfunc/data"
 	"github.com/KarlGW/azfunc/output"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestNewOutput(t *testing.T) {
@@ -20,8 +21,8 @@ func TestNewOutput(t *testing.T) {
 			input: nil,
 			want: &outputs{
 				outputs:     map[string]outputable{},
-				logs:        nil,
 				returnValue: nil,
+				log:         newInvocationLogger(),
 			},
 		},
 		{
@@ -32,17 +33,14 @@ func TestNewOutput(t *testing.T) {
 						output.NewHTTP(),
 						output.NewGeneric("queue"),
 					}
-					o.Logs = []string{"Log message"}
-					o.returnValue = 0
 				},
 			},
 			want: &outputs{
 				outputs: map[string]outputable{
 					"queue": output.NewGeneric("queue"),
 				},
-				logs:        []string{"Log message"},
-				returnValue: 0,
-				http:        output.NewHTTP(),
+				http: output.NewHTTP(),
+				log:  newInvocationLogger(),
 			},
 		},
 	}
@@ -51,7 +49,7 @@ func TestNewOutput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := newOutputs(test.input...)
 
-			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(outputs{}, output.HTTP{}, output.Generic{})); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmp.AllowUnexported(outputs{}, output.HTTP{}, output.Generic{}, invocationLogger{}), cmpopts.IgnoreFields(invocationLogger{}, "l", "w", "mu")); diff != "" {
 				t.Errorf("NewOutput() = unexpected result (-want +got)\n%s\n", diff)
 			}
 		})
@@ -79,8 +77,8 @@ func TestOutput_JSON(t *testing.T) {
 						"Content-Type": {"application/json"},
 					}
 				}),
-				logs:        nil,
 				returnValue: nil,
+				log:         newInvocationLogger(),
 			},
 			want: output1,
 		},
