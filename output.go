@@ -147,7 +147,7 @@ func (o *outputs) HTTP() *output.HTTP {
 // to the outputs logs field that is used by the function host
 // to handle logging. The log entries are not written until
 // the function has run to completion.
-func (o outputs) Log() invocationLogger {
+func (o outputs) Log() InvocationLogger {
 	return o.log
 }
 
