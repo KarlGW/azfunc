@@ -51,13 +51,13 @@ func (o outputs) MarshalJSON() ([]byte, error) {
 }
 
 // outputsOptions contains options for creating a new
-// Output.
+// outputs.
 type outputsOptions struct {
 	http    *output.HTTP
 	outputs []outputable
 }
 
-// outputsOption is a function that sets OutputOptions.
+// outputsOption is a function that sets outputsOptions.
 type outputsOption func(o *outputsOptions)
 
 // newOutputs creates a new outputs containing output bindings to be used for creating
@@ -78,7 +78,7 @@ func newOutputs(options ...outputsOption) *outputs {
 	return outputs
 }
 
-// json returns the JSON encoding of Output.
+// json returns the JSON encoding of outputs.
 func (o outputs) json() []byte {
 	if o.http != nil {
 		o.outputs[o.http.Name()] = o.http
@@ -87,7 +87,7 @@ func (o outputs) json() []byte {
 	return b
 }
 
-// Add one or more output bindings to functionOutput.
+// Add one or more output bindings to outputs.
 func (o *outputs) Add(outputs ...outputable) {
 	if o.outputs == nil {
 		o.outputs = make(map[string]outputable, len(outputs))
