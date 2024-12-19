@@ -20,7 +20,7 @@ type outputable interface {
 // outputs represents an outgoing response to the Function Host.
 type outputs struct {
 	outputs     map[string]outputable
-	log         invocationLogger
+	log         InvocationLogger
 	http        *output.HTTP
 	returnValue any
 }
