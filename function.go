@@ -65,7 +65,7 @@ type functionApp struct {
 	clients clients
 	// log provides logging for the FunctionApp. Defaults to a no-op
 	// logger.
-	log    logger
+	log    Logger
 	stopCh chan os.Signal
 	errCh  chan error
 }
@@ -232,9 +232,9 @@ func WithClient(name string, client any) FunctionAppOption {
 	}
 }
 
-// WithLogger sets the provided logger to the FunctionApp.
-// The logger must satisfy the logger interface.
-func WithLogger(log logger) FunctionAppOption {
+// WithLogger sets the provided Logger to the FunctionApp.
+// The Logger must satisfy the Logger interface.
+func WithLogger(log Logger) FunctionAppOption {
 	return func(f *functionApp) {
 		f.log = log
 	}
@@ -291,7 +291,7 @@ func parseBool(s string) bool {
 
 // setupLogger determines if logging should be disabled or not
 // based on an environment variable.
-func setupLogger() logger {
+func setupLogger() Logger {
 	if parseBool(os.Getenv(functionsDisableLogging)) {
 		return noOpLogger{}
 	}
