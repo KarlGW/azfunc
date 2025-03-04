@@ -156,6 +156,13 @@ func NewHTTP(r *http.Request, options ...HTTPOption) (*HTTP, error) {
 	}
 	d.Metadata = t.Metadata
 
+	canonicalHeaders := make(http.Header, len(d.Headers))
+	for k, v := range d.Headers {
+		canonicalHeaders[http.CanonicalHeaderKey(k)] = v
+	}
+
+	d.Headers = canonicalHeaders
+
 	return &d, nil
 }
 
