@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/KarlGW/azfunc"
-	"github.com/KarlGW/azfunc/trigger"
+	"github.com/potatoattack/azfunc"
+	"github.com/potatoattack/azfunc/trigger"
 )
 
 func main() {

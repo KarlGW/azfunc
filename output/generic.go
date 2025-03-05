@@ -1,6 +1,6 @@
 package output
 
-import "github.com/KarlGW/azfunc/data"
+import "github.com/potatoattack/azfunc/data"
 
 // Generic represents a generic output binding. With custom handlers
 // all bindings that are not HTTP output bindings share the

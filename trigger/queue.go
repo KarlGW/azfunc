@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 )
 
 // Queue represents a Queue Storage trigger.

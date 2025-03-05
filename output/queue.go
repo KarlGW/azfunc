@@ -1,6 +1,6 @@
 package output
 
-import "github.com/KarlGW/azfunc/data"
+import "github.com/potatoattack/azfunc/data"
 
 // Queue represents a Queue Storage output binding.
 type Queue struct {

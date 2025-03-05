@@ -1,6 +1,6 @@
 package output
 
-import "github.com/KarlGW/azfunc/data"
+import "github.com/potatoattack/azfunc/data"
 
 // ServiceBus represents a service bus output binding.
 type ServiceBus struct {

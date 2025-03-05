@@ -3,7 +3,7 @@ package eventgrid
 import (
 	"time"
 
-	"github.com/KarlGW/azfunc/uuid"
+	"github.com/potatoattack/azfunc/uuid"
 )
 
 // Schema represents the schema of the event.

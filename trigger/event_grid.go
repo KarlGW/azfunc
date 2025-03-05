@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/KarlGW/azfunc/eventgrid"
+	"github.com/potatoattack/azfunc/eventgrid"
 )
 
 // EventGrid represents an Event Grid trigger. It handles both

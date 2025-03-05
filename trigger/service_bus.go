@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 )
 
 // ServiceBus represents a Service Bus trigger. It supports both

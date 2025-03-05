@@ -1,7 +1,7 @@
 package output
 
 import (
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 )
 
 // EventGrid represents an Event Grid output binding.

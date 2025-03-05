@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 	"github.com/google/go-cmp/cmp"
 )
 

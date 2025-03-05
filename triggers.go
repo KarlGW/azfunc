@@ -3,7 +3,7 @@ package azfunc
 import (
 	"net/http"
 
-	"github.com/KarlGW/azfunc/trigger"
+	"github.com/potatoattack/azfunc/trigger"
 )
 
 // triggerable is the interface that wraps around the method run.

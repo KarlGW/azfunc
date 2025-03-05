@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KarlGW/azfunc/eventgrid"
+	"github.com/potatoattack/azfunc/eventgrid"
 	"github.com/google/go-cmp/cmp"
 )
 

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/KarlGW/azfunc/data"
-	"github.com/KarlGW/azfunc/output"
+	"github.com/potatoattack/azfunc/data"
+	"github.com/potatoattack/azfunc/output"
 	"github.com/google/go-cmp/cmp"
 )
 

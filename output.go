@@ -3,8 +3,8 @@ package azfunc
 import (
 	"encoding/json"
 
-	"github.com/KarlGW/azfunc/data"
-	"github.com/KarlGW/azfunc/output"
+	"github.com/potatoattack/azfunc/data"
+	"github.com/potatoattack/azfunc/output"
 )
 
 // outputable is the interface that wraps around methods Data, Name and Write.

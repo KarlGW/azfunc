@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 )
 
 var (
@@ -20,11 +20,9 @@ var (
 	ErrHTTPInvalidBody = errors.New("invalid body")
 )
 
-var (
-	// defaultMultipartFormMaxMemory is the default memory to use
-	// when parsing multipart form data.
-	defaultMultipartFormMaxMemory int64 = 32 << 20
-)
+// defaultMultipartFormMaxMemory is the default memory to use
+// when parsing multipart form data.
+var defaultMultipartFormMaxMemory int64 = 32 << 20
 
 // HTTP represents an HTTP trigger.
 type HTTP struct {

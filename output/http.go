@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/KarlGW/azfunc/data"
+	"github.com/potatoattack/azfunc/data"
 )
 
 // HTTP represents an HTTP output binding.

@@ -1,4 +1,4 @@
-module github.com/KarlGW/azfunc
+module github.com/potatoattack/azfunc
 
 go 1.21
 
