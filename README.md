@@ -7,7 +7,6 @@
 The purpose of this module is to provide functions and structures that helps with handling the incoming and outgoing requests to
 and from the Azure Function host when developing Azure Functions with Custom handlers and Go.
 
-
 ## Contents
 
 * [Why use this module?](#why-use-this-module)
@@ -22,7 +21,6 @@ and from the Azure Function host when developing Azure Functions with Custom han
   * [Error handling](#error-handling)
   * [Logging](#logging)
 * [TODO](#todo)
-
 
 ## Why use this module?
 
@@ -118,13 +116,11 @@ Creating this application structure can be done with ease with the help of the F
 
 An example on how to create a function with a HTTP trigger and a HTTP output binding (response) is provided further [below](#http-trigger-and-http-output-binding).
 
-
 ### Concepts
 
 When working with the `FunctionApp` there are some concepts to understand and work with. The `FunctionApp` represents the entire Function App, and it is to this structure the functions (with their trigger and output bindings) that should be run are registered to. Each function that is registered contains a `*azfunc.Context` and a [trigger](#triggers-input-bindings).
 
 The triggers is the triggering event and the data it contains, and the context contains output bindings (and writing to them), output error and logging.
-
 
 #### Triggers (input bindings)
 
@@ -177,7 +173,6 @@ needs to be parsed into a `struct` matching the expected incoming payload.
 func(ctx *azfunc.Context, trigger *trigger.Generic) error
 ```
 
-
 #### Outputs (output bindings)
 
 **[HTTP output](https://pkg.go.dev/github.com/KarlGW/azfunc/output#HTTP)**
@@ -224,6 +219,7 @@ Assuming the `*azfunc.Context` is bound to the name `ctx`:
 The functions provided to the `FunctionApp` returns an error.
 
 As an example: A function is triggered and run and encounters an error for one of it's calls. This error is deemed to be fatal and the function cannot carry on further. Thus we return the error.
+
 ```go
 func run(ctx *azfunc.Context, trigger *trigger.Queue) error {
     if err := someFunc(); err != nil {
@@ -246,7 +242,7 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) error {
         // The incoming request body did not match the expected one,
         // this is equivalent of a HTTP 400 and should not signal to
         // the function host that it has failed, but still
-        // stop further exection and return.
+        // stop further execution and return.
         ctx.Outputs.HTTP().WriteHeader(http.StatusBadRequest)
         return nil
     }
@@ -279,8 +275,8 @@ func run(ctx *azfunc.Context, trigger *trigger.HTTP) (err error) {
 
 There are two main approaches to logging, both provided in the `azfunc.Context`.
 
-- `ctx.Log()` - Logs to `stdout` (Debug, Info) and `stderr` (Error, Warning). These logs are written in "real time".
-- `ctx.Outputs.Log()` - Writes log entries to the output to the function host (invocation logs). It contains the same methods as `ctx.Log()` together with `Write()` which takes a custom string. These logs are written when the function has run and returned its response to the function host.
+* `ctx.Log()` - Logs to `stdout` (Debug, Info) and `stderr` (Error, Warning). These logs are written in "real time".
+* `ctx.Outputs.Log()` - Writes log entries to the output to the function host (invocation logs). It contains the same methods as `ctx.Log()` together with `Write()` which takes a custom string. These logs are written when the function has run and returned its response to the function host.
 
 Both methods are visible in application insights.
 
