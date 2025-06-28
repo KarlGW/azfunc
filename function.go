@@ -224,7 +224,8 @@ func (a functionApp) handler(fn function) http.Handler {
 	})
 }
 
-// WithReadTimeout sets the write timeout for the FunctionApp.
+// WithReadTimeout sets the read timeout for the FunctionApp
+// HTTP server.
 func WithReadTimeout(d time.Duration) FunctionAppOption {
 	return func(f *functionApp) {
 		if d > 0 {
@@ -233,7 +234,8 @@ func WithReadTimeout(d time.Duration) FunctionAppOption {
 	}
 }
 
-// WithWriteTimeout sets the write timeout for the FunctionApp.
+// WithWriteTimeout sets the write timeout for the FunctionApp
+// HTTP server.
 func WithWriteTimeout(d time.Duration) FunctionAppOption {
 	return func(f *functionApp) {
 		if d > 0 {
@@ -242,7 +244,8 @@ func WithWriteTimeout(d time.Duration) FunctionAppOption {
 	}
 }
 
-// WithIdleTimeout sets the idle timeout for the FunctionApp.
+// WithIdleTimeout sets the idle timeout for the FunctionApp
+// HTTP server.
 func WithIdleTimeout(d time.Duration) FunctionAppOption {
 	return func(f *functionApp) {
 		if d > 0 {
