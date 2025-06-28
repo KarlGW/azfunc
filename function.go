@@ -22,11 +22,21 @@ const (
 	functionsDisableLogging = "FUNCTIONS_DISABLE_LOGGING"
 )
 
-var (
-	// ErrNoFunction is returned when no function has been set to the
-	// FunctionApp.
-	ErrNoFunction = errors.New("at least one function must be set")
+const (
+	// defaultReadTimeout is the default read timeout for the
+	// function app's HTTP server.
+	defaultReadTimeout = 30 * time.Second
+	// defaultWriteTimeout is the default write timeout for the
+	// function app's HTTP server.
+	defaultWriteTimeout = 30 * time.Second
+	// defaultIdleTimeout is the default idle timeout for the
+	// function app's HTTP server.
+	defaultIdleTimeout = 60 * time.Second
 )
+
+// ErrNoFunction is returned when no function has been set to the
+// FunctionApp.
+var ErrNoFunction = errors.New("at least one function must be set")
 
 // function is an internal structure that represents a function
 // in a FunctionApp.
@@ -86,9 +96,9 @@ func NewFunctionApp(options ...FunctionAppOption) *functionApp {
 		httpServer: &http.Server{
 			Addr:         os.Getenv(functionsCustomHandlerHost) + ":" + port,
 			Handler:      router,
-			ReadTimeout:  time.Second * 30,
-			WriteTimeout: time.Second * 30,
-			IdleTimeout:  time.Second * 60,
+			ReadTimeout:  defaultReadTimeout,
+			WriteTimeout: defaultWriteTimeout,
+			IdleTimeout:  defaultIdleTimeout,
 		},
 		functions: make(map[string]function),
 		router:    router,
@@ -212,6 +222,33 @@ func (a functionApp) handler(fn function) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(ctx.Outputs.json())
 	})
+}
+
+// WithWriteTimeout sets the write timeout for the FunctionApp.
+func WithReadTimeout(d time.Duration) FunctionAppOption {
+	return func(f *functionApp) {
+		if d > 0 {
+			f.httpServer.ReadTimeout = d
+		}
+	}
+}
+
+// WithWriteTimeout sets the write timeout for the FunctionApp.
+func WithWriteTimeout(d time.Duration) FunctionAppOption {
+	return func(f *functionApp) {
+		if d > 0 {
+			f.httpServer.WriteTimeout = d
+		}
+	}
+}
+
+// WithIdleTimeout sets the idle timeout for the FunctionApp.
+func WithIdleTimeout(d time.Duration) FunctionAppOption {
+	return func(f *functionApp) {
+		if d > 0 {
+			f.httpServer.IdleTimeout = d
+		}
+	}
 }
 
 // WithService sets the provided service to the FunctionApp. Can be
