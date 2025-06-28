@@ -78,6 +78,9 @@ type functionApp struct {
 	log    Logger
 	stopCh chan os.Signal
 	errCh  chan error
+	// shutdownFuncs contains functions that will be called when the
+	// FunctionApp is stopped.
+	shutdownFuncs []func() error
 }
 
 // FunctionAppOption is a function that sets options to a
@@ -172,6 +175,12 @@ func (a functionApp) stop() {
 	a.httpServer.SetKeepAlivesEnabled(false)
 	if err := a.httpServer.Shutdown(ctx); err != nil {
 		a.errCh <- err
+	}
+
+	for _, fn := range a.shutdownFuncs {
+		if err := fn(); err != nil {
+			a.errCh <- err
+		}
 	}
 
 	a.stopCh <- sig
@@ -283,6 +292,18 @@ func WithLogger(log Logger) FunctionAppOption {
 func WithDisableLogging() FunctionAppOption {
 	return func(f *functionApp) {
 		f.log = noOpLogger{}
+	}
+}
+
+// WithShutdownFunc sets a function that will be called when the
+// FunctionApp is stopped. This can be used to perform
+// cleanup operations or to gracefully shutdown dependencies.
+// Can be used multiple times to add multiple shutdown functions.
+func WithShutdownFunc(fn func() error) FunctionAppOption {
+	return func(f *functionApp) {
+		if fn != nil {
+			f.shutdownFuncs = append(f.shutdownFuncs, fn)
+		}
 	}
 }
 
